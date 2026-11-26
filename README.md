@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Start this private backup
 
 This copy restores the database from the Cloudflare-connected local installation, together with its uploads and application encryption keys. Sign in with the same email and password you used on that installation. The copy creates its own browser sessions.
@@ -138,3 +139,6 @@ node tests/browser-smoke.cjs verify
 ```
 
 The smoke test creates sample objective, leave and expense records, verifies role enforcement and approval, and downloads a CSV and PDF. Set `WFI_URL` to the isolated test origin before running browser tests. It reads the optional demo access code from `.env` or the process environment.
+=======
+# M.Tech-Final-Year-Project
+>>>>>>> 4096321282c1941403d310dc26df5ee05e8ec670
