@@ -1,0 +1,11 @@
+const { userScope } = require('../middleware/userScope');
+const r = require('express').Router(), c = require('../controllers/aiController');
+const p = require('../middleware/authMiddleware');
+const { staffOrAbove } = require('../middleware/authMiddleware');
+r.get('/insights',                    p,               c.getAIInsights);
+r.get('/attrition',                   p, staffOrAbove, c.getAttritionDashboard);
+r.get('/attrition/:employee_id',      p, staffOrAbove, c.computeAttritionScore);
+r.get('/burnout/:employee_id',        p, staffOrAbove, c.computeBurnoutScore);
+r.get('/leave-forecast/:employee_id', p, userScope('employee_id', { allowStaff: true }),               c.forecastLeave);
+r.get('/salary-benchmark',            p, staffOrAbove, c.getSalaryBenchmark);
+module.exports = r;

@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Build requests · Workforce Intelligence</title>
+  <link rel="stylesheet" href="/workspace.css">
+  <link rel="stylesheet" href="/modules.css">
+  <link rel="stylesheet" href="/navigation.css">
+  <link rel="stylesheet" href="/preferences.css">
+  <link rel="stylesheet" href="/build-requests.css">
+  <link rel="stylesheet" href="/theme.css">
+  <script src="/navigation.js" defer></script>
+  <script src="/appearance.js" defer></script>
+  <script src="/build-requests.js" defer></script>
+</head>
+<body class="wfi-module-page">
+<main id="main-content">
+  <section class="page-heading">
+    <div>
+      <h1>Build requests</h1>
+      <p>Submit development instructions, claim requests, and copy their prompts to Codex.</p>
+    </div>
+    <a class="action-link" href="/admin-dashboard.html">Admin dashboard</a>
+  </section>
+  <p id="build-message" role="status" aria-live="polite"></p>
+  <div id="build-workspace" class="build-layout" hidden>
+    <section class="records-surface" aria-labelledby="queue-title">
+      <h2 id="queue-title">Request queue</h2>
+      <div class="build-actions">
+        <button type="button" id="claim-next" class="primary" aria-describedby="claim-next-empty" disabled>Pick up next request</button>
+        <button type="button" id="refresh-queue">Refresh</button>
+      </div>
+      <p id="claim-next-empty" hidden>No queued requests to pick up. Refresh to check for new submissions.</p>
+      <div class="build-status-filters" id="build-filters" role="group" aria-label="Filter build requests by status"></div>
+      <div id="queue-list"></div>
+      <button type="button" id="load-older" hidden>Load older requests</button>
+    </section>
+    <section class="records-surface" aria-labelledby="build-submit-title">
+      <h2 id="build-submit-title">New request</h2>
+      <form id="build-create" class="build-form">
+        <label>Title<input name="title" maxlength="150" required></label>
+        <label>Instructions<textarea name="instructions" maxlength="12000" rows="6" required></textarea></label>
+        <label>Acceptance criteria (optional)<textarea name="acceptance_criteria" maxlength="4000" rows="4"></textarea></label>
+        <button class="primary" type="submit">Submit request</button>
+      </form>
+    </section>
+  </div>
+  <section class="records-surface build-detail" id="build-detail" aria-labelledby="build-detail-title" hidden></section>
+</main>
+</body>
+</html>

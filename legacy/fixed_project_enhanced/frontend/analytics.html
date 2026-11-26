@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Analytics – Workforce Intelligence v6.0</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+  body{background:#F0F4F8}
+  .pw{max-width:1080px;margin:0 auto;padding:24px}
+  .card{background:#fff;border-radius:12px;padding:22px;box-shadow:0 2px 12px rgba(0,0,0,.08);border:1px solid #e2e8f0;margin-bottom:18px}
+  .ct{font-weight:700;font-size:14px;margin-bottom:14px;color:#0f172a}
+  .srow{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:10px;margin-bottom:18px}
+  .sc{background:#fff;border-radius:12px;padding:14px 12px;text-align:center;box-shadow:0 2px 10px rgba(0,0,0,.07);border:1px solid #e2e8f0}
+  .sv{font-size:24px;font-weight:700;margin-bottom:2px}
+  .sl{font-size:10px;color:#64748b;font-weight:600;text-transform:uppercase;letter-spacing:.04em}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:18px}
+  .chart-bars{display:flex;align-items:flex-end;gap:5px;height:90px;padding-top:8px}
+  .cb{flex:1;border-radius:3px 3px 0 0;min-width:14px;cursor:pointer;transition:opacity .2s;position:relative}
+  .cb:hover{opacity:.75}
+  .cb-lbl{position:absolute;bottom:-18px;left:50%;transform:translateX(-50%);font-size:9px;color:#94a3b8;white-space:nowrap;font-family:monospace}
+  .pbar{height:7px;background:#f1f5f9;border-radius:3px;margin-top:5px;overflow:hidden}
+  .pfill{height:100%;border-radius:3px;transition:width 1s ease}
+  .perf-row{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+  .perf-av{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:12px;flex-shrink:0}
+  .badge{display:inline-block;padding:2px 8px;border-radius:999px;font-size:10px;font-weight:700}
+  .bg{background:#dcfce7;color:#16a34a}.br{background:#fee2e2;color:#dc2626}.bb{background:#dbeafe;color:#2563eb}
+  .tab-row{display:flex;gap:4px;background:#f1f5f9;padding:4px;border-radius:8px;margin-bottom:16px;flex-wrap:wrap}
+  .tb{padding:6px 14px;border:none;border-radius:6px;cursor:pointer;font-size:11px;font-weight:700;background:transparent;color:#64748b;font-family:inherit}
+  .tb.on{background:#fff;color:#2563eb;box-shadow:0 2px 6px rgba(0,0,0,.07)}
+  @media(max-width:640px){.grid2{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<nav class="navbar">
+  <div class="nav-brand">⚡ Workforce Intelligence v6.0</div>
+  <div class="nav-links">
+    <a href="leaderboard.html" style="color:#fff">🏆 Leaderboard</a>
+    <a href="reports.html" style="color:#fff;margin-left:16px">📈 Reports</a>
+    <a href="javascript:history.back()" style="color:#fff;margin-left:16px">← Back</a>
+    <a href="login.html" onclick="localStorage.clear()" style="color:#fff;margin-left:16px">Logout</a>
+  </div>
+</nav>
+
+<div class="pw">
+  <h2 style="margin-bottom:18px;font-size:1.4rem">📊 Analytics & Intelligence</h2>
+
+  <div class="srow" id="statsRow">
+    <div class="sc"><div class="sv" id="sTasks" style="color:#2563eb">—</div><div class="sl">Total Tasks</div></div>
+    <div class="sc"><div class="sv" id="sDone"  style="color:#16a34a">—</div><div class="sl">Completed</div></div>
+    <div class="sc"><div class="sv" id="sRate"  style="color:#16a34a">—</div><div class="sl">Completion %</div></div>
+    <div class="sc"><div class="sv" id="sOver"  style="color:#dc2626">—</div><div class="sl">Overdue</div></div>
+    <div class="sc"><div class="sv" id="sLeave" style="color:#d97706">—</div><div class="sl">Pending Leaves</div></div>
+    <div class="sc"><div class="sv" id="sIn"    style="color:#0891b2">—</div><div class="sl">Present Today</div></div>
+  </div>
+
+  <div class="tab-row">
+    <button class="tb on" onclick="setTrend('monthly',this)">Monthly</button>
+    <button class="tb" onclick="setTrend('weekly',this)">Weekly</button>
+    <button class="tb" onclick="setTrend('daily',this)">Daily</button>
+    <button class="tb" onclick="setTrend('annual',this)">Annual</button>
+  </div>
+
+  <div class="grid2">
+    <div class="card">
+      <div class="ct">📈 Task Trend</div>
+      <div class="chart-bars" id="trendChart" style="margin-bottom:22px"></div>
+      <div style="display:flex;gap:10px;font-size:10px;color:#64748b;flex-wrap:wrap">
+        <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:10px;background:#2563eb;border-radius:2px"></span>Completed</span>
+        <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:10px;background:#dc2626;border-radius:2px"></span>Overdue</span>
+      </div>
+    </div>
+    <div class="card">
+      <div class="ct">📊 Task Status Breakdown</div>
+      <div id="statusBars"></div>
+    </div>
+  </div>
+
+  <div class="grid2">
+    <div class="card">
+      <div class="ct">🏆 Top Performers</div>
+      <div id="perfList"></div>
+    </div>
+    <div class="card">
+      <div class="ct">📅 Attendance by Department</div>
+      <div id="deptBars"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+const API   = 'http://localhost:5000/api';
+const token = localStorage.getItem('token');
+if (!token) location.href = 'login.html';
+
+const COLORS = ['hsl(200,65%,55%)','hsl(260,65%,55%)','hsl(170,60%,45%)','hsl(220,65%,50%)','hsl(30,65%,55%)','hsl(340,65%,55%)','hsl(50,70%,45%)','hsl(140,55%,45%)','hsl(310,60%,55%)','hsl(160,55%,45%)'];
+
+async function api(path) {
+  const r = await fetch(API+path,{headers:{'Authorization':'Bearer '+token}});
+  return r.json();
+}
+
+async function loadStats() {
+  try {
+    const s = await api('/analytics/hr-summary').catch(() => api('/analytics/summary'));
+    document.getElementById('sTasks').textContent = s.total_tasks   || '—';
+    document.getElementById('sDone' ).textContent = s.completed_tasks || '—';
+    document.getElementById('sRate' ).textContent = (s.completion_rate || 0)+'%';
+    document.getElementById('sOver' ).textContent = s.overdue_tasks  || '—';
+    document.getElementById('sLeave').textContent = s.pending_leaves || '—';
+    document.getElementById('sIn'   ).textContent = s.clocked_in_today !== undefined ? s.clocked_in_today : '—';
+  } catch(e) { console.error(e); }
+}
+
+async function loadTrend(period='monthly') {
+  try {
+    const data = await api('/analytics/'+period);
+    const el   = document.getElementById('trendChart');
+    if (!data.length) { el.innerHTML='<div style="color:#94a3b8;font-size:12px">No data</div>'; return; }
+    const maxVal = Math.max(...data.map(d=>d.total||1));
+    el.innerHTML = data.slice(-8).map(d => {
+      const doneH = Math.round(((d.completed||0)/maxVal)*90);
+      const overH = Math.round(((d.overdue||0)/maxVal)*90);
+      return `<div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:1px;position:relative">
+        <div class="cb" style="height:${overH}px;background:#dc2626;opacity:.6"></div>
+        <div class="cb" style="height:${doneH}px;background:#2563eb">
+          <div class="cb-lbl">${d.label||''}</div>
+        </div>
+      </div>`;
+    }).join('');
+  } catch(e) { console.error(e); }
+}
+
+async function loadPerformers() {
+  try {
+    const data = await api('/analytics/performers');
+    const el   = document.getElementById('perfList');
+    const list = Array.isArray(data) ? data.slice(0,8) : [];
+    const maxPts = list[0] ? (list[0].total_points || list[0].productivity_score || 100) : 100;
+    el.innerHTML = list.map((p,i) => {
+      const pts  = p.total_points || p.productivity_score || 0;
+      const bar  = Math.round((pts/maxPts)*100);
+      const rate = p.completion_rate || 0;
+      return `<div class="perf-row">
+        <div class="perf-av" style="background:${COLORS[i%COLORS.length]}">${(p.full_name||'?')[0]}</div>
+        <div style="flex:1">
+          <div style="font-weight:700;font-size:12px">${p.full_name}</div>
+          <div class="pbar"><div class="pfill" style="width:${bar}%;background:${COLORS[i%COLORS.length]}"></div></div>
+        </div>
+        <div style="text-align:right;white-space:nowrap">
+          <div style="font-family:monospace;font-size:13px;font-weight:600;color:#2563eb">${pts.toLocaleString()}</div>
+          <div style="font-size:10px;color:#94a3b8">${rate}%</div>
+        </div>
+      </div>`;
+    }).join('') || '<div style="color:#94a3b8;font-size:12px">No data</div>';
+  } catch(e) { console.error(e); }
+}
+
+async function loadStatusBars() {
+  try {
+    const data = await api('/analytics/summary');
+    const tasks = data.tasks || {};
+    const total = (tasks.total || 1);
+    const statuses = [
+      ['Completed',   '#16a34a', Math.round(((tasks.completed||0)/total)*100), tasks.completed||0],
+      ['In Progress', '#2563eb', Math.round(((tasks.in_progress||0)/total)*100), tasks.in_progress||0],
+      ['Pending',     '#d97706', Math.round(((tasks.pending||0)/total)*100), tasks.pending||0],
+      ['Overdue',     '#dc2626', Math.round(((tasks.overdue||0)/total)*100), tasks.overdue||0]
+    ];
+    document.getElementById('statusBars').innerHTML = statuses.map(([l,c,v,n]) => `
+      <div style="margin-bottom:14px">
+        <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px">
+          <span style="font-weight:600">${l}</span>
+          <span style="font-family:monospace;color:${c}">${v}% <small style="color:#94a3b8">(${n})</small></span>
+        </div>
+        <div class="pbar"><div class="pfill" style="width:${v}%;background:${c}"></div></div>
+      </div>`).join('');
+  } catch(e) {
+    // Fallback static on API error
+    const statuses = [['Completed','#16a34a',53],['In Progress','#2563eb',32],['Pending','#d97706',10],['Overdue','#dc2626',5]];
+    document.getElementById('statusBars').innerHTML = statuses.map(([l,c,v]) => `
+      <div style="margin-bottom:14px">
+        <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px">
+          <span style="font-weight:600">${l}</span><span style="font-family:monospace;color:${c}">${v}%</span>
+        </div>
+        <div class="pbar"><div class="pfill" style="width:${v}%;background:${c}"></div></div>
+      </div>`).join('');
+  }
+}
+
+async function loadDeptBars() {
+  const COLORS = ['#2563eb','#16a34a','#0891b2','#7c3aed','#d97706','#dc2626','#0d9488','#db2777'];
+  try {
+    const [depts, performers] = await Promise.all([api('/admin/departments'), api('/analytics/performers')]);
+    const deptScore = {};
+    performers.forEach(p => {
+      if (!p.dept_name) return;
+      if (!deptScore[p.dept_name]) deptScore[p.dept_name] = {total:0, count:0};
+      deptScore[p.dept_name].total += (p.completion_rate||0);
+      deptScore[p.dept_name].count++;
+    });
+    if (!depts.length) throw new Error('no depts');
+    document.getElementById('deptBars').innerHTML = depts.slice(0,8).map((d,i) => {
+      const sc = deptScore[d.dept_name];
+      const rate = sc ? Math.round(sc.total / sc.count) : 0;
+      return `
+        <div style="margin-bottom:12px">
+          <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:3px">
+            <span style="font-weight:600">${d.dept_name}</span>
+            <span style="font-family:monospace;color:${COLORS[i%COLORS.length]}">${rate}% <small style="color:#94a3b8">${d.member_count||0} staff</small></span>
+          </div>
+          <div class="pbar"><div class="pfill" style="width:${Math.max(rate,2)}%;background:${COLORS[i%COLORS.length]}"></div></div>
+        </div>`;
+    }).join('');
+  } catch(e) {
+    const depts = [['Engineering','#2563eb',94],['HR','#16a34a',96],['Finance','#0891b2',97],['Product','#7c3aed',91],['Marketing','#d97706',89]];
+    document.getElementById('deptBars').innerHTML = depts.map(([d,c,r]) => `
+      <div style="margin-bottom:12px">
+        <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:3px">
+          <span style="font-weight:600">${d}</span><span style="font-family:monospace;color:${c}">${r}%</span>
+        </div>
+        <div class="pbar"><div class="pfill" style="width:${r}%;background:${c}"></div></div>
+      </div>`).join('');
+  }
+}
+
+function setTrend(period, btn) {
+  document.querySelectorAll('.tb').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  loadTrend(period);
+}
+
+loadStats(); loadTrend('monthly'); loadPerformers(); loadStatusBars(); loadDeptBars();
+</script>
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <a href="index.html" class="footer-brand">⚡ Workforce Intelligence Platform v6.0</a>
+    <p class="footer-copy">&copy; 2025 Workforce Intelligence Platform v6.0</p>
+  </div>
+</footer>
+</body>
+</html>

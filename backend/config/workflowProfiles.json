@@ -1,0 +1,512 @@
+{
+  "regularization": {
+    "table": "workflow_regularization",
+    "fields": [
+      {
+        "key": "work_date",
+        "type": "date",
+        "label": "Work date"
+      },
+      {
+        "key": "requested_clock_in",
+        "type": "text",
+        "label": "Requested clock in"
+      },
+      {
+        "key": "requested_clock_out",
+        "type": "text",
+        "label": "Requested clock out"
+      },
+      {
+        "key": "reason",
+        "type": "text",
+        "label": "Reason"
+      }
+    ]
+  },
+  "wfh-tracker": {
+    "table": "workflow_wfh_tracker",
+    "fields": [
+      {
+        "key": "from_date",
+        "type": "date",
+        "label": "From date"
+      },
+      {
+        "key": "to_date",
+        "type": "date",
+        "label": "To date"
+      },
+      {
+        "key": "work_location",
+        "type": "text",
+        "label": "Work location"
+      },
+      {
+        "key": "deliverables",
+        "type": "text",
+        "label": "Deliverables"
+      }
+    ]
+  },
+  "shift-bidding": {
+    "table": "workflow_shift_bidding",
+    "fields": [
+      {
+        "key": "shift_id",
+        "type": "number",
+        "label": "Shift id"
+      },
+      {
+        "key": "effective_date",
+        "type": "date",
+        "label": "Effective date"
+      },
+      {
+        "key": "preference_reason",
+        "type": "text",
+        "label": "Preference reason"
+      }
+    ]
+  },
+  "statutory-bonus": {
+    "table": "workflow_statutory_bonus",
+    "fields": [
+      {
+        "key": "employee_id",
+        "type": "number",
+        "label": "Employee id"
+      },
+      {
+        "key": "financial_year",
+        "type": "text",
+        "label": "Financial year"
+      },
+      {
+        "key": "eligible_wages",
+        "type": "number",
+        "label": "Eligible wages"
+      },
+      {
+        "key": "bonus_percent",
+        "type": "number",
+        "label": "Bonus percent"
+      }
+    ]
+  },
+  "probation": {
+    "table": "workflow_probation",
+    "fields": [
+      {
+        "key": "review_date",
+        "type": "date",
+        "label": "Review date"
+      },
+      {
+        "key": "reviewer_id",
+        "type": "number",
+        "label": "Reviewer id"
+      },
+      {
+        "key": "rating",
+        "type": "number",
+        "label": "Rating"
+      },
+      {
+        "key": "recommendation",
+        "type": "text",
+        "label": "Recommendation"
+      }
+    ]
+  },
+  "goals-okr": {
+    "table": "workflow_goals_okr",
+    "fields": [
+      {
+        "key": "metric",
+        "type": "text",
+        "label": "Metric"
+      },
+      {
+        "key": "baseline",
+        "type": "number",
+        "label": "Baseline"
+      },
+      {
+        "key": "target",
+        "type": "number",
+        "label": "Target"
+      },
+      {
+        "key": "actual",
+        "type": "number",
+        "label": "Actual"
+      }
+    ]
+  },
+  "career-roadmap": {
+    "table": "workflow_career_roadmap",
+    "fields": [
+      {
+        "key": "target_role",
+        "type": "text",
+        "label": "Target role"
+      },
+      {
+        "key": "skill",
+        "type": "text",
+        "label": "Skill"
+      },
+      {
+        "key": "mentor_id",
+        "type": "number",
+        "label": "Mentor id"
+      },
+      {
+        "key": "completion_percent",
+        "type": "number",
+        "label": "Completion percent"
+      }
+    ]
+  },
+  "contract-labour": {
+    "table": "workflow_contract_labour",
+    "fields": [
+      {
+        "key": "contractor",
+        "type": "text",
+        "label": "Contractor"
+      },
+      {
+        "key": "contract_start",
+        "type": "date",
+        "label": "Contract start"
+      },
+      {
+        "key": "contract_end",
+        "type": "date",
+        "label": "Contract end"
+      },
+      {
+        "key": "worker_count",
+        "type": "number",
+        "label": "Worker count"
+      },
+      {
+        "key": "registration_reference",
+        "type": "text",
+        "label": "Registration reference"
+      }
+    ]
+  },
+  "vendor-management": {
+    "table": "workflow_vendor_management",
+    "fields": [
+      {
+        "key": "legal_name",
+        "type": "text",
+        "label": "Legal name"
+      },
+      {
+        "key": "contact_email",
+        "type": "email",
+        "label": "Contact email"
+      },
+      {
+        "key": "service_category",
+        "type": "text",
+        "label": "Service category"
+      },
+      {
+        "key": "contract_end",
+        "type": "date",
+        "label": "Contract end"
+      }
+    ]
+  },
+  "visitor-management": {
+    "table": "workflow_visitor_management",
+    "fields": [
+      {
+        "key": "visitor_name",
+        "type": "text",
+        "label": "Visitor name"
+      },
+      {
+        "key": "host_id",
+        "type": "number",
+        "label": "Host id"
+      },
+      {
+        "key": "visit_date",
+        "type": "date",
+        "label": "Visit date"
+      },
+      {
+        "key": "purpose",
+        "type": "text",
+        "label": "Purpose"
+      }
+    ]
+  },
+  "disciplinary": {
+    "table": "workflow_disciplinary",
+    "fields": [
+      {
+        "key": "employee_id",
+        "type": "number",
+        "label": "Employee id"
+      },
+      {
+        "key": "incident_date",
+        "type": "date",
+        "label": "Incident date"
+      },
+      {
+        "key": "policy_reference",
+        "type": "text",
+        "label": "Policy reference"
+      },
+      {
+        "key": "resolution",
+        "type": "text",
+        "label": "Resolution",
+        "optional": true
+      }
+    ]
+  },
+  "grievance": {
+    "table": "workflow_grievance",
+    "fields": [
+      {
+        "key": "category",
+        "type": "text",
+        "label": "Category"
+      },
+      {
+        "key": "incident_date",
+        "type": "date",
+        "label": "Incident date"
+      },
+      {
+        "key": "requested_remedy",
+        "type": "text",
+        "label": "Requested remedy"
+      },
+      {
+        "key": "resolution",
+        "type": "text",
+        "label": "Resolution",
+        "optional": true
+      }
+    ]
+  },
+  "maternity-leave": {
+    "table": "workflow_maternity_leave",
+    "fields": [
+      {
+        "key": "from_date",
+        "type": "date",
+        "label": "From date"
+      },
+      {
+        "key": "to_date",
+        "type": "date",
+        "label": "To date"
+      },
+      {
+        "key": "handover_contact",
+        "type": "text",
+        "label": "Handover contact"
+      },
+      {
+        "key": "handover_plan",
+        "type": "text",
+        "label": "Handover plan"
+      }
+    ]
+  },
+  "mental-health": {
+    "table": "workflow_mental_health",
+    "fields": [
+      {
+        "key": "resource_url",
+        "type": "url",
+        "label": "Resource url"
+      },
+      {
+        "key": "contact",
+        "type": "text",
+        "label": "Contact"
+      },
+      {
+        "key": "availability",
+        "type": "text",
+        "label": "Availability"
+      }
+    ]
+  },
+  "credit-score": {
+    "table": "workflow_credit_score",
+    "fields": [
+      {
+        "key": "bureau",
+        "type": "text",
+        "label": "Bureau"
+      },
+      {
+        "key": "report_date",
+        "type": "date",
+        "label": "Report date"
+      },
+      {
+        "key": "follow_up",
+        "type": "text",
+        "label": "Follow up"
+      }
+    ]
+  },
+  "biometric-enrollment": {
+    "table": "workflow_biometric_enrollment",
+    "fields": [
+      {
+        "key": "consent_reference",
+        "type": "text",
+        "label": "Consent reference"
+      },
+      {
+        "key": "purpose",
+        "type": "text",
+        "label": "Purpose"
+      },
+      {
+        "key": "retention_until",
+        "type": "date",
+        "label": "Retention until"
+      }
+    ]
+  },
+  "face-recognition": {
+    "table": "workflow_face_recognition",
+    "fields": [
+      {
+        "key": "consent_reference",
+        "type": "text",
+        "label": "Consent reference"
+      },
+      {
+        "key": "system_owner",
+        "type": "text",
+        "label": "System owner"
+      },
+      {
+        "key": "retention_until",
+        "type": "date",
+        "label": "Retention until"
+      }
+    ]
+  },
+  "cybersecurity": {
+    "table": "workflow_cybersecurity",
+    "fields": [
+      {
+        "key": "system",
+        "type": "text",
+        "label": "System"
+      },
+      {
+        "key": "control",
+        "type": "text",
+        "label": "Control"
+      },
+      {
+        "key": "evidence_reference",
+        "type": "text",
+        "label": "Evidence reference"
+      },
+      {
+        "key": "remediation",
+        "type": "text",
+        "label": "Remediation",
+        "optional": true
+      }
+    ]
+  },
+  "threat-monitor": {
+    "table": "workflow_threat_monitor",
+    "fields": [
+      {
+        "key": "system",
+        "type": "text",
+        "label": "System"
+      },
+      {
+        "key": "severity",
+        "type": "text",
+        "label": "Severity"
+      },
+      {
+        "key": "incident_date",
+        "type": "date",
+        "label": "Incident date"
+      },
+      {
+        "key": "containment",
+        "type": "text",
+        "label": "Containment",
+        "optional": true
+      }
+    ]
+  },
+  "fraud-detection": {
+    "table": "workflow_fraud_detection",
+    "fields": [
+      {
+        "key": "employee_id",
+        "type": "number",
+        "label": "Employee id"
+      },
+      {
+        "key": "claim_reference",
+        "type": "text",
+        "label": "Claim reference"
+      },
+      {
+        "key": "amount",
+        "type": "number",
+        "label": "Amount"
+      },
+      {
+        "key": "review_findings",
+        "type": "text",
+        "label": "Review findings",
+        "optional": true
+      }
+    ]
+  },
+  "lwf-tracker": {
+    "table": "workflow_lwf_tracker",
+    "fields": [
+      {
+        "key": "state",
+        "type": "text",
+        "label": "State"
+      },
+      {
+        "key": "financial_year",
+        "type": "text",
+        "label": "Financial year"
+      },
+      {
+        "key": "employee_contribution",
+        "type": "number",
+        "label": "Employee contribution"
+      },
+      {
+        "key": "employer_contribution",
+        "type": "number",
+        "label": "Employer contribution"
+      }
+    ]
+  }
+}

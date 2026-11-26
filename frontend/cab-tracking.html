@@ -1,0 +1,1900 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Cab Live Tracking — Workforce Intelligence</title>
+<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<style>
+
+/* ── UNIVERSAL SIDEBAR NAV ── */
+.wiq-wrap{display:flex;min-height:100vh}
+.wiq-sidebar{width:220px;min-width:220px;background:#0a1220;border-right:1px solid rgba(255,255,255,.07);position:sticky;top:0;height:100vh;overflow-y:auto;flex-shrink:0;transition:width .2s;z-index:200}
+.wiq-sidebar::-webkit-scrollbar{width:3px}.wiq-sidebar::-webkit-scrollbar-thumb{background:#1e3a5f}
+.wiq-sidebar-header{padding:14px 14px 10px;border-bottom:1px solid rgba(255,255,255,.07)}
+.wiq-logo{font-size:.9rem;font-weight:900;color:#fff;display:flex;align-items:center;gap:7px}
+.wiq-user-pill{display:flex;align-items:center;gap:7px;padding:8px 10px;margin:8px 0 4px;background:rgba(255,255,255,.04);border-radius:8px;font-size:.7rem;color:#64748b}
+.wiq-user-name{font-weight:700;color:#cbd5e1;font-size:.72rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:120px}
+.wiq-logout-btn{display:flex;align-items:center;gap:6px;padding:7px 10px;margin:0 6px 6px;background:rgba(220,38,38,.1);border:1px solid rgba(220,38,38,.2);border-radius:7px;color:#f87171;font-size:.72rem;font-weight:700;cursor:pointer;width:calc(100% - 12px);text-decoration:none;transition:all .15s}
+.wiq-logout-btn:hover{background:rgba(220,38,38,.2)}
+.wiq-nav-group{margin-bottom:2px}
+.wiq-nav-label{font-size:.59rem;font-weight:800;color:#1e3a5f;text-transform:uppercase;letter-spacing:.09em;padding:8px 14px 3px;cursor:pointer;display:flex;align-items:center;justify-content:space-between}
+.wiq-nav-label:hover{color:#334155}
+.wiq-nav-label .arr{font-size:.6rem;transition:.2s;color:#1e3a5f}
+.wiq-nav-items{display:flex;flex-direction:column;gap:1px;padding:0 6px 4px}
+.wiq-nav-item{display:flex;align-items:center;gap:7px;padding:5px 8px;border-radius:6px;font-size:.71rem;font-weight:600;color:#475569;text-decoration:none;transition:all .15s;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.wiq-nav-item:hover{background:rgba(37,99,235,.12);color:#60a5fa}
+.wiq-nav-item.active{background:rgba(37,99,235,.18);color:#60a5fa;font-weight:800}
+.wiq-nav-item .ico{font-size:.8rem;flex-shrink:0;width:16px;text-align:center}
+.wiq-main{flex:1;min-width:0;overflow-x:hidden}
+.wiq-collapsed .wiq-sidebar{width:48px}
+.wiq-collapsed .wiq-nav-item span,.wiq-collapsed .wiq-nav-label span:first-child,.wiq-collapsed .wiq-user-name,.wiq-collapsed .wiq-logo span,.wiq-collapsed .wiq-logout-btn span{display:none}
+.wiq-collapsed .wiq-nav-items{padding:0 3px}
+.wiq-collapsed .wiq-nav-item{justify-content:center;padding:6px}
+.wiq-collapsed .wiq-logout-btn{justify-content:center;padding:7px;margin:0 3px 4px}
+.wiq-toggle{background:none;border:none;color:#475569;cursor:pointer;padding:4px 8px;font-size:.75rem;display:flex;align-items:center;gap:4px;margin-left:auto}
+.wiq-toggle:hover{color:#60a5fa}
+@media(max-width:768px){.wiq-sidebar{position:fixed;left:-220px;top:0;transition:left .2s}.wiq-sidebar.open{left:0;box-shadow:4px 0 20px rgba(0,0,0,.5)}.wiq-mob-toggle{display:flex!important}}
+.wiq-mob-toggle{display:none;position:fixed;top:12px;left:12px;z-index:300;background:#1e3a5f;border:none;border-radius:8px;padding:7px 10px;color:#fff;font-size:.8rem;cursor:pointer}
+
+:root{--dark:#0a0f1e;--blue:#2563eb;--cyan:#0891b2;--green:#16a34a;--red:#dc2626;--amber:#d97706}
+*{box-sizing:border-box}
+body{background:var(--dark);color:#f1f5f9;font-family:var(--wfi-font);margin:0}
+.track-wrap{max-width:1180px;margin:0 auto;padding:80px 16px 40px}
+
+/* ── BOOKING CONFIRMATION BANNER ── */
+.confirm-banner{background:linear-gradient(135deg,#16a34a,#0891b2);border-radius:18px;padding:20px 24px;margin-bottom:20px;display:none}
+.confirm-banner.show{display:block;animation:slideDown .5s ease}
+@keyframes slideDown{from{opacity:0;transform:translateY(-16px)}to{opacity:1;transform:translateY(0)}}
+.cb-title{font-size:1.1rem;font-weight:900;color:#fff;margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.cb-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px}
+.cb-item{background:rgba(255,255,255,.12);border-radius:10px;padding:10px 14px}
+.cb-label{font-size:.65rem;color:#a7f3d0;text-transform:uppercase;letter-spacing:.07em;font-weight:700;margin-bottom:2px}
+.cb-val{font-size:.88rem;font-weight:700;color:#fff}
+.otp-badge{background:rgba(255,255,255,.2);border:2px solid rgba(255,255,255,.4);border-radius:10px;padding:10px 16px;text-align:center}
+.otp-label{font-size:.65rem;color:#a7f3d0;text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px}
+.otp-num{font-size:2rem;font-weight:900;color:#fff;letter-spacing:.35em}
+
+/* ── MAIN GRID ── */
+.main-grid{display:grid;grid-template-columns:340px 1fr;gap:18px;align-items:start}
+
+/* ── MAP ── */
+#trackMap{height:480px;border-radius:16px;border:1.5px solid rgba(255,255,255,.1)}
+
+/* ── PANELS ── */
+.panel{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.09);border-radius:16px;padding:18px;margin-bottom:14px}
+.panel-title{font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#64748b;margin-bottom:12px}
+
+/* ── DRIVER CARD ── */
+.driver-wrap{display:flex;gap:12px;align-items:flex-start}
+.d-avatar{width:60px;height:60px;border-radius:12px;background:linear-gradient(135deg,#1e3a8a,#2563eb);display:flex;align-items:center;justify-content:center;font-size:1.6rem;flex-shrink:0;border:2px solid rgba(59,130,246,.4)}
+.d-name{font-size:1rem;font-weight:800;color:#f1f5f9;margin-bottom:2px}
+.d-code{font-size:.7rem;color:#64748b;background:rgba(255,255,255,.06);border-radius:5px;padding:1px 7px;display:inline-block;margin-bottom:6px}
+.d-row{font-size:.78rem;color:#94a3b8;display:flex;align-items:center;gap:6px;margin-bottom:3px}
+.d-row a{color:#60a5fa;text-decoration:none;font-weight:600}
+.stars{color:#fbbf24;font-size:.85rem}
+.stars .e{color:#334155}
+
+/* ── JOURNEY STATUS ── */
+.j-status{display:flex;align-items:center;gap:10px;padding:12px 14px;border-radius:10px;font-size:.85rem;font-weight:700;margin-bottom:10px}
+.js-waiting  {background:rgba(234,179,8,.08);border:1px solid rgba(234,179,8,.25);color:#fde047}
+.js-transit  {background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.25);color:#86efac}
+.js-completed{background:rgba(99,102,241,.08);border:1px solid rgba(99,102,241,.25);color:#a5b4fc}
+.js-sos      {background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.3);color:#fca5a5;animation:sosPulse 1s infinite}
+@keyframes sosPulse{0%,100%{opacity:1}50%{opacity:.5}}
+.speed-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+.speed-box{background:rgba(255,255,255,.04);border-radius:8px;padding:10px;text-align:center}
+.speed-num{font-size:1.5rem;font-weight:900;color:#60a5fa}
+.speed-unit{font-size:.65rem;color:#475569;margin-top:1px}
+
+/* ── BOOKING DETAILS ── */
+.bk-row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.05);font-size:.8rem}
+.bk-row:last-child{border:none}
+.bk-lbl{color:#64748b}.bk-val{color:#f1f5f9;font-weight:600;text-align:right}
+
+/* ── PING LOG ── */
+.ping-log{display:flex;flex-direction:column;gap:5px;max-height:130px;overflow-y:auto}
+.ping-row{display:flex;justify-content:space-between;font-size:.7rem;color:#475569;padding:3px 0;border-bottom:1px solid rgba(255,255,255,.04)}
+
+/* ── SOS BIG BUTTON ── */
+.sos-btn{width:100%;padding:15px;background:linear-gradient(135deg,#dc2626,#991b1b);border:none;border-radius:14px;color:#fff;font-size:1rem;font-weight:900;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:all .2s;letter-spacing:.03em}
+.sos-btn:hover{transform:scale(1.02);box-shadow:0 8px 24px rgba(220,38,38,.4)}
+
+/* ── EMERGENCY SERVICES SECTION ── */
+.emergency-section{margin-top:14px}
+.emergency-tabs{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap}
+.etab{padding:7px 14px;border:1.5px solid rgba(255,255,255,.1);border-radius:999px;background:transparent;color:#64748b;font-size:.75rem;font-weight:700;cursor:pointer;transition:all .2s}
+.etab.active{background:linear-gradient(135deg,#dc2626,#991b1b);color:#fff;border-color:transparent}
+.etab.police.active{background:linear-gradient(135deg,#1e3a8a,#2563eb)}
+.etab.hospital.active{background:linear-gradient(135deg,#dc2626,#b91c1c)}
+.etab.restaurant.active{background:linear-gradient(135deg,#d97706,#b45309)}
+.etab.pharmacy.active{background:linear-gradient(135deg,#16a34a,#0d9488)}
+.service-list{display:flex;flex-direction:column;gap:8px;max-height:300px;overflow-y:auto}
+.service-card{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:12px 14px;display:flex;gap:12px;align-items:flex-start;transition:border-color .2s;cursor:pointer}
+.service-card:hover{border-color:rgba(59,130,246,.4)}
+.svc-icon{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0}
+.svc-police{background:rgba(37,99,235,.2)}
+.svc-hospital{background:rgba(220,38,38,.2)}
+.svc-restaurant{background:rgba(217,119,6,.2)}
+.svc-pharmacy{background:rgba(22,163,74,.2)}
+.svc-name{font-size:.84rem;font-weight:700;color:#f1f5f9;margin-bottom:2px}
+.svc-addr{font-size:.72rem;color:#64748b;margin-bottom:4px;line-height:1.4}
+.svc-meta{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.svc-dist{font-size:.7rem;color:#60a5fa;font-weight:700}
+.svc-phone{font-size:.72rem;color:#86efac;font-weight:700;text-decoration:none}
+.svc-phone:hover{text-decoration:underline}
+.svc-open{font-size:.68rem;padding:2px 7px;border-radius:999px;font-weight:700}
+.open-yes{background:rgba(34,197,94,.15);color:#86efac}
+.open-no{background:rgba(239,68,68,.12);color:#fca5a5}
+.loading-services{color:#475569;font-size:.8rem;padding:12px;text-align:center;animation:pulse 1.5s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.no-location-msg{background:rgba(217,119,6,.1);border:1px solid rgba(217,119,6,.3);border-radius:10px;padding:12px;font-size:.78rem;color:#fde047;line-height:1.6}
+
+/* ── RATING ── */
+.star-row{display:flex;gap:6px;justify-content:center;margin:8px 0}
+.star-row span{font-size:1.6rem;cursor:pointer;color:#334155;transition:color .1s}
+.star-row span.lit{color:#fbbf24}
+
+/* ── LIVE DOT ── */
+.live-dot{width:8px;height:8px;background:#22c55e;border-radius:50%;animation:sosPulse 1.5s infinite}
+
+/* ── NOTIFICATION BANNER (approval confirmation) ── */
+.notif-bar{background:linear-gradient(135deg,#1e3a8a,#0891b2);border-radius:12px;padding:12px 18px;margin-bottom:16px;font-size:.85rem;color:#fff;display:none;align-items:center;gap:10px}
+.notif-bar.show{display:flex;animation:slideDown .4s ease}
+
+@media(max-width:768px){
+  .main-grid{grid-template-columns:1fr}
+  #trackMap{height:300px}
+  .cb-grid{grid-template-columns:1fr 1fr}
+}
+.toast{position:fixed;bottom:24px;right:24px;background:#1e293b;color:#fff;padding:13px 22px;border-radius:12px;font-size:.87rem;font-weight:600;z-index:9999;transform:translateY(80px);opacity:0;transition:all .3s;max-width:360px;word-break:break-word;box-shadow:0 8px 30px rgba(0,0,0,.25)}
+.toast.show{transform:translateY(0);opacity:1}
+.toast.success{background:#16a34a}
+.toast.error{background:#dc2626}
+.toast.warn{background:#d97706}
+
+/* ── TOPBAR FIXES  ─────────────────────────────── */
+.navbar,.wiq-topbar,nav.topbar{
+  display:flex!important;align-items:center!important;
+  padding:0 20px!important;height:54px!important;
+  background:#fff!important;
+  border-bottom:2px solid #e8f0ff!important;
+  position:sticky!important;top:0!important;z-index:100!important;
+  gap:12px!important;flex-wrap:nowrap!important;
+  box-shadow:0 1px 8px rgba(37,99,235,.08)!important;
+}
+.nav-brand{
+  font-size:.88rem!important;font-weight:900!important;
+  color:#1E3A5F!important;white-space:nowrap!important;
+  display:flex!important;align-items:center!important;gap:6px!important;
+  flex-shrink:0!important;letter-spacing:-.01em!important;
+}
+.nav-brand .logo-icon{
+  width:28px!important;height:28px!important;
+  background:linear-gradient(135deg,#2563EB,#7C3AED)!important;
+  border-radius:7px!important;display:inline-flex!important;
+  align-items:center!important;justify-content:center!important;
+  font-size:.9rem!important;flex-shrink:0!important;
+}
+.nav-brand .logo-text{
+  font-size:.85rem!important;font-weight:900!important;color:#1E3A5F!important;
+}
+.nav-brand .logo-version{
+  font-size:.55rem!important;font-weight:700!important;
+  color:#2563EB!important;background:#EFF6FF!important;
+  padding:1px 5px!important;border-radius:4px!important;
+  border:1px solid #BFDBFE!important;
+}
+.nav-info{
+  display:flex!important;align-items:center!important;
+  gap:8px!important;flex-shrink:0!important;margin-left:auto!important;
+}
+.nav-divider{width:1px!important;height:20px!important;background:#E2E8F0!important}
+
+/* ── CARD COLOR SHADOWS ─────────────────────────────── */
+.card,.wiq-card,[class*="-card"]{
+  transition:all .25s cubic-bezier(.34,1.56,.64,1)!important;
+  border-radius:12px!important;
+}
+.card:hover,.wiq-card:hover{
+  transform:translateY(-4px) scale(1.006)!important;
+  box-shadow:0 12px 32px rgba(37,99,235,.18),
+             0 2px 8px rgba(37,99,235,.1)!important;
+}
+/* Module-specific card shadows */
+.card-payroll:hover{box-shadow:0 12px 32px rgba(5,150,105,.18)!important}
+.card-leave:hover{box-shadow:0 12px 32px rgba(245,158,11,.18)!important}
+.card-alert:hover{box-shadow:0 12px 32px rgba(220,38,38,.18)!important}
+
+/* ── BUTTON SYSTEM ─────────────────────────────────── */
+.btn{
+  display:inline-flex!important;align-items:center!important;
+  gap:5px!important;padding:7px 16px!important;
+  border-radius:8px!important;font-size:.76rem!important;
+  font-weight:700!important;cursor:pointer!important;
+  border:none!important;transition:all .2s!important;
+  white-space:nowrap!important;font-family:var(--wfi-font);
+}
+.btn-primary{
+  background:linear-gradient(135deg,#2563EB,#1D4ED8)!important;
+  color:#fff!important;
+  box-shadow:0 2px 8px rgba(37,99,235,.3)!important;
+}
+.btn-primary:hover{
+  background:linear-gradient(135deg,#1D4ED8,#1E40AF)!important;
+  box-shadow:0 4px 14px rgba(37,99,235,.4)!important;
+  transform:translateY(-1px)!important;
+}
+.btn-outline,.btn-sm.btn-outline{
+  background:#fff!important;color:#2563EB!important;
+  border:1.5px solid #BFDBFE!important;
+  padding:5px 13px!important;font-size:.72rem!important;
+}
+.btn-outline:hover{
+  background:#EFF6FF!important;
+  border-color:#2563EB!important;
+  box-shadow:0 2px 8px rgba(37,99,235,.15)!important;
+}
+.btn-danger{
+  background:linear-gradient(135deg,#DC2626,#B91C1C)!important;
+  color:#fff!important;
+}
+.btn-danger:hover{box-shadow:0 4px 14px rgba(220,38,38,.35)!important}
+.btn-success{
+  background:linear-gradient(135deg,#059669,#047857)!important;
+  color:#fff!important;
+}
+.btn-success:hover{box-shadow:0 4px 14px rgba(5,150,105,.35)!important}
+.btn-sm{padding:5px 12px!important;font-size:.7rem!important}
+.btn-lg{padding:10px 22px!important;font-size:.82rem!important}
+
+/* ── STATUS BADGES ─────────────────────────────────── */
+.badge,.status-badge,[class*=badge]{
+  display:inline-flex!important;align-items:center!important;
+  padding:3px 10px!important;border-radius:999px!important;
+  font-size:.62rem!important;font-weight:800!important;
+  text-transform:uppercase!important;letter-spacing:.04em!important;
+}
+
+/* ── SIDEBAR BRAND ─────────────────────────────────── */
+.wiq-logo{
+  display:flex!important;align-items:center!important;
+  gap:8px!important;padding:0 4px!important;
+}
+.wiq-logo .logo-mark{
+  width:32px!important;height:32px!important;
+  background:linear-gradient(135deg,#2563EB,#7C3AED)!important;
+  border-radius:9px!important;display:flex!important;
+  align-items:center!important;justify-content:center!important;
+  font-size:1rem!important;flex-shrink:0!important;
+  box-shadow:0 4px 12px rgba(37,99,235,.35)!important;
+}
+.wiq-logo span{
+  font-weight:900!important;font-size:.82rem!important;
+  color:#F8FAFC!important;letter-spacing:-.01em!important;
+}
+
+/* ═══ DARK/LIGHT MODE  ════════════════════════════════════ */
+:root{--dm-bg:#F8FAFC;--dm-card:#ffffff;--dm-text:#1e293b;--dm-muted:#64748b;--dm-border:#e2e8f0;--dm-sidebar:#0a1220;--dm-topbar:#ffffff;--dm-input:#ffffff;--dm-hover:#f1f5f9}
+body.dark-mode{--dm-bg:#0B1120;--dm-card:#111827;--dm-text:#e2e8f0;--dm-muted:#94a3b8;--dm-border:#1e2d4a;--dm-sidebar:#060d18;--dm-topbar:#111827;--dm-input:#1e2d4a;--dm-hover:#1e293b}
+body{background:var(--dm-bg)!important;color:var(--dm-text)!important;transition:background .25s,color .25s}
+.wiq-sidebar,aside{background:var(--dm-sidebar)!important}
+.navbar,.wiq-topbar,nav{background:var(--dm-topbar)!important;border-bottom-color:var(--dm-border)!important}
+.card,.wiq-card,.stat-card,.kpi-card{background:var(--dm-card)!important;border-color:var(--dm-border)!important}
+main,.main-content,.wiq-content,.page-wrap{background:var(--dm-bg)!important}
+input:not([type=checkbox]):not([type=radio]),select,textarea,.form-input{background:var(--dm-input)!important;border-color:var(--dm-border)!important;color:var(--dm-text)!important}
+table{background:var(--dm-card)!important}thead tr{background:#1e3a5f!important}tbody tr:hover{background:var(--dm-hover)!important}
+h1,h2,h3,h4,h5,h6,p,span,label,li,td,th{color:inherit}
+.dm-toggle{width:40px;height:22px;border-radius:999px;border:none;cursor:pointer;position:relative;background:#e2e8f0;transition:background .3s;flex-shrink:0;outline:none}
+.dm-toggle.on{background:linear-gradient(135deg,#4f46e5,#7c3aed)}
+.dm-toggle::after{content:'';position:absolute;top:2px;left:2px;width:18px;height:18px;border-radius:50%;background:#fff;transition:transform .3s;box-shadow:0 1px 4px rgba(0,0,0,.2)}
+.dm-toggle.on::after{transform:translateX(18px)}
+.dm-icon{font-size:.85rem;cursor:pointer}
+
+
+/* ═══ COOKIE CONSENT BANNER ════════════════════════════════ */
+#cookieBanner{
+  position:fixed;bottom:0;left:0;right:0;z-index:9998;
+  background:linear-gradient(135deg,#0F172A,#1E293B);
+  border-top:2px solid #2563EB;
+  padding:16px 32px;
+  display:flex;align-items:center;justify-content:space-between;
+  flex-wrap:wrap;gap:12px;
+  box-shadow:0 -4px 24px rgba(0,0,0,.3);
+  transform:translateY(100%);transition:transform .4s ease;
+}
+#cookieBanner.visible{transform:translateY(0)}
+.cookie-text{font-size:.78rem;color:#CBD5E1;line-height:1.6;max-width:700px}
+.cookie-text a{color:#60A5FA;text-decoration:none;font-weight:600}
+.cookie-text a:hover{text-decoration:underline}
+.cookie-actions{display:flex;gap:8px;flex-shrink:0}
+.cookie-btn-accept{
+  background:linear-gradient(135deg,#2563EB,#4F46E5);color:#fff;
+  border:none;border-radius:8px;padding:8px 20px;font-size:.74rem;
+  font-weight:700;cursor:pointer;font-family:var(--wfi-font);
+  box-shadow:0 4px 12px rgba(37,99,235,.4);transition:all .2s;
+}
+.cookie-btn-accept:hover{transform:translateY(-1px);box-shadow:0 6px 16px rgba(37,99,235,.5)}
+.cookie-btn-settings{
+  background:transparent;color:#94A3B8;
+  border:1.5px solid #334155;border-radius:8px;padding:8px 16px;font-size:.74rem;
+  font-weight:700;cursor:pointer;font-family:var(--wfi-font);transition:all .2s;
+}
+.cookie-btn-settings:hover{color:#F1F5F9;border-color:#64748B}
+.cookie-btn-decline{
+  background:transparent;color:#64748B;border:none;
+  font-size:.7rem;cursor:pointer;font-family:var(--wfi-font);padding:4px 8px;
+}
+
+</style>
+
+<style id="wfi-card-fix">
+.card,.stat-card,.kpi-card{margin-bottom:12px}
+.grid,.stats-grid{gap:14px}
+.export-bar{padding:10px 0;margin-bottom:12px}
+.tab-panel{padding:4px 0}
+.wiq-main{padding:16px 20px}
+@media(max-width:768px){.wiq-main{padding:12px}}
+/* Dark mode button always visible */
+#dmt,#dmToggle{display:flex!important;opacity:1!important;visibility:visible!important}
+/* Print improvements */
+@media print{
+  .wiq-sidebar,.navbar,.topbar,.export-bar,.wiq-mob-toggle{display:none!important}
+  .wiq-main,.main{margin:0!important;padding:20px!important;max-width:100%!important}
+  table{page-break-inside:avoid}
+  .card{page-break-inside:avoid;border:1px solid #e2e8f0!important}
+}
+</style>
+
+<style id="wiq-sb-css">
+
+
+/* ── UNIVERSAL SIDEBAR NAV ── */
+.wiq-wrap{display:flex;min-height:100vh}
+.wiq-sidebar{width:220px;min-width:220px;background:#0a1220;border-right:1px solid rgba(255,255,255,.07);position:sticky;top:0;height:100vh;overflow-y:auto;flex-shrink:0;transition:width .2s;z-index:200}
+.wiq-sidebar::-webkit-scrollbar{width:3px}.wiq-sidebar::-webkit-scrollbar-thumb{background:#1e3a5f}
+.wiq-sidebar-header{padding:14px 14px 10px;border-bottom:1px solid rgba(255,255,255,.07)}
+.wiq-logo{font-size:.9rem;font-weight:900;color:#fff;display:flex;align-items:center;gap:7px}
+.wiq-user-pill{display:flex;align-items:center;gap:7px;padding:8px 10px;margin:8px 0 4px;background:rgba(255,255,255,.04);border-radius:8px;font-size:.7rem;color:#64748b}
+.wiq-user-name{font-weight:700;color:#cbd5e1;font-size:.72rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:120px}
+.wiq-logout-btn{display:flex;align-items:center;gap:6px;padding:7px 10px;margin:0 6px 6px;background:rgba(220,38,38,.1);border:1px solid rgba(220,38,38,.2);border-radius:7px;color:#f87171;font-size:.72rem;font-weight:700;cursor:pointer;width:calc(100% - 12px);text-decoration:none;transition:all .15s}
+.wiq-logout-btn:hover{background:rgba(220,38,38,.2)}
+.wiq-nav-group{margin-bottom:2px}
+.wiq-nav-label{font-size:.59rem;font-weight:800;color:#1e3a5f;text-transform:uppercase;letter-spacing:.09em;padding:8px 14px 3px;cursor:pointer;display:flex;align-items:center;justify-content:space-between}
+.wiq-nav-label:hover{color:#334155}
+.wiq-nav-label .arr{font-size:.6rem;transition:.2s;color:#1e3a5f}
+.wiq-nav-items{display:flex;flex-direction:column;gap:1px;padding:0 6px 4px}
+.wiq-nav-item{display:flex;align-items:center;gap:7px;padding:5px 8px;border-radius:6px;font-size:.71rem;font-weight:600;color:#475569;text-decoration:none;transition:all .15s;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.wiq-nav-item:hover{background:rgba(37,99,235,.12);color:#60a5fa}
+.wiq-nav-item.active{background:rgba(37,99,235,.18);color:#60a5fa;font-weight:800}
+.wiq-nav-item .ico{font-size:.8rem;flex-shrink:0;width:16px;text-align:center}
+.wiq-main{flex:1;min-width:0;overflow-x:hidden}
+.wiq-collapsed .wiq-sidebar{width:48px}
+.wiq-collapsed .wiq-nav-item span,.wiq-collapsed .wiq-nav-label span:first-child,.wiq-collapsed .wiq-user-name,.wiq-collapsed .wiq-logo span,.wiq-collapsed .wiq-logout-btn span{display:none}
+.wiq-collapsed .wiq-nav-items{padding:0 3px}
+.wiq-collapsed .wiq-nav-item{justify-content:center;padding:6px}
+.wiq-collapsed .wiq-logout-btn{justify-content:center;padding:7px;margin:0 3px 4px}
+.wiq-toggle{background:none;border:none;color:#475569;cursor:pointer;padding:4px 8px;font-size:.75rem;display:flex;align-items:center;gap:4px;margin-left:auto}
+.wiq-toggle:hover{color:#60a5fa}
+@media(max-width:768px){.wiq-sidebar{position:fixed;left:-220px;top:0;transition:left .2s}.wiq-sidebar.open{left:0;box-shadow:4px 0 20px rgba(0,0,0,.5)}.wiq-mob-toggle{display:flex!important}}
+.wiq-mob-toggle{display:none;position:fixed;top:12px;left:12px;z-index:300;background:#1e3a5f;border:none;border-radius:8px;padding:7px 10px;color:#fff;font-size:.8rem;cursor:pointer}
+
+  body{background:#F0F4F8}
+  .page-wrap{max-width:1200px;margin:0 auto;padding:24px}
+  .card{background:#fff;border-radius:12px;padding:24px;margin-bottom:24px;box-shadow:0 2px 12px rgba(0,0,0,.08)}
+  .card h3{margin-top:0;color:#1B4F8A;font-size:1.1rem;margin-bottom:16px}
+  .btn{padding:9px 22px;border:none;border-radius:7px;font-weight:600;cursor:pointer;font-size:14px;transition:.15s}
+  .btn-primary{background:#1B4F8A;color:#fff} .btn-primary:hover{background:#1a3f72}
+  .btn-success{background:#27AE60;color:#fff} .btn-success:hover{background:#1e8449}
+  .btn-danger{background:#C0392B;color:#fff}  .btn-danger:hover{background:#a93226}
+  .btn-sm{padding:5px 14px;font-size:12px;border-radius:5px;border:none;font-weight:600;cursor:pointer}
+  .btn-outline{background:#fff;border:1.5px solid #1B4F8A;color:#1B4F8A}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+  .grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+  @media(max-width:700px){.grid2,.grid4{grid-template-columns:1fr}}
+  table{width:100%;border-collapse:collapse;font-size:13px}
+  th{background:#1B4F8A;color:#fff;padding:10px 12px;text-align:left;white-space:nowrap}
+  td{padding:9px 12px;border-bottom:1px solid #EEF2F7;vertical-align:middle}
+  tr:hover td{background:#F8FAFB}
+  .badge{padding:3px 10px;border-radius:12px;font-size:11px;font-weight:700}
+  .badge.present{background:#D5F5E3;color:#1E8449}
+  .badge.absent{background:#FADBD8;color:#C0392B}
+  .badge.late{background:#FEF9E7;color:#D4AC0D}
+  .badge.half_day{background:#D6EAF8;color:#1B4F8A}
+  .badge.leave{background:#EEF2F7;color:#5D6D7E}
+  #msg{padding:11px 16px;border-radius:8px;margin-bottom:16px;display:none;font-weight:600}
+  #msg.success{background:#D5F5E3;color:#1E8449;display:block}
+  #msg.error{background:#FADBD8;color:#C0392B;display:block}
+  .tabs{display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap}
+  .tab{padding:9px 22px;border-radius:8px;border:2px solid #BDC3C7;background:#fff;color:#5D6D7E;font-weight:600;cursor:pointer;font-size:14px}
+  .tab.active{background:#1B4F8A;color:#fff;border-color:#1B4F8A}
+  /* Clock widget */
+  .clock-card{background:linear-gradient(135deg,#1B4F8A,#2563eb);border-radius:12px;padding:28px;color:#fff;text-align:center}
+  .clock-time{font-size:3rem;font-weight:800;letter-spacing:2px;font-family:var(--wfi-font);margin-bottom:6px}
+  .clock-date{font-size:.95rem;opacity:.8;margin-bottom:20px}
+  .clock-status{background:rgba(255,255,255,.15);border-radius:8px;padding:10px 16px;font-size:.95rem;margin-bottom:20px}
+  .clock-status.clocked-in{background:rgba(39,174,96,.3)}
+  .clock-status.clocked-out{background:rgba(192,57,43,.2)}
+  .clock-btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+  .clock-btn{padding:12px 28px;border:none;border-radius:8px;font-size:15px;font-weight:700;cursor:pointer;transition:.15s}
+  .clock-btn.in{background:#27AE60;color:#fff} .clock-btn.in:hover{background:#1e8449}
+  .clock-btn.out{background:#C0392B;color:#fff} .clock-btn.out:hover{background:#a93226}
+  .clock-btn:disabled{opacity:.4;cursor:not-allowed}
+  /* Stat cards */
+  .stat-card{background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:10px;padding:16px;text-align:center}
+  .stat-num{font-size:2rem;font-weight:800;color:#1B4F8A}
+  .stat-label{font-size:.8rem;font-weight:700;color:#64748b;margin-top:3px;text-transform:uppercase;letter-spacing:.05em}
+  .stat-sub{font-size:.75rem;color:#94a3b8;margin-top:3px}
+  /* Today dot */
+  .today-dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px}
+  .dot-present{background:#27AE60}
+  .dot-absent{background:#C0392B}
+  .dot-late{background:#D4AC0D}
+  /* Form */
+  .form-group{margin-bottom:14px}
+  .form-group label{display:block;font-weight:600;color:#1B4F8A;margin-bottom:5px;font-size:13px}
+  .form-group input,.form-group select,.form-group textarea{width:100%;padding:9px 12px;border:1px solid #BDC3C7;border-radius:7px;font-size:14px;box-sizing:border-box}
+  .pbar{height:8px;background:#e2e8f0;border-radius:4px;overflow:hidden;margin-top:6px}
+  .pfill{height:100%;border-radius:4px;transition:width 1s ease}
+.toast{position:fixed;bottom:24px;right:24px;background:#1e293b;color:#fff;padding:13px 22px;border-radius:12px;font-size:.87rem;font-weight:600;z-index:9999;transform:translateY(80px);opacity:0;transition:all .3s;max-width:360px;word-break:break-word;box-shadow:0 8px 30px rgba(0,0,0,.25)}
+.toast.show{transform:translateY(0);opacity:1}
+.toast.success{background:#16a34a}
+.toast.error{background:#dc2626}
+.toast.warn{background:#d97706}
+
+/* ── TOPBAR FIXES  ─────────────────────────────── */
+.navbar,.wiq-topbar,nav.topbar{
+  display:flex!important;align-items:center!important;
+  padding:0 20px!important;height:54px!important;
+  background:#fff!important;
+  border-bottom:2px solid #e8f0ff!important;
+  position:sticky!important;top:0!important;z-index:100!important;
+  gap:12px!important;flex-wrap:nowrap!important;
+  box-shadow:0 1px 8px rgba(37,99,235,.08)!important;
+}
+.nav-brand{
+  font-size:.88rem!important;font-weight:900!important;
+  color:#1E3A5F!important;white-space:nowrap!important;
+  display:flex!important;align-items:center!important;gap:6px!important;
+  flex-shrink:0!important;letter-spacing:-.01em!important;
+}
+.nav-brand .logo-icon{
+  width:28px!important;height:28px!important;
+  background:linear-gradient(135deg,#2563EB,#7C3AED)!important;
+  border-radius:7px!important;display:inline-flex!important;
+  align-items:center!important;justify-content:center!important;
+  font-size:.9rem!important;flex-shrink:0!important;
+}
+.nav-brand .logo-text{
+  font-size:.85rem!important;font-weight:900!important;color:#1E3A5F!important;
+}
+.nav-brand .logo-version{
+  font-size:.55rem!important;font-weight:700!important;
+  color:#2563EB!important;background:#EFF6FF!important;
+  padding:1px 5px!important;border-radius:4px!important;
+  border:1px solid #BFDBFE!important;
+}
+.nav-info{
+  display:flex!important;align-items:center!important;
+  gap:8px!important;flex-shrink:0!important;margin-left:auto!important;
+}
+.nav-divider{width:1px!important;height:20px!important;background:#E2E8F0!important}
+
+/* ── CARD COLOR SHADOWS ─────────────────────────────── */
+.card,.wiq-card,[class*="-card"]{
+  transition:all .25s cubic-bezier(.34,1.56,.64,1)!important;
+  border-radius:12px!important;
+}
+.card:hover,.wiq-card:hover{
+  transform:translateY(-4px) scale(1.006)!important;
+  box-shadow:0 12px 32px rgba(37,99,235,.18),
+             0 2px 8px rgba(37,99,235,.1)!important;
+}
+/* Module-specific card shadows */
+.card-payroll:hover{box-shadow:0 12px 32px rgba(5,150,105,.18)!important}
+.card-leave:hover{box-shadow:0 12px 32px rgba(245,158,11,.18)!important}
+.card-alert:hover{box-shadow:0 12px 32px rgba(220,38,38,.18)!important}
+
+/* ── BUTTON SYSTEM ─────────────────────────────────── */
+.btn{
+  display:inline-flex!important;align-items:center!important;
+  gap:5px!important;padding:7px 16px!important;
+  border-radius:8px!important;font-size:.76rem!important;
+  font-weight:700!important;cursor:pointer!important;
+  border:none!important;transition:all .2s!important;
+  white-space:nowrap!important;font-family:var(--wfi-font);
+}
+.btn-primary{
+  background:linear-gradient(135deg,#2563EB,#1D4ED8)!important;
+  color:#fff!important;
+  box-shadow:0 2px 8px rgba(37,99,235,.3)!important;
+}
+.btn-primary:hover{
+  background:linear-gradient(135deg,#1D4ED8,#1E40AF)!important;
+  box-shadow:0 4px 14px rgba(37,99,235,.4)!important;
+  transform:translateY(-1px)!important;
+}
+.btn-outline,.btn-sm.btn-outline{
+  background:#fff!important;color:#2563EB!important;
+  border:1.5px solid #BFDBFE!important;
+  padding:5px 13px!important;font-size:.72rem!important;
+}
+.btn-outline:hover{
+  background:#EFF6FF!important;
+  border-color:#2563EB!important;
+  box-shadow:0 2px 8px rgba(37,99,235,.15)!important;
+}
+.btn-danger{
+  background:linear-gradient(135deg,#DC2626,#B91C1C)!important;
+  color:#fff!important;
+}
+.btn-danger:hover{box-shadow:0 4px 14px rgba(220,38,38,.35)!important}
+.btn-success{
+  background:linear-gradient(135deg,#059669,#047857)!important;
+  color:#fff!important;
+}
+.btn-success:hover{box-shadow:0 4px 14px rgba(5,150,105,.35)!important}
+.btn-sm{padding:5px 12px!important;font-size:.7rem!important}
+.btn-lg{padding:10px 22px!important;font-size:.82rem!important}
+
+/* ── STATUS BADGES ─────────────────────────────────── */
+.badge,.status-badge,[class*=badge]{
+  display:inline-flex!important;align-items:center!important;
+  padding:3px 10px!important;border-radius:999px!important;
+  font-size:.62rem!important;font-weight:800!important;
+  text-transform:uppercase!important;letter-spacing:.04em!important;
+}
+
+/* ── SIDEBAR BRAND ─────────────────────────────────── */
+.wiq-logo{
+  display:flex!important;align-items:center!important;
+  gap:8px!important;padding:0 4px!important;
+}
+.wiq-logo .logo-mark{
+  width:32px!important;height:32px!important;
+  background:linear-gradient(135deg,#2563EB,#7C3AED)!important;
+  border-radius:9px!important;display:flex!important;
+  align-items:center!important;justify-content:center!important;
+  font-size:1rem!important;flex-shrink:0!important;
+  box-shadow:0 4px 12px rgba(37,99,235,.35)!important;
+}
+.wiq-logo span{
+  font-weight:900!important;font-size:.82rem!important;
+  color:#F8FAFC!important;letter-spacing:-.01em!important;
+}
+
+/* ═══ DARK/LIGHT MODE  ════════════════════════════════════ */
+:root{--dm-bg:#F8FAFC;--dm-card:#ffffff;--dm-text:#1e293b;--dm-muted:#64748b;--dm-border:#e2e8f0;--dm-sidebar:#0a1220;--dm-topbar:#ffffff;--dm-input:#ffffff;--dm-hover:#f1f5f9}
+body.dark-mode{--dm-bg:#0B1120;--dm-card:#111827;--dm-text:#e2e8f0;--dm-muted:#94a3b8;--dm-border:#1e2d4a;--dm-sidebar:#060d18;--dm-topbar:#111827;--dm-input:#1e2d4a;--dm-hover:#1e293b}
+body{background:var(--dm-bg)!important;color:var(--dm-text)!important;transition:background .25s,color .25s}
+.wiq-sidebar,aside{background:var(--dm-sidebar)!important}
+.navbar,.wiq-topbar,nav{background:var(--dm-topbar)!important;border-bottom-color:var(--dm-border)!important}
+.card,.wiq-card,.stat-card,.kpi-card{background:var(--dm-card)!important;border-color:var(--dm-border)!important}
+main,.main-content,.wiq-content,.page-wrap{background:var(--dm-bg)!important}
+input:not([type=checkbox]):not([type=radio]),select,textarea,.form-input{background:var(--dm-input)!important;border-color:var(--dm-border)!important;color:var(--dm-text)!important}
+table{background:var(--dm-card)!important}thead tr{background:#1e3a5f!important}tbody tr:hover{background:var(--dm-hover)!important}
+h1,h2,h3,h4,h5,h6,p,span,label,li,td,th{color:inherit}
+.dm-toggle{width:40px;height:22px;border-radius:999px;border:none;cursor:pointer;position:relative;background:#e2e8f0;transition:background .3s;flex-shrink:0;outline:none}
+.dm-toggle.on{background:linear-gradient(135deg,#4f46e5,#7c3aed)}
+.dm-toggle::after{content:'';position:absolute;top:2px;left:2px;width:18px;height:18px;border-radius:50%;background:#fff;transition:transform .3s;box-shadow:0 1px 4px rgba(0,0,0,.2)}
+.dm-toggle.on::after{transform:translateX(18px)}
+.dm-icon{font-size:.85rem;cursor:pointer}
+
+
+/* ═══ COOKIE CONSENT BANNER ════════════════════════════════ */
+#cookieBanner{
+  position:fixed;bottom:0;left:0;right:0;z-index:9998;
+  background:linear-gradient(135deg,#0F172A,#1E293B);
+  border-top:2px solid #2563EB;
+  padding:16px 32px;
+  display:flex;align-items:center;justify-content:space-between;
+  flex-wrap:wrap;gap:12px;
+  box-shadow:0 -4px 24px rgba(0,0,0,.3);
+  transform:translateY(100%);transition:transform .4s ease;
+}
+#cookieBanner.visible{transform:translateY(0)}
+.cookie-text{font-size:.78rem;color:#CBD5E1;line-height:1.6;max-width:700px}
+.cookie-text a{color:#60A5FA;text-decoration:none;font-weight:600}
+.cookie-text a:hover{text-decoration:underline}
+.cookie-actions{display:flex;gap:8px;flex-shrink:0}
+.cookie-btn-accept{
+  background:linear-gradient(135deg,#2563EB,#4F46E5);color:#fff;
+  border:none;border-radius:8px;padding:8px 20px;font-size:.74rem;
+  font-weight:700;cursor:pointer;font-family:var(--wfi-font);
+  box-shadow:0 4px 12px rgba(37,99,235,.4);transition:all .2s;
+}
+.cookie-btn-accept:hover{transform:translateY(-1px);box-shadow:0 6px 16px rgba(37,99,235,.5)}
+.cookie-btn-settings{
+  background:transparent;color:#94A3B8;
+  border:1.5px solid #334155;border-radius:8px;padding:8px 16px;font-size:.74rem;
+  font-weight:700;cursor:pointer;font-family:var(--wfi-font);transition:all .2s;
+}
+.cookie-btn-settings:hover{color:#F1F5F9;border-color:#64748B}
+.cookie-btn-decline{
+  background:transparent;color:#64748B;border:none;
+  font-size:.7rem;cursor:pointer;font-family:var(--wfi-font);padding:4px 8px;
+}
+
+
+/* ── Dropdown nav groups ── */
+.wiq-nav-group-label{cursor:pointer;user-select:none;display:flex;align-items:center;justify-content:space-between;padding:7px 16px;font-size:.67rem;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:#64748B}
+.wiq-dropdown-toggle:hover{color:#93C5FD;background:rgba(37,99,235,.07);border-radius:8px}
+.wiq-arrow{font-size:.6rem;transition:transform .2s;flex-shrink:0}
+.wiq-dropdown-body{max-height:0;overflow:hidden;transition:max-height .3s ease}
+.wiq-dropdown-body.open{max-height:800px}
+/* ── Nav icons ── */
+.wiq-nav-item a .ico{width:20px;text-align:center;font-size:.88rem;flex-shrink:0}
+/* ── Active link highlight ── */
+.wiq-nav-item a.active,.wiq-nav-item a:has(.ico):hover{background:rgba(37,99,235,.15);color:#93C5FD}
+/* ── Logo ── */
+.wiq-logo-icon{width:32px;height:32px;background:linear-gradient(135deg,#1D4ED8,#6D28D9);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0}
+.wiq-logo-name{font-size:.78rem;font-weight:900;color:#E2E8F0;line-height:1.2}
+.wiq-logo-badge{font-size:.55rem;color:#60A5FA;background:rgba(37,99,235,.2);padding:1px 7px;border-radius:999px;margin-top:3px;display:inline-block;font-weight:700;letter-spacing:.05em}
+/* ── Card & Margin global fixes ── */
+.card,.stat-card,.kpi-card,.metric-card{margin-bottom:14px!important;border-radius:12px!important}
+.grid,.stats-grid,.kpi-grid{gap:14px!important}
+.wiq-main{padding:20px 24px!important;display:flex;flex-direction:column;min-height:100vh}
+.export-bar{padding:10px 0!important;margin-bottom:12px!important;display:flex;gap:8px;flex-wrap:wrap}
+@media(max-width:768px){
+  .wiq-mob-toggle{display:flex!important;align-items:center;justify-content:center}
+  .wiq-sidebar{position:fixed!important;left:-270px;top:0;height:100vh;z-index:500;transition:left .3s;overflow-y:auto}
+  .wiq-sidebar.open{left:0!important;box-shadow:4px 0 20px rgba(0,0,0,.5)}
+  .wiq-wrap{flex-direction:column}
+  .wiq-main{margin-left:0!important;padding:14px 16px!important}
+}
+/* ── Print ── */
+@media print{.wiq-sidebar,.wiq-mob-toggle,.export-bar,.cookie-banner,#ckb,#cookieBanner{display:none!important}.wiq-main{margin:0!important;padding:20px!important;max-width:100%!important}.card{page-break-inside:avoid;border:1px solid #e2e8f0!important}}
+</style>
+  <link rel="stylesheet" href="/workspace.css">
+  <script src="/workspace.js" defer></script>
+  <link rel="stylesheet" href="/navigation.css">
+  <script src="/navigation.js" defer></script>
+
+<script src="/appearance.js" defer></script>
+
+<link rel="stylesheet" href="/preferences.css">
+<link rel="stylesheet" href="/theme.css">
+</head>
+<body><button class="wiq-mob-toggle" onclick="openMobSidebar()" id="mobToggleBtn" style="display:none;position:fixed;top:14px;left:14px;z-index:600;background:#2563EB;color:#fff;border:none;border-radius:9px;padding:9px 13px;cursor:pointer;font-size:1rem;box-shadow:0 4px 16px rgba(37,99,235,.45)">&#9776;</button>
+<div class="wiq-wrap">
+<div class="wiq-sidebar" id="wiqSidebar">
+  <div class="wiq-sidebar-header">
+    <div class="wiq-logo">
+      <div class="wiq-logo-icon">&#9889;</div>
+      <div class="wiq-logo-text">
+        <span class="wiq-logo-name">Workforce<br>Intelligence</span>
+        <span class="wiq-logo-badge">Enterprise HRMS</span>
+      </div>
+    </div>
+    <div class="wiq-user-pill">
+      <span class="wiq-user-avatar">&#128100;</span>
+      <span class="wiq-user-name" id="sidebarUserName">Loading...</span>
+      <button class="wiq-tog" onclick="window.tdm&&window.tdm()" id="dmt" title="Toggle dark mode" style="width:28px;height:16px;border-radius:8px;border:none;background:#334155;cursor:pointer;flex-shrink:0"></button>
+    </div>
+  </div>
+  <nav class="wiq-nav">
+
+    <!-- DASHBOARDS -->
+    <div class="wiq-nav-group">
+      <div class="wiq-nav-group-label">Dashboards</div>
+      <div class="wiq-nav-item"><a href="admin-dashboard.html"><span class="ico">&#9711;</span><span>Admin Dashboard</span></a></div>
+      <div class="wiq-nav-item"><a href="employee-dashboard.html"><span class="ico">&#128100;</span><span>Employee Dashboard</span></a></div>
+      <div class="wiq-nav-item"><a href="manager.html"><span class="ico">&#128084;</span><span>Manager Dashboard</span></a></div>
+      <div class="wiq-nav-item"><a href="activity-history.html"><span class="ico">&#128203;</span><span>Activity History</span></a></div>
+    </div>
+
+    <!-- HR MANAGEMENT (dropdown) -->
+    <div class="wiq-nav-group">
+      <div class="wiq-nav-group-label wiq-dropdown-toggle" onclick="toggleGroup('grp-hr')">
+        &#128101; HR Management <span class="wiq-arrow" id="arr-hr">&#9660;</span>
+      </div>
+      <div id="grp-hr" class="wiq-dropdown-body">
+        <div class="wiq-nav-item"><a href="attendance.html"><span class="ico">&#128336;</span><span>Attendance</span></a></div>
+        <div class="wiq-nav-item"><a href="leave.html"><span class="ico">&#127964;</span><span>Leave Management</span></a></div>
+        <div class="wiq-nav-item"><a href="hiring.html"><span class="ico">&#127919;</span><span>Hiring & ATS</span></a></div>
+        <div class="wiq-nav-item"><a href="onboarding.html"><span class="ico">&#128640;</span><span>Onboarding</span></a></div>
+        <div class="wiq-nav-item"><a href="performance.html"><span class="ico">&#128202;</span><span>Performance</span></a></div>
+        <div class="wiq-nav-item"><a href="training.html"><span class="ico">&#127891;</span><span>Training & LMS</span></a></div>
+        <div class="wiq-nav-item"><a href="goals-okr.html"><span class="ico">&#127942;</span><span>Goals & OKR</span></a></div>
+        <div class="wiq-nav-item"><a href="exit.html"><span class="ico">&#128682;</span><span>Exit Management</span></a></div>
+        <div class="wiq-nav-item"><a href="employee-directory.html"><span class="ico">&#128101;</span><span>Employee Directory</span></a></div>
+        <div class="wiq-nav-item"><a href="org-chart.html"><span class="ico">&#127961;</span><span>Org Chart</span></a></div>
+        <div class="wiq-nav-item"><a href="shift-roster.html"><span class="ico">&#128197;</span><span>Shift Roster</span></a></div>
+        <div class="wiq-nav-item"><a href="shift-bidding.html"><span class="ico">&#128260;</span><span>Shift Bidding</span></a></div>
+        <div class="wiq-nav-item"><a href="wfh-tracker.html"><span class="ico">&#127968;</span><span>WFH Tracker</span></a></div>
+        <div class="wiq-nav-item"><a href="time-tracker.html"><span class="ico">&#9201;</span><span>Time Tracker</span></a></div>
+        <div class="wiq-nav-item"><a href="regularization.html"><span class="ico">&#128393;</span><span>Regularisation</span></a></div>
+      </div>
+    </div>
+
+    <!-- PAYROLL & FINANCE (dropdown) -->
+    <div class="wiq-nav-group">
+      <div class="wiq-nav-group-label wiq-dropdown-toggle" onclick="toggleGroup('grp-pay')">
+        &#128176; Payroll & Finance <span class="wiq-arrow" id="arr-pay">&#9660;</span>
+      </div>
+      <div id="grp-pay" class="wiq-dropdown-body">
+        <div class="wiq-nav-item"><a href="salary.html"><span class="ico">&#128176;</span><span>Payroll Processing</span></a></div>
+        <div class="wiq-nav-item"><a href="payslip-portal.html"><span class="ico">&#128196;</span><span>Payslip Portal</span></a></div>
+        <div class="wiq-nav-item"><a href="salary-revision.html"><span class="ico">&#128200;</span><span>Salary Revision</span></a></div>
+        <div class="wiq-nav-item"><a href="salary-advance.html"><span class="ico">&#128179;</span><span>Salary Advance</span></a></div>
+        <div class="wiq-nav-item"><a href="tax-portal.html"><span class="ico">&#129534;</span><span>TDS / Tax Portal</span></a></div>
+        <div class="wiq-nav-item"><a href="investment-declaration.html"><span class="ico">&#128209;</span><span>IT Declaration</span></a></div>
+        <div class="wiq-nav-item"><a href="form-24q.html"><span class="ico">&#127963;</span><span>Form 24Q</span></a></div>
+        <div class="wiq-nav-item"><a href="statutory-bonus.html"><span class="ico">&#127873;</span><span>Statutory Bonus</span></a></div>
+        <div class="wiq-nav-item"><a href="lwf-tracker.html"><span class="ico">&#127963;</span><span>LWF Tracker</span></a></div>
+        <div class="wiq-nav-item"><a href="benefits.html"><span class="ico">&#127973;</span><span>Benefits & Perks</span></a></div>
+        <div class="wiq-nav-item"><a href="loan-portal.html"><span class="ico">&#127991;</span><span>Loan Portal</span></a></div>
+        <div class="wiq-nav-item"><a href="banking.html"><span class="ico">&#127970;</span><span>Banking</span></a></div>
+      </div>
+    </div>
+
+    <!-- COMPLIANCE (dropdown) -->
+    <div class="wiq-nav-group">
+      <div class="wiq-nav-group-label wiq-dropdown-toggle" onclick="toggleGroup('grp-comp')">
+        &#9878;&#65039; Compliance <span class="wiq-arrow" id="arr-comp">&#9660;</span>
+      </div>
+      <div id="grp-comp" class="wiq-dropdown-body">
+        <div class="wiq-nav-item"><a href="compliance.html"><span class="ico">&#9878;&#65039;</span><span>Statutory Compliance</span></a></div>
+        <div class="wiq-nav-item"><a href="posh-complaints.html"><span class="ico">&#128737;</span><span>POSH / ICC</span></a></div>
+        <div class="wiq-nav-item"><a href="privacy-policy.html"><span class="ico">&#128274;</span><span>Privacy Policy</span></a></div>
+        <div class="wiq-nav-item"><a href="cookie-policy.html"><span class="ico">&#127850;</span><span>Cookie Policy</span></a></div>
+        <div class="wiq-nav-item"><a href="security-policy.html"><span class="ico">&#128737;</span><span>Security Policy</span></a></div>
+        <div class="wiq-nav-item"><a href="company-policies.html"><span class="ico">&#128220;</span><span>Company Policies</span></a></div>
+      </div>
+    </div>
+
+    <!-- AI & INTELLIGENCE -->
+    <div class="wiq-nav-group">
+      <div class="wiq-nav-group-label wiq-dropdown-toggle" onclick="toggleGroup('grp-ai')">
+        &#129302; AI & Intelligence <span class="wiq-arrow" id="arr-ai">&#9660;</span>
+      </div>
+      <div id="grp-ai" class="wiq-dropdown-body">
+        <div class="wiq-nav-item"><a href="ai-assistant.html"><span class="ico">&#129302;</span><span>AI Assistant</span></a></div>
+        <div class="wiq-nav-item"><a href="hr-copilot.html"><span class="ico">&#129504;</span><span>HR Copilot</span></a></div>
+        <div class="wiq-nav-item"><a href="ai-insights.html"><span class="ico">&#128202;</span><span>AI Insights</span></a></div>
+      </div>
+    </div>
+
+    <!-- SECURITY (dropdown) -->
+    <div class="wiq-nav-group">
+      <div class="wiq-nav-group-label wiq-dropdown-toggle" onclick="toggleGroup('grp-sec')">
+        &#128737; Security <span class="wiq-arrow" id="arr-sec">&#9660;</span>
+      </div>
+      <div id="grp-sec" class="wiq-dropdown-body">
+        <div class="wiq-nav-item"><a href="fraud-detection.html"><span class="ico">&#128269;</span><span>Fraud Detection</span></a></div>
+        <div class="wiq-nav-item"><a href="cybersecurity.html"><span class="ico">&#128737;</span><span>Cybersecurity</span></a></div>
+        <div class="wiq-nav-item"><a href="threat-monitor.html"><span class="ico">&#128308;</span><span>Threat Monitor</span></a></div>
+        <div class="wiq-nav-item"><a href="audit-log.html"><span class="ico">&#128196;</span><span>Audit Log</span></a></div>
+        <div class="wiq-nav-item"><a href="session-management.html"><span class="ico">&#128273;</span><span>Session Mgmt</span></a></div>
+      </div>
+    </div>
+
+    <!-- ANALYTICS (dropdown) -->
+    <div class="wiq-nav-group">
+      <div class="wiq-nav-group-label wiq-dropdown-toggle" onclick="toggleGroup('grp-ana')">
+        &#128202; Analytics <span class="wiq-arrow" id="arr-ana">&#9660;</span>
+      </div>
+      <div id="grp-ana" class="wiq-dropdown-body">
+        <div class="wiq-nav-item"><a href="analytics.html"><span class="ico">&#128200;</span><span>Analytics Dashboard</span></a></div>
+        <div class="wiq-nav-item"><a href="reports.html"><span class="ico">&#128209;</span><span>Reports Center</span></a></div>
+        <div class="wiq-nav-item"><a href="workforce-planning.html"><span class="ico">&#128202;</span><span>Workforce Planning</span></a></div>
+        <div class="wiq-nav-item"><a href="real-time-monitor.html"><span class="ico">&#128225;</span><span>Real-Time Monitor</span></a></div>
+        <div class="wiq-nav-item"><a href="headcount.html"><span class="ico">&#128101;</span><span>Headcount</span></a></div>
+        <div class="wiq-nav-item"><a href="diversity.html"><span class="ico">&#127752;</span><span>Diversity & DEI</span></a></div>
+      </div>
+    </div>
+
+    <!-- SAFETY & WELFARE (dropdown) -->
+    <div class="wiq-nav-group">
+      <div class="wiq-nav-group-label wiq-dropdown-toggle" onclick="toggleGroup('grp-safe')">
+        &#10084;&#65039; Welfare & Safety <span class="wiq-arrow" id="arr-safe">&#9660;</span>
+      </div>
+      <div id="grp-safe" class="wiq-dropdown-body">
+        <div class="wiq-nav-item"><a href="mental-health.html"><span class="ico">&#128156;</span><span>Mental Health & EAP</span></a></div>
+        <div class="wiq-nav-item"><a href="112-emergency.html"><span class="ico">&#128680;</span><span>112 Emergency & SOS</span></a></div>
+        <div class="wiq-nav-item"><a href="women-safety-policy.html"><span class="ico">&#127800;</span><span>Women Safety</span></a></div>
+        <div class="wiq-nav-item"><a href="cab-booking.html"><span class="ico">&#128663;</span><span>Cab & Transport</span></a></div>
+        <div class="wiq-nav-item"><a href="visitor-management.html"><span class="ico">&#127970;</span><span>Visitor Management</span></a></div>
+        <div class="wiq-nav-item"><a href="welfare.html"><span class="ico">&#10084;&#65039;</span><span>Welfare Hub</span></a></div>
+        <div class="wiq-nav-item"><a href="pulse-survey.html"><span class="ico">&#128202;</span><span>Pulse Survey</span></a></div>
+      </div>
+    </div>
+
+    <!-- EMPLOYEE SELF-SERVICE (dropdown) -->
+    <div class="wiq-nav-group">
+      <div class="wiq-nav-group-label wiq-dropdown-toggle" onclick="toggleGroup('grp-ess')">
+        &#128111; Self-Service <span class="wiq-arrow" id="arr-ess">&#9660;</span>
+      </div>
+      <div id="grp-ess" class="wiq-dropdown-body">
+        <div class="wiq-nav-item"><a href="employee-self-service.html"><span class="ico">&#128111;</span><span>Self-Service Portal</span></a></div>
+        <div class="wiq-nav-item"><a href="profile.html"><span class="ico">&#128100;</span><span>My Profile</span></a></div>
+        <div class="wiq-nav-item"><a href="document-vault.html"><span class="ico">&#128193;</span><span>Document Vault</span></a></div>
+        <div class="wiq-nav-item"><a href="expenses.html"><span class="ico">&#128184;</span><span>Expenses</span></a></div>
+        <div class="wiq-nav-item"><a href="tasks.html"><span class="ico">&#9989;</span><span>My Tasks</span></a></div>
+        <div class="wiq-nav-item"><a href="helpdesk.html"><span class="ico">&#127916;</span><span>IT Helpdesk</span></a></div>
+        <div class="wiq-nav-item"><a href="announcements.html"><span class="ico">&#128226;</span><span>Announcements</span></a></div>
+        <div class="wiq-nav-item"><a href="notifications.html"><span class="ico">&#128276;</span><span>Notifications</span></a></div>
+        <div class="wiq-nav-item"><a href="festival-calendar.html"><span class="ico">&#127881;</span><span>Festival Calendar</span></a></div>
+      </div>
+    </div>
+
+    <!-- BIOMETRICS (dropdown) -->
+    <div class="wiq-nav-group">
+      <div class="wiq-nav-group-label wiq-dropdown-toggle" onclick="toggleGroup('grp-bio')">
+        &#128272; Biometrics <span class="wiq-arrow" id="arr-bio">&#9660;</span>
+      </div>
+      <div id="grp-bio" class="wiq-dropdown-body">
+        <div class="wiq-nav-item"><a href="face-recognition.html"><span class="ico">&#128065;&#65039;</span><span>Face Recognition</span></a></div>
+        <div class="wiq-nav-item"><a href="biometric-enrollment.html"><span class="ico">&#128272;</span><span>Biometric Enrollment</span></a></div>
+      </div>
+    </div>
+
+    <!-- ADMIN (dropdown) -->
+    <div class="wiq-nav-group">
+      <div class="wiq-nav-group-label wiq-dropdown-toggle" onclick="toggleGroup('grp-adm')">
+        &#9881;&#65039; Administration <span class="wiq-arrow" id="arr-adm">&#9660;</span>
+      </div>
+      <div id="grp-adm" class="wiq-dropdown-body">
+        <div class="wiq-nav-item"><a href="settings.html"><span class="ico">&#9881;&#65039;</span><span>Settings</span></a></div>
+        <div class="wiq-nav-item"><a href="employee-grades.html"><span class="ico">&#127885;</span><span>Employee Grades</span></a></div>
+        <div class="wiq-nav-item"><a href="assets.html"><span class="ico">&#127963;</span><span>Assets</span></a></div>
+        <div class="wiq-nav-item"><a href="data-export.html"><span class="ico">&#128228;</span><span>Data Export</span></a></div>
+        <div class="wiq-nav-item"><a href="registration-tracker.html"><span class="ico">&#128203;</span><span>Registration Tracker</span></a></div>
+      </div>
+    </div>
+
+    <!-- LOGOUT -->
+    <div class="wiq-nav-group" style="margin-top:auto;padding-top:8px;border-top:1px solid rgba(255,255,255,.07)">
+      <div class="wiq-nav-item"><a href="#" onclick="window.logout&&window.logout();return false;" style="color:#EF4444!important"><span class="ico">&#128682;</span><span>Logout</span></a></div>
+    </div>
+
+  </nav>
+</div>
+
+<div class="wiq-main">
+
+<nav class="navbar">
+  <div class="nav-brand">
+      <span class="logo-icon">&#9889;</span>
+      <span class="logo-text">Workforce Intelligence</span>
+      <span class="logo-version"></span>
+    </div>
+  <div class="nav-info" style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+    <div style="display:flex;align-items:center;gap:5px;background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.3);border-radius:999px;padding:4px 12px;font-size:.75rem;color:#86efac">
+      <span class="live-dot"></span> Live
+    </div>
+    <a href="employee-dashboard.html" class="btn btn-sm btn-outline">← Dashboard</a>
+    <button onclick="logout()" class="btn btn-sm btn-outline">Logout</button>
+  </div>
+</nav>
+
+<div class="track-wrap">
+  <!-- 2-HOUR BOOKING POLICY NOTICE -->
+  <div style="background:#eff6ff;border:1.5px solid #bfdbfe;border-radius:10px;padding:11px 16px;margin:14px;font-size:.8rem;color:#1d4ed8;display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+    <span style="font-size:1.1rem;flex-shrink:0">&#9200;</span>
+    <div>
+      <b>Cab Booking Policy:</b> All bookings must be made <b>at least 2 hours before pickup time</b>.
+      Same-day bookings allowed if pickup is 2&#43; hours away.
+      Cancellations accepted up to <b>1 hour before pickup</b>.
+      Night cabs (10 PM&#8211;6 AM) must be pre-booked by <b>8 PM</b>.
+    </div>
+  </div>
+
+  <!-- Approval notification bar (shown when just approved) -->
+  <div class="notif-bar" id="approvalBar">
+    <span style="font-size:1.3rem">✅</span>
+    <div id="approvalMsg">Your cab booking has been approved!</div>
+  </div>
+
+  <!-- Booking confirmation card (shown after approval) -->
+  <div class="confirm-banner" id="confirmBanner">
+    <div class="cb-title">🎉 Cab Booking Confirmed!</div>
+    <div class="cb-grid" id="confirmGrid"></div>
+  </div>
+
+  <!-- Booking selector -->
+  <div style="display:flex;gap:10px;margin-bottom:18px;align-items:center;flex-wrap:wrap">
+    <div style="flex:1;min-width:200px">
+      <select id="bookingSelector" onchange="loadBooking(this.value)"
+        style="width:100%;padding:10px 14px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:10px;color:#f1f5f9;font-size:.84rem">
+        <option value="">Select your booking…</option>
+      </select>
+    </div>
+    <div style="font-size:.78rem;color:#64748b">Booking #<b id="tBookingId" style="color:#60a5fa">–</b></div>
+  </div>
+
+  <div class="main-grid">
+    <!-- ══ LEFT PANEL ══ -->
+    <div>
+
+      <!-- Journey status -->
+      <div class="panel">
+        <div class="panel-title">Journey Status</div>
+        <div id="journeyStatusBadge" class="j-status js-waiting">⏳ Waiting for pickup</div>
+        <div class="speed-row">
+          <div class="speed-box"><div class="speed-num" id="liveSpeed">0</div><div class="speed-unit">km/h</div></div>
+          <div class="speed-box"><div class="speed-num" id="distOffice" style="font-size:1.3rem">–</div><div class="speed-unit">km from office</div></div>
+        </div>
+      </div>
+
+      <!-- Driver card -->
+      <div class="panel">
+        <div class="panel-title">Your Driver</div>
+        <div id="driverCard"><div style="color:#475569;font-size:.82rem;text-align:center;padding:12px">Loading driver details…</div></div>
+      </div>
+
+      <!-- OTP -->
+      <div id="otpPanel" class="panel" style="display:none;text-align:center">
+        <div class="panel-title">Share OTP with Driver</div>
+        <div class="otp-badge">
+          <div class="otp-label">Journey OTP</div>
+          <div class="otp-num" id="otpDisplay">──────</div>
+          <div style="font-size:.7rem;color:#a7f3d0;margin-top:6px">Show this to driver to start/end trip</div>
+        </div>
+      </div>
+
+      <!-- Booking details -->
+      <div class="panel">
+        <div class="panel-title">Booking Details</div>
+        <div id="bookingDetails"><div style="color:#475569;font-size:.82rem;text-align:center;padding:10px">Select a booking above</div></div>
+      </div>
+
+      <!-- SOS -->
+      <button class="sos-btn" id="sosBtn" onclick="triggerSOS()" style="display:none;margin-bottom:14px">
+        🚨 SOS — Emergency Alert
+      </button>
+
+      <!-- Rate driver -->
+      <div class="panel" id="ratingPanel" style="display:none">
+        <div class="panel-title">Rate Your Driver</div>
+        <div class="star-row" id="starRow">
+          <span onclick="setRating(1)">★</span><span onclick="setRating(2)">★</span>
+          <span onclick="setRating(3)">★</span><span onclick="setRating(4)">★</span>
+          <span onclick="setRating(5)">★</span>
+        </div>
+        <textarea id="ratingFeedback" placeholder="Optional feedback…" rows="2"
+          style="width:100%;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:8px;color:#f1f5f9;font-size:.8rem;resize:none;margin-bottom:8px"></textarea>
+        <button onclick="submitRating()" class="btn btn-full" style="background:#1a56db">Submit Rating ⭐</button>
+        <p id="ratingMsg" class="msg" style="margin-top:6px"></p>
+      </div>
+
+      <!-- EMERGENCY SERVICES -->
+      <div class="panel emergency-section">
+        <div class="panel-title">🆘 Nearby Emergency Services</div>
+
+        <!-- Location status -->
+        <div id="locationStatus" class="no-location-msg" style="display:none">
+          📍 Enable location to see nearby services automatically.
+          <br>Or we'll show services for <b>Patna, Bihar</b> by default.
+        </div>
+
+        <!-- Type filter tabs -->
+        <div class="emergency-tabs">
+          <button class="etab police active" data-type="police"     onclick="filterServices(this,'police')">🚔 Police</button>
+          <button class="etab hospital"      data-type="hospital"   onclick="filterServices(this,'hospital')">🏥 Hospital</button>
+          <button class="etab restaurant"    data-type="restaurant" onclick="filterServices(this,'restaurant')">🍽️ Food</button>
+          <button class="etab pharmacy"      data-type="pharmacy"   onclick="filterServices(this,'pharmacy')">💊 Pharmacy</button>
+        </div>
+
+        <!-- Static emergency numbers always visible -->
+        <div id="emergencyNumbers" style="background:rgba(220,38,38,.08);border:1px solid rgba(220,38,38,.2);border-radius:10px;padding:10px 14px;margin-bottom:10px">
+          <div style="font-size:.72rem;font-weight:700;color:#fca5a5;margin-bottom:8px;text-transform:uppercase;letter-spacing:.06em">📞 National Emergency Numbers</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
+            <a href="tel:100" style="background:rgba(37,99,235,.15);border-radius:8px;padding:7px 10px;text-decoration:none;display:flex;align-items:center;gap:6px">
+              <span>🚔</span><div><div style="font-size:.72rem;font-weight:800;color:#93c5fd">100</div><div style="font-size:.65rem;color:#64748b">Police</div></div>
+            </a>
+            <a href="tel:102" style="background:rgba(220,38,38,.15);border-radius:8px;padding:7px 10px;text-decoration:none;display:flex;align-items:center;gap:6px">
+              <span>🚑</span><div><div style="font-size:.72rem;font-weight:800;color:#fca5a5">102</div><div style="font-size:.65rem;color:#64748b">Ambulance</div></div>
+            </a>
+            <a href="tel:101" style="background:rgba(234,179,8,.15);border-radius:8px;padding:7px 10px;text-decoration:none;display:flex;align-items:center;gap:6px">
+              <span>🚒</span><div><div style="font-size:.72rem;font-weight:800;color:#fde047">101</div><div style="font-size:.65rem;color:#64748b">Fire</div></div>
+            </a>
+            <a href="tel:112" style="background:rgba(22,163,74,.15);border-radius:8px;padding:7px 10px;text-decoration:none;display:flex;align-items:center;gap:6px">
+              <span>🆘</span><div><div style="font-size:.72rem;font-weight:800;color:#86efac">112</div><div style="font-size:.65rem;color:#64748b">Emergency</div></div>
+            </a>
+            <a href="tel:1098" style="background:rgba(124,58,237,.15);border-radius:8px;padding:7px 10px;text-decoration:none;display:flex;align-items:center;gap:6px">
+              <span>👶</span><div><div style="font-size:.72rem;font-weight:800;color:#c4b5fd">1098</div><div style="font-size:.65rem;color:#64748b">Child Helpline</div></div>
+            </a>
+            <a href="tel:1091" style="background:rgba(219,39,119,.15);border-radius:8px;padding:7px 10px;text-decoration:none;display:flex;align-items:center;gap=6px">
+              <span>👩</span><div><div style="font-size:.72rem;font-weight:800;color:#f9a8d4">1091</div><div style="font-size:.65rem;color:#64748b">Women Helpline</div></div>
+            </a>
+          </div>
+        </div>
+
+        <!-- Company helpline -->
+        <div style="background:rgba(37,99,235,.1);border:1px solid rgba(37,99,235,.25);border-radius:10px;padding:10px 14px;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;gap:10px">
+          <div>
+            <div style="font-size:.72rem;font-weight:700;color:#93c5fd;margin-bottom:2px">🏢 Workforce Intelligence Cab Helpline</div>
+            <div style="font-size:.7rem;color:#64748b">24×7 support for all cab emergencies</div>
+          </div>
+          <a href="tel:+919876543210" style="background:#2563eb;color:#fff;border-radius:9px;padding:8px 14px;text-decoration:none;font-size:.8rem;font-weight:800;white-space:nowrap">📞 +91-9876543210</a>
+        </div>
+
+        <!-- Nearby places list -->
+        <div id="nearbyList" class="service-list">
+          <div class="loading-services">📍 Detecting your location…</div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ══ MAP + PING LOG ══ -->
+    <div>
+      <!-- Map legend -->
+      <div id="mapLegend" style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:8px;font-size:.72rem;color:#94a3b8">
+        <span style="display:flex;align-items:center;gap:5px"><span style="display:inline-block;width:12px;height:12px;border-radius:50%;background:#1a56db"></span> Office</span>
+        <span id="legendPickup" style="display:none;align-items:center;gap:5px"><span style="display:inline-block;width:12px;height:12px;border-radius:50%;background:#f59e0b"></span> Pickup Stop</span>
+        <span style="display:flex;align-items:center;gap:5px"><span style="display:inline-block;width:12px;height:12px;border-radius:50%;background:#16a34a"></span> You</span>
+        <span style="display:flex;align-items:center;gap:5px"><span style="display:inline-block;width:12px;height:12px;border-radius:50%;background:#3b82f6"></span> Driver</span>
+        <span id="legendRoute" style="display:none;align-items:center;gap:5px"><span style="display:inline-block;width:20px;height:3px;background:#f59e0b;border-radius:2px"></span> Route</span>
+      </div>
+      <div id="trackMap"></div>
+      <!-- Map action buttons -->
+      <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
+        <button onclick="fitMapToRoute()" class="btn btn-sm btn-outline" style="font-size:.72rem;padding:5px 12px">🗺️ Fit Route</button>
+        <button onclick="centerOnDriver()" class="btn btn-sm btn-outline" style="font-size:.72rem;padding:5px 12px">🚗 Center Driver</button>
+        <button onclick="centerOnMe()" class="btn btn-sm btn-outline" style="font-size:.72rem;padding:5px 12px">📍 Center Me</button>
+        <button onclick="openInGoogleMaps()" class="btn btn-sm btn-outline" style="font-size:.72rem;padding:5px 12px;color:#4ade80;border-color:rgba(74,222,128,.3)">↗ Google Maps</button>
+      </div>
+      <div class="panel" style="margin-top:14px;background:rgba(255,255,255,.02)">
+        <div class="panel-title">📡 Location Pings</div>
+        <div class="ping-log" id="pingLog"><div style="color:#475569;font-size:.78rem">No pings yet.</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js">
+const API = '/api';
+</script>
+<script src="app.js"></script>
+<script>
+/* ════════════════════════════════════════════
+   CAB TRACKING -- with Emergency Services
+════════════════════════════════════════════ */
+var _map, _driverMarker, _employeeMarker, _routeLine;
+var _pickupMarker, _plannedRouteLine, _boundsGroup;
+var _bookingId, _driverId, _pollTimer;
+var _currentBooking = null;
+var _selectedRating = 0;
+var _userLat = null, _userLng = null;
+var _currentServiceType = 'police';
+var _nearbyCache = {};
+
+var OFFICE = {lat: 25.6093, lng: 85.1376};
+
+// Fallback pickup coords keyed by route_id (matches migrate_route_coords.sql)
+var ROUTE_COORDS = {
+  1: {lat: 25.6205, lng: 85.1310, stop: 'Rajiv Nagar Bus Stop'},
+  2: {lat: 25.6012, lng: 85.1482, stop: 'Kankarbagh Crossing'},
+  3: {lat: 25.6097, lng: 85.1121, stop: 'Boring Road Petrol Pump'},
+  4: {lat: 25.6214, lng: 85.1268, stop: 'Patliputra Colony Gate'},
+  5: {lat: 25.6093, lng: 85.1376, stop: 'Office Main Gate'}
+};
+
+/* ── Map init ─────────────────────────────── */
+function initMap() {
+  if(typeof L==='undefined'){console.warn('Leaflet not loaded');return;}
+  _map = L.map('trackMap', {zoomControl:true}).setView([OFFICE.lat, OFFICE.lng], 13);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+    {attribution:'© OpenStreetMap', maxZoom:19}).addTo(_map);
+
+  // Office marker
+  L.marker([OFFICE.lat, OFFICE.lng], {
+    icon: L.divIcon({
+      className:'',
+      html:'<div style="background:#1a56db;color:#fff;padding:5px 10px;border-radius:8px;font-size:.7rem;font-weight:700;white-space:nowrap;box-shadow:0 4px 12px rgba(0,0,0,.4)">🏢 Office</div>',
+      iconAnchor:[40,18]
+    })
+  }).bindPopup('<b>Office</b><br>Workforce Intelligence HQ').addTo(_map);
+}
+
+/* ── Draw planned route: pickup stop -> office ─ */
+function drawPlannedRoute(booking) {
+  // Get coords from booking (DB) or fallback to ROUTE_COORDS
+  var pickupLat = parseFloat(booking.pickup_lat) || (ROUTE_COORDS[booking.route_id]||{}).lat || null;
+  var pickupLng = parseFloat(booking.pickup_lng) || (ROUTE_COORDS[booking.route_id]||{}).lng || null;
+  var dropLat   = parseFloat(booking.drop_lat)   || OFFICE.lat;
+  var dropLng   = parseFloat(booking.drop_lng)   || OFFICE.lng;
+
+  if(!pickupLat || !pickupLng) return;
+
+  // Remove old planned markers/line
+  if(_pickupMarker)    { _map.removeLayer(_pickupMarker);    _pickupMarker=null; }
+  if(_plannedRouteLine){ _map.removeLayer(_plannedRouteLine);_plannedRouteLine=null; }
+
+  // Pickup stop marker
+  var stopName = booking.pickup_stop || 'Pickup Stop';
+  _pickupMarker = L.marker([pickupLat, pickupLng], {
+    icon: L.divIcon({
+      className:'',
+      html:'<div style="background:#f59e0b;color:#fff;padding:5px 10px;border-radius:8px;font-size:.7rem;font-weight:700;white-space:nowrap;box-shadow:0 4px 12px rgba(0,0,0,.4)">🚏 '+escHtml(stopName)+'</div>',
+      iconAnchor:[50,18]
+    })
+  }).bindPopup('<b>Pickup Stop</b><br>'+escHtml(stopName)+'<br><span style="font-size:.75rem;color:#666">Pickup: '+String(booking.pickup_time||'').slice(0,5)+'</span>').addTo(_map);
+
+  // Show legend items
+  var lp = document.getElementById('legendPickup');
+  var lr = document.getElementById('legendRoute');
+  if(lp) lp.style.display='flex';
+  if(lr) lr.style.display='flex';
+
+  // Try OSRM for real road route, fallback to straight line
+  fetchOSRMRoute(pickupLat, pickupLng, dropLat, dropLng, stopName);
+
+  // Fit map to show both pickup & office
+  try {
+    var bounds = L.latLngBounds([[pickupLat,pickupLng],[dropLat,dropLng]]);
+    if(_userLat) bounds.extend([_userLat,_userLng]);
+    _map.fitBounds(bounds, {padding:[40,40]});
+  } catch(e) {}
+}
+
+/* ── OSRM route fetcher (free, no API key) ─── */
+async function fetchOSRMRoute(fromLat, fromLng, toLat, toLng, stopName) {
+  try {
+    var url = 'https://router.project-osrm.org/route/v1/driving/'+fromLng+','+fromLat+';'+toLng+','+toLat+'?overview=full&geometries=geojson';
+    var r = await fetch(url, {signal: AbortSignal.timeout(6000)});
+    var data = await r.json();
+    if(data.code==='Ok' && data.routes && data.routes[0]) {
+      var coords = data.routes[0].geometry.coordinates.map(function(c){return [c[1],c[0]];});
+      if(_plannedRouteLine) _map.removeLayer(_plannedRouteLine);
+      _plannedRouteLine = L.polyline(coords, {
+        color:'#f59e0b', weight:4, opacity:.8, dashArray:'10,6'
+      }).bindPopup('<b>Route to Office</b><br>'+escHtml(stopName||'Pickup')+'-> Office<br>~'+
+        (data.routes[0].distance/1000).toFixed(1)+' km · '+Math.ceil(data.routes[0].duration/60)+' min'
+      ).addTo(_map);
+    } else {
+      drawStraightRoute(fromLat, fromLng, toLat, toLng);
+    }
+  } catch(e) {
+    drawStraightRoute(fromLat, fromLng, toLat, toLng);
+  }
+}
+
+/* ── Straight-line fallback ───────────────── */
+function drawStraightRoute(fromLat, fromLng, toLat, toLng) {
+  if(_plannedRouteLine) _map.removeLayer(_plannedRouteLine);
+  _plannedRouteLine = L.polyline([[fromLat,fromLng],[toLat,toLng]], {
+    color:'#f59e0b', weight:3, opacity:.7, dashArray:'8,6'
+  }).bindPopup('Estimated route (road data unavailable)').addTo(_map);
+}
+
+/* ── Map utility buttons ──────────────────── */
+function fitMapToRoute() {
+  var pts = [[OFFICE.lat, OFFICE.lng]];
+  if(_pickupMarker)   pts.push(_pickupMarker.getLatLng());
+  if(_driverMarker)   pts.push(_driverMarker.getLatLng());
+  if(_employeeMarker) pts.push(_employeeMarker.getLatLng());
+  if(pts.length > 1) _map.fitBounds(L.latLngBounds(pts), {padding:[40,40]});
+}
+
+function centerOnDriver() {
+  if(_driverMarker) _map.setView(_driverMarker.getLatLng(), 15);
+  else showToast('No driver location yet.');
+}
+
+function centerOnMe() {
+  if(_employeeMarker) _map.setView(_employeeMarker.getLatLng(), 15);
+  else if(_userLat)   _map.setView([_userLat, _userLng], 15);
+  else showToast('Location not detected.');
+}
+
+function openInGoogleMaps() {
+  var b = _currentBooking;
+  if(!b) { showToast('Select a booking first.'); return; }
+  var pLat = parseFloat(b.pickup_lat) || (ROUTE_COORDS[b.route_id]||{}).lat || OFFICE.lat;
+  var pLng = parseFloat(b.pickup_lng) || (ROUTE_COORDS[b.route_id]||{}).lng || OFFICE.lng;
+  var url = 'https://www.google.com/maps/dir/'+pLat+','+pLng+'/'+OFFICE.lat+','+OFFICE.lng;
+  window.open(url, '_blank');
+}
+
+function showToast(msg) {
+  var t = document.createElement('div');
+  t.textContent = msg;
+  t.style.cssText = 'position:fixed;bottom:30px;left:50%;transform:translateX(-50%);background:#1e293b;color:#f1f5f9;padding:10px 20px;border-radius:8px;font-size:.82rem;z-index:9999;box-shadow:0 4px 16px rgba(0,0,0,.5)';
+  document.body.appendChild(t);
+  setTimeout(function(){t.remove();},2500);
+}
+
+/* ── Distance (Haversine) ─────────────────── */
+function haversine(lat1,lng1,lat2,lng2){
+  var R=6371, dLat=(lat2-lat1)*Math.PI/180, dLng=(lng2-lng1)*Math.PI/180;
+  var a=Math.sin(dLat/2)*Math.sin(dLat/2)+Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLng/2)*Math.sin(dLng/2);
+  return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));
+}
+
+/* ── Load bookings selector ───────────────── */
+async function loadMyBookingsForSelector() {
+  try {
+    var r = await fetch(API+'/cab/my',{headers:authHeaders()});
+    var list = await r.json();
+    var sel = document.getElementById('bookingSelector');
+    var active = list.filter(function(b){ return ['pending','approved'].includes(b.status); });
+    active.forEach(function(b){
+      var opt = document.createElement('option');
+      opt.value = b.booking_id;
+      opt.textContent = '#'+b.booking_id+' · '+b.route_name+' · '+formatDate(b.booking_date)+' · '+b.status.toUpperCase();
+      sel.appendChild(opt);
+    });
+    // Auto-select first approved
+    var approved = list.filter(function(b){return b.status==='approved';});
+    if(approved.length) { sel.value=approved[0].booking_id; loadBooking(approved[0].booking_id); }
+  } catch(e){ console.error(e); }
+}
+
+/* ── Load booking detail ──────────────────── */
+async function loadBooking(id) {
+  if(!id) return;
+  _bookingId = id;
+  setInner('tBookingId', id);
+  try {
+    var r = await fetch(API+'/cab/my',{headers:authHeaders()});
+    var list = await r.json();
+    _currentBooking = list.find(function(b){return b.booking_id==id;});
+    if(!_currentBooking) return;
+
+    // Show confirmation banner if approved
+    if(_currentBooking.status === 'approved') showConfirmationBanner(_currentBooking);
+
+    // OTP
+    if(_currentBooking.otp && _currentBooking.status==='approved'){
+      document.getElementById('otpPanel').style.display='block';
+      setInner('otpDisplay', _currentBooking.otp);
+    }
+
+    // SOS button
+    var sosBtn = document.getElementById('sosBtn');
+    if(sosBtn) sosBtn.style.display = _currentBooking.status==='approved'?'block':'none';
+
+    // Journey status
+    updateJourneyStatus(_currentBooking.journey_status||'waiting');
+
+    // Booking details
+    renderBookingDetails(_currentBooking);
+
+    // Driver card
+    if(_currentBooking.driver_name) renderDriverCard(_currentBooking);
+
+    // Draw planned route on map (pickup stop -> office)
+    drawPlannedRoute(_currentBooking);
+
+    // Rating form if completed
+    if(_currentBooking.journey_status==='completed' && _currentBooking.driver_id)
+      document.getElementById('ratingPanel').style.display='block';
+
+    // Start tracking
+    if(_currentBooking.status==='approved') startTracking(id);
+
+  } catch(e){ console.error(e); }
+}
+
+/* ── Confirmation banner ──────────────────── */
+function showConfirmationBanner(b) {
+  var banner = document.getElementById('confirmBanner');
+  var grid   = document.getElementById('confirmGrid');
+  banner.classList.add('show');
+  var vIcon = b.vehicle_type==='Bus'?'🚌':b.vehicle_type==='Car'?'🚗':'🏍️';
+  grid.innerHTML =
+    cbItem('📅 Date',       formatDate(b.booking_date))+
+    cbItem('📍 Route',      b.route_name)+
+    cbItem('🚏 Pickup Stop',b.pickup_stop)+
+    cbItem('🕗 Pickup Time',String(b.pickup_time||'').slice(0,5))+
+    cbItem(vIcon+' Vehicle',b.vehicle_label)+
+    cbItem('💺 Seat',       b.seat_number?'#'+b.seat_number:'Auto')+
+    (b.driver_name?cbItem('🧑‍✈️ Driver', b.driver_name + (b.driver_mobile?' · '+b.driver_mobile:'')):'')+
+    (b.otp?'<div class="cb-item otp-badge" style="grid-column:span 2;text-align:center"><div class="otp-label">Journey OTP</div><div class="otp-num">'+escHtml(b.otp)+'</div></div>':'');
+}
+function cbItem(label,val){
+  return '<div class="cb-item"><div class="cb-label">'+escHtml(label)+'</div><div class="cb-val">'+escHtml(String(val||'–'))+'</div></div>';
+}
+
+/* ── Journey status ───────────────────────── */
+function updateJourneyStatus(status){
+  var badge = document.getElementById('journeyStatusBadge');
+  if(!badge) return;
+  var cfg={
+    waiting:   {cls:'js-waiting',  text:'⏳ Waiting for driver'},
+    in_transit:{cls:'js-transit',  text:'🚗 Journey in progress'},
+    completed: {cls:'js-completed',text:'\u2705 Journey complete'},
+    sos:       {cls:'js-sos',      text:'🚨 SOS ACTIVE'}
+  };
+  var c=cfg[status]||cfg.waiting;
+  badge.className='j-status '+c.cls;
+  badge.textContent=c.text;
+}
+
+/* ── Booking detail rows ──────────────────── */
+function renderBookingDetails(b){
+  var vIcon=b.vehicle_type==='Bus'?'🚌':b.vehicle_type==='Car'?'🚗':'🏍️';
+  document.getElementById('bookingDetails').innerHTML=[
+    bRow('📅 Date',       formatDate(b.booking_date)),
+    bRow('📍 Route',      b.route_name),
+    bRow('🚏 Stop',       b.pickup_stop),
+    bRow('🕗 Pickup',     String(b.pickup_time||'').slice(0,5)),
+    bRow('🏠 Drop',       String(b.drop_time||'').slice(0,5)),
+    bRow(vIcon+' Vehicle',b.vehicle_label),
+    bRow('💺 Seat',       b.seat_number?'#'+b.seat_number:'–'),
+    bRow('🔄 Trip Type',  b.trip_type||'both'),
+    b.shift_name?bRow('⏰ Shift',b.shift_name):'',
+    b.distance_km?bRow('📏 Distance',b.distance_km+' km'):'',
+    b.night_cab?bRow('🌙 Night Cab','Yes'):'',
+  ].join('');
+}
+function bRow(lbl,val){
+  return '<div class="bk-row"><span class="bk-lbl">'+escHtml(lbl)+'</span><span class="bk-val">'+escHtml(String(val||'–'))+'</span></div>';
+}
+
+/* ── Driver card ──────────────────────────── */
+function renderDriverCard(b){
+  var rt = parseFloat(b.driver_rating||b.avg_rating||5);
+  var stars=''; for(var i=1;i<=5;i++) stars+='<span class="'+(i<=Math.round(rt)?'':' e')+'">★</span>';
+  document.getElementById('driverCard').innerHTML=
+    '<div class="driver-wrap">'+
+      '<div class="d-avatar">🧑‍✈️</div>'+
+      '<div>'+
+        '<div class="d-name">'+escHtml(b.driver_name)+'</div>'+
+        '<span class="d-code">'+escHtml(b.driver_code||b.driver_id||'')+'</span>'+
+        '<div class="stars">'+stars+' <span style="font-size:.72rem;color:#64748b">'+rt.toFixed(1)+'</span></div>'+
+        '<div class="d-row">📞 <a href="tel:'+escHtml(b.driver_mobile||'')+'">'+escHtml(b.driver_mobile||'–')+'</a></div>'+
+        (b.vehicle_label?'<div class="d-row">'+(b.vehicle_type==='Bus'?'🚌':b.vehicle_type==='Car'?'🚗':'🏍️')+' '+escHtml(b.vehicle_label)+'</div>':'')+
+        (b.driver_acknowledged?'<div style="background:rgba(34,197,94,.1);border-radius:6px;padding:3px 8px;font-size:.7rem;color:#86efac;font-weight:700;margin-top:4px;display:inline-block">\u2713 Responsibility Accepted</div>':'')+
+      '</div>'+
+    '</div>';
+}
+
+/* ── Tracking poll ────────────────────────── */
+function startTracking(bookingId){
+  if(_pollTimer) clearInterval(_pollTimer);
+  pollTracking(bookingId);
+  _pollTimer=setInterval(function(){pollTracking(bookingId);},10000);
+}
+
+async function pollTracking(bookingId){
+  try {
+    var r=await fetch(API+'/cab/track/'+bookingId,{headers:authHeaders()});
+    var pings=await r.json();
+    if(!pings.length) return;
+    var latest=pings[0];
+    var lat=parseFloat(latest.latitude), lng=parseFloat(latest.longitude);
+
+    // Driver marker
+    if(_driverMarker) _map.removeLayer(_driverMarker);
+    _driverMarker=L.marker([lat,lng],{
+      icon:L.divIcon({className:'',
+        html:'<div style="background:#1a56db;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.1rem;box-shadow:0 4px 12px rgba(0,0,0,.5)">🚗</div>',
+        iconSize:[36,36],iconAnchor:[18,18]})
+    }).bindPopup('<b>Driver</b><br>'+lat.toFixed(5)+', '+lng.toFixed(5)).addTo(_map);
+
+    // Trail
+    if(_routeLine) _map.removeLayer(_routeLine);
+    var coords=pings.slice(0,10).map(function(p){return[parseFloat(p.latitude),parseFloat(p.longitude)];});
+    _routeLine=L.polyline(coords,{color:'#3b82f6',weight:3,opacity:.6,dashArray:'6,4'}).addTo(_map);
+
+    setInner('liveSpeed',Math.round(parseFloat(latest.speed_kmh||0)));
+    var dist=haversine(OFFICE.lat,OFFICE.lng,lat,lng);
+    setInner('distOffice',dist.toFixed(1));
+    _map.setView([lat,lng],14);
+
+    // Ping log
+    document.getElementById('pingLog').innerHTML=pings.slice(0,8).map(function(p){
+      return '<div class="ping-row">'+
+        '<span>'+parseFloat(p.latitude).toFixed(4)+', '+parseFloat(p.longitude).toFixed(4)+'</span>'+
+        '<span>'+new Date(p.recorded_at).toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit',second:'2-digit'})+'</span>'+
+      '</div>';
+    }).join('');
+
+    // Update nearby services if user location changed significantly
+    if(_userLat && Math.abs(_userLat-lat)>0.01) loadNearbyServices(_userLat, _userLng, _currentServiceType);
+  } catch(e){}
+}
+
+/* ══════════════════════════════════════════
+   EMERGENCY SERVICES
+══════════════════════════════════════════ */
+function filterServices(btn, type){
+  document.querySelectorAll('.etab').forEach(function(b){b.classList.remove('active');});
+  btn.classList.add('active');
+  _currentServiceType = type;
+  if(_userLat) loadNearbyServices(_userLat, _userLng, type);
+  else loadNearbyServices(OFFICE.lat, OFFICE.lng, type);
+}
+
+function detectLocation(){
+  if(!navigator.geolocation){
+    document.getElementById('locationStatus').style.display='block';
+    loadNearbyServices(OFFICE.lat, OFFICE.lng, _currentServiceType);
+    return;
+  }
+  navigator.geolocation.getCurrentPosition(
+    function(pos){
+      _userLat = pos.coords.latitude;
+      _userLng = pos.coords.longitude;
+      // Add "You" marker
+      if(_employeeMarker) _map.removeLayer(_employeeMarker);
+      _employeeMarker = L.marker([_userLat,_userLng],{
+        icon:L.divIcon({className:'',
+          html:'<div style="background:#16a34a;color:#fff;padding:5px 10px;border-radius:8px;font-size:.7rem;font-weight:700;box-shadow:0 4px 12px rgba(0,0,0,.4)">📍 You</div>',
+          iconAnchor:[20,18]})
+      }).addTo(_map);
+      _map.setView([_userLat, _userLng], 14);
+      loadNearbyServices(_userLat, _userLng, _currentServiceType);
+    },
+    function(){
+      document.getElementById('locationStatus').style.display='block';
+      loadNearbyServices(OFFICE.lat, OFFICE.lng, _currentServiceType);
+    },
+    {timeout:6000}
+  );
+}
+
+/* ── Fetch nearby from Overpass OSM API ───── */
+async function loadNearbyServices(lat, lng, type){
+  var list = document.getElementById('nearbyList');
+  list.innerHTML='<div class="loading-services">🔍 Finding nearby '+type+' …</div>';
+
+  // OSM Overpass query mapping
+  var queries = {
+    police:     'amenity=police',
+    hospital:   'amenity=hospital|amenity=clinic',
+    restaurant: 'amenity=restaurant|amenity=fast_food|amenity=cafe',
+    pharmacy:   'amenity=pharmacy|amenity=chemist'
+  };
+  var osmTag = queries[type] || 'amenity=police';
+
+  // Cache key
+  var cacheKey = type+'_'+lat.toFixed(2)+'_'+lng.toFixed(2);
+  if(_nearbyCache[cacheKey]){
+    renderServices(_nearbyCache[cacheKey], lat, lng, type);
+    return;
+  }
+
+  // Overpass QL -- 3km radius
+  var radius = 3000;
+  var tags = osmTag.split('|');
+  var tagFilters = tags.map(function(t){
+    var parts = t.split('=');
+    return 'node["'+parts[0]+'"="'+parts[1]+'"]';
+  }).join('');
+
+  var query = '[out:json][timeout:10];('+
+    tags.map(function(t){
+      var p=t.split('=');
+      return 'node["'+p[0]+'"="'+p[1]+'"](around:'+radius+','+lat+','+lng+');';
+    }).join('')+
+  ');out body 10;';
+
+  try {
+    var resp = await fetch('https://overpass-api.de/api/interpreter?data='+encodeURIComponent(query));
+    if(!resp.ok) throw new Error('Overpass error');
+    var data = await resp.json();
+    var places = (data.elements||[]).slice(0,8).map(function(el){
+      return {
+        name:    el.tags.name || el.tags['name:en'] || capitalise(type),
+        address: [el.tags['addr:street'], el.tags['addr:city']].filter(Boolean).join(', ') || 'See map',
+        phone:   el.tags.phone || el.tags['contact:phone'] || null,
+        lat:     el.lat, lng: el.lon,
+        opening: el.tags.opening_hours || null
+      };
+    });
+    _nearbyCache[cacheKey] = places;
+    renderServices(places, lat, lng, type);
+  } catch(e){
+    // Fallback to static Patna data
+    renderServices(getStaticServices(type), lat, lng, type);
+  }
+}
+
+function renderServices(places, userLat, userLng, type){
+  var list = document.getElementById('nearbyList');
+  if(!places.length){
+    list.innerHTML='<div style="color:#475569;font-size:.8rem;padding:12px;text-align:center">No nearby '+type+' found.</div>';
+    return;
+  }
+  var icons = {police:'🚔',hospital:'🏥',restaurant:'🍽️',pharmacy:'💊'};
+  var classes = {police:'svc-police',hospital:'svc-hospital',restaurant:'svc-restaurant',pharmacy:'svc-pharmacy'};
+  var icon = icons[type]||'📍';
+  var cls  = classes[type]||'svc-police';
+
+  // Sort by distance
+  places.forEach(function(p){
+    p._dist = p.lat ? haversine(userLat,userLng,p.lat,p.lng) : 99;
+  });
+  places.sort(function(a,b){return a._dist-b._dist;});
+
+  list.innerHTML = places.map(function(p){
+    var distText = p._dist<90 ? (p._dist<1?(p._dist*1000).toFixed(0)+'m':p._dist.toFixed(1)+' km') : '';
+    var isOpen = p.opening ? (p.opening.toLowerCase().includes('24/7')||p.opening.toLowerCase().includes('open')) : null;
+    return '<div class="service-card" data-name="'+escHtml(p.name)+'" onclick="flyToService('+p.lat+','+p.lng+',this.dataset.name)">'+
+      '<div class="svc-icon '+cls+'">'+icon+'</div>'+
+      '<div style="flex:1">'+
+        '<div class="svc-name">'+escHtml(p.name)+'</div>'+
+        '<div class="svc-addr">'+escHtml(p.address)+'</div>'+
+        '<div class="svc-meta">'+
+          (distText?'<span class="svc-dist">📏 '+distText+'</span>':'')+
+          (p.phone?'<a href="tel:'+escHtml(p.phone)+'" class="svc-phone" onclick="event.stopPropagation()">📞 '+escHtml(p.phone)+'</a>':'')+
+          (isOpen!==null?'<span class="svc-open '+(isOpen?'open-yes':'open-no')+'">'+(isOpen?'Open':'Closed')+'</span>':'')+
+        '</div>'+
+      '</div>'+
+    '</div>';
+  }).join('');
+}
+
+function flyToService(lat, lng, name){
+  if(!lat || !lng) return;
+  _map.flyTo([lat,lng],16,{duration:1});
+  L.popup().setLatLng([lat,lng]).setContent('<b>'+escHtml(name)+'</b>').openOn(_map);
+}
+
+function capitalise(str){ return str.charAt(0).toUpperCase()+str.slice(1); }
+
+// Static fallback for Patna, Bihar
+function getStaticServices(type){
+  var data = {
+    police:[
+      {name:'Patna Sahib Police Station',address:'Patna Sahib, Patna',phone:'0612-2223456',lat:25.615,lng:85.155},
+      {name:'Kankarbagh Police Station',address:'Kankarbagh, Patna',phone:'0612-2351234',lat:25.600,lng:85.148},
+      {name:'Rajiv Nagar Police Outpost',address:'Rajiv Nagar, Patna',phone:'0612-2601234',lat:25.620,lng:85.130},
+      {name:'Boring Road Police Station',address:'Boring Road, Patna',phone:'0612-2223344',lat:25.610,lng:85.110}
+    ],
+    hospital:[
+      {name:'PMCH – Patna Medical College',address:'Ashok Rajpath, Patna',phone:'0612-2300123',lat:25.618,lng:85.137},
+      {name:'AIIMS Patna',address:'Phulwari, Patna',phone:'0612-2451070',lat:25.556,lng:85.097},
+      {name:'Ruban Memorial Hospital',address:'Judges Court Rd, Patna',phone:'0612-2200305',lat:25.614,lng:85.140},
+      {name:'Paras HMRI Hospital',address:'Raja Bazar, Patna',phone:'0612-3069000',lat:25.608,lng:85.150}
+    ],
+    restaurant:[
+      {name:'Bihar Club Restaurant',address:'Beer Chand Patel Path, Patna',phone:'0612-2230456',lat:25.617,lng:85.144},
+      {name:'Tandoor Hut',address:'Frazer Road, Patna',phone:'0612-2220789',lat:25.611,lng:85.145},
+      {name:'Spicy Affair',address:'Boring Road, Patna',phone:'0612-2601456',lat:25.609,lng:85.112},
+      {name:'Hotel Chanakya Restaurant',address:'Beer Chand Patel Path, Patna',phone:'0612-2231071',lat:25.616,lng:85.142}
+    ],
+    pharmacy:[
+      {name:'Apollo Pharmacy',address:'Patliputra Colony, Patna',phone:'1860-500-0101',lat:25.621,lng:85.127},
+      {name:'MedPlus Pharmacy',address:'Kankarbagh, Patna',phone:'040-67006700',lat:25.601,lng:85.147},
+      {name:'Jan Aushadhi Kendra',address:'Rajiv Nagar, Patna',phone:'1800-180-8080',lat:25.619,lng:85.131},
+      {name:'Fortis Pharmacy',address:'Bailey Road, Patna',phone:'0612-3046666',lat:25.618,lng:85.118}
+    ]
+  };
+  return data[type]||[];
+}
+
+/* ── SOS ──────────────────────────────────── */
+async function triggerSOS(){
+  if(!_bookingId) return;
+  if(!confirm('🚨 EMERGENCY ALERT -- This will notify Admin & Manager immediately with your location. Confirm?')) return;
+  var pos=null;
+  try{ pos=await new Promise(function(rs,rj){navigator.geolocation.getCurrentPosition(rs,rj,{timeout:3000});}); }catch(_){}
+  try{
+    var r=await fetch(API+'/cab/sos',{method:'POST',headers:authHeaders(),body:JSON.stringify({
+      booking_id:_bookingId,
+      latitude: pos?pos.coords.latitude:null,
+      longitude:pos?pos.coords.longitude:null,
+      message:'Passenger SOS from tracking page'
+    })});
+    var d=await r.json();
+    alert(d.message);
+    updateJourneyStatus('sos');
+  } catch(e){ alert('SOS failed. Call 112 or +91-9876543210'); }
+}
+
+/* ── Rating ───────────────────────────────── */
+function setRating(n){
+  _selectedRating=n;
+  document.querySelectorAll('#starRow span').forEach(function(s,i){s.classList.toggle('lit',i<n);});
+}
+async function submitRating(){
+  if(!_selectedRating) return showMsg('ratingMsg','Please select stars.',true);
+  try{
+    var r=await fetch(API+'/cab/rate',{method:'POST',headers:authHeaders(),
+      body:JSON.stringify({booking_id:_bookingId,rating:_selectedRating,feedback:document.getElementById('ratingFeedback').value})});
+    var d=await r.json();
+    showMsg('ratingMsg',d.message,!r.ok);
+    if(r.ok) document.getElementById('ratingPanel').style.display='none';
+  }catch(e){showMsg('ratingMsg','Failed.',true);}
+}
+
+/* ── Socket listener (approval notification) ── */
+function initSocket(){
+  if(typeof io==='undefined') return;
+  var tok=getToken(); if(!tok) return;
+  try{
+    var sock=io(window.location.origin,{auth:{token:tok},transports:['websocket','polling']});
+    sock.on('wip:notification',function(data){
+      if(data.type==='cab_approved'){
+        var bar=document.getElementById('approvalBar');
+        var msg=document.getElementById('approvalMsg');
+        if(bar&&msg){
+          msg.textContent=data.message||'Your cab booking has been approved!';
+          bar.classList.add('show');
+          setTimeout(function(){bar.classList.remove('show');},8000);
+        }
+        // Reload booking
+        if(data.data&&data.data.booking_id) loadBooking(data.data.booking_id);
+      }
+      if(data.type==='cab_complete') updateJourneyStatus('completed');
+    });
+  }catch(e){}
+}
+
+/* ── Boot ─────────────────────────────────── */
+document.addEventListener('DOMContentLoaded',function(){
+  var u=getUser(); if(!u){window.location.href='login.html';return;}
+  initMap();
+  loadMyBookingsForSelector();
+  detectLocation();
+  initSocket();
+  // URL param ?booking=ID
+  var params=new URLSearchParams(window.location.search);
+  var bParam=params.get('booking');
+  if(bParam) setTimeout(function(){
+    var sel=document.getElementById('bookingSelector');
+    sel.value=bParam; loadBooking(bParam);
+  }, 600);
+});
+</script>
+<div class="toast" id="toast"></div>
+</div></div>
+<script>
+
+function toggleGroup(el){
+  const items=el.nextElementSibling;
+  const arr=el.querySelector('.arr');
+  const collapsed=items.style.display==='none';
+  items.style.display=collapsed?'flex':'none';
+  if(arr)arr.style.transform=collapsed?'':'rotate(-90deg)';
+}
+function toggleSidebar(){
+  const w=document.querySelector('.wiq-wrap');
+  const btn=document.querySelector('.wiq-toggle');
+  if(!w)return;
+  const collapsed=w.classList.toggle('wiq-collapsed');
+  if(btn)btn.textContent=collapsed?'▶':'◀';
+}
+function openMobSidebar(){
+  document.getElementById('wiqSidebar').classList.toggle('open');
+}
+// Set active page highlight
+(function(){
+  const cur=location.pathname.split('/').pop()||'index.html';
+  document.querySelectorAll('.wiq-nav-item').forEach(a=>{
+    if(a.getAttribute('href')===cur)a.classList.add('active');
+  });
+})();
+// Set sidebar username
+(function(){
+  const name=document.getElementById('sidebarUserName');
+  if(!name)return;
+  const tok=localStorage.getItem('token');
+  if(!tok){name.textContent='Guest';return;}
+  fetch(('/api')+'/auth/me',
+    {headers:{'Authorization':'Bearer '+tok}})
+    .then(r=>r.json()).then(d=>{if(name)name.textContent=d.full_name||d.email||'User';}).catch(()=>{});
+})();
+
+
+
+// Dark/Light Mode
+window.toggleDarkMode=function(){
+  var d=document.body.classList.toggle('dark-mode');
+  localStorage.setItem('wfi_dark_mode',d?'1':'0');
+  var btn=document.getElementById('dmToggle');
+  var icon=document.getElementById('dmIcon');
+  if(btn)btn.classList.toggle('on',d);
+  if(icon)icon.textContent=d?'\u2600\uFE0F':'\uD83C\uDF19';
+};
+(function(){
+  if(localStorage.getItem('wfi_dark_mode')==='1'){
+    document.body.classList.add('dark-mode');
+    var btn=document.getElementById('dmToggle');if(btn)btn.classList.add('on');
+    var icon=document.getElementById('dmIcon');if(icon)icon.textContent='\u2600\uFE0F';
+  }
+})();
+
+
+
+// ── Universal Function Stubs  ─────────────────────────────
+// Sidebar/Mobile
+window.openMobSidebar = window.openMobSidebar || function(){
+  var s=document.querySelector('.wiq-sidebar,aside');
+  if(s){s.style.transform='translateX(0)';s.style.zIndex='999';}
+};
+window.toggleSidebar = window.toggleSidebar || function(){
+  var s=document.querySelector('.wiq-sidebar,aside');
+  if(s){var open=s.style.transform==='translateX(0)';s.style.transform=open?'':'translateX(0)';}
+};
+window.toggleGroup = window.toggleGroup || function(el){
+  var p=el&&el.closest?el.closest('.wiq-nav-group'):null;
+  if(p){var sub=p.querySelector('.wiq-sub');if(sub)sub.style.display=sub.style.display==='none'?'block':'none';}
+};
+// Tab switching
+window.switchTab = window.switchTab || function(tab,section){
+  var tabs=document.querySelectorAll('[onclick*=switchTab]');
+  tabs.forEach(function(t){t.classList.remove('active','btn-primary');t.classList.add('btn-outline');});
+  if(event&&event.target){event.target.classList.add('active','btn-primary');event.target.classList.remove('btn-outline');}
+  var sections=document.querySelectorAll('[id$="-section"],[id$="Tab"],[id$="-tab"],[class*=tab-pane]');
+  sections.forEach(function(s){s.style.display='none';});
+  var target=section?document.getElementById(section):null;
+  if(!target&&tab)target=document.getElementById(tab);
+  if(target)target.style.display='';
+};
+// CSV Download
+window.dlCSV=window.dlCSV||function(rows,headers,fn){var lines=[(headers||[]).join(',')];(rows||[]).forEach(function(r){lines.push((headers||[]).map(function(h){var v=String(r[h]!==undefined?r[h]:'').replace(/"/g,'""');return v.indexOf(',')>-1?'"'+v+'"':v;}).join(','));});var a=document.createElement('a');a.href=URL.createObjectURL(new Blob([lines.join('\n')],{type:'text/csv'}));a.download=(fn||'export')+'_'+new Date().toISOString().slice(0,10)+'.csv';document.body.appendChild(a);a.click();document.body.removeChild(a);if(typeof showToast==='function')showToast('Downloaded',true);};
+
+window.acceptCookies = function() {
+  localStorage.setItem('wfi_cookie_consent','all');
+  localStorage.setItem('wfi_cookie_pref','1');
+  localStorage.setItem('wfi_cookie_analytics','1');
+  var banner = document.getElementById('cookieBanner');
+  if(banner){banner.style.transform='translateY(100%)';setTimeout(function(){banner.style.display='none';},400);}
+  if(typeof showToast==='function') showToast('Cookie preferences saved ✅',true);
+};
+window.declineCookies = function() {
+  localStorage.setItem('wfi_cookie_consent','essential');
+  var banner = document.getElementById('cookieBanner');
+  if(banner){banner.style.transform='translateY(100%)';setTimeout(function(){banner.style.display='none';},400);}
+};
+window.showCookieSettings = function() {
+  var m = document.getElementById('cookieModal');
+  if(m){m.style.display='flex';}
+};
+window.closeCookieModal = function() {
+  var m = document.getElementById('cookieModal');
+  if(m){m.style.display='none';}
+};
+window.saveCookieSettings = function() {
+  var pref = document.getElementById('ckPref');
+  var analytics = document.getElementById('ckAnalytics');
+  localStorage.setItem('wfi_cookie_consent','custom');
+  if(pref) localStorage.setItem('wfi_cookie_pref',pref.checked?'1':'0');
+  if(analytics) localStorage.setItem('wfi_cookie_analytics',analytics.checked?'1':'0');
+  closeCookieModal();
+  var banner = document.getElementById('cookieBanner');
+  if(banner){banner.style.transform='translateY(100%)';}
+  if(typeof showToast==='function') showToast('Cookie preferences saved ✅',true);
+};
+
+</script>
+<script id="wfi-utils">
+(function(){
+var w=window;
+w.dlPrint=w.dlPrint||function(t,c){var wi=window.open('','_blank','width=1100,height=800');if(!wi)return;var h='<html><head><title>'+(t||'Report')+'<\/title><style>*{box-sizing:border-box}body{font-family:Segoe UI,sans-serif;padding:28px;color:#1e293b;max-width:960px;margin:0 auto}.hdr{display:flex;justify-content:space-between;align-items:center;border-bottom:2px solid #2563EB;padding-bottom:12px;margin-bottom:20px}.brand{font-weight:900;color:#2563EB;font-size:1rem}.meta{font-size:.72rem;color:#64748b}h2{color:#1e293b;margin-bottom:14px}table{width:100%;border-collapse:collapse;margin-top:10px}th{background:#1e3a5f;color:#fff;padding:8px 12px;text-align:left;font-size:.72rem;font-weight:700;text-transform:uppercase}td{padding:8px 12px;border-bottom:1px solid #e2e8f0;font-size:.8rem}tr:nth-child(even)td{background:#f8fafc}.ftr{margin-top:20px;padding-top:10px;border-top:1px solid #e2e8f0;font-size:.7rem;color:#94a3b8;display:flex;justify-content:space-between}.btn{background:#2563EB;color:#fff;border:none;padding:9px 24px;border-radius:7px;font-weight:700;cursor:pointer;font-size:.8rem;margin-top:14px}@media print{.btn{display:none}}<\/style><\/head><body><div class="hdr"><div class="brand">&#9889; WFI<\/div><div class="meta">'+new Date().toLocaleString()+'<\/div><\/div><h2>'+(t||'Report')+'<\/h2>'+(c||'<p>No data.<\/p>')+'<div class="ftr"><span>WFI<\/span><span>'+new Date().toLocaleDateString()+'<\/span><\/div><button class="btn" onclick="window.print()">Print \/ PDF<\/button><\/body><\/html>';wi.document.write(h);wi.document.close();};
+w.dlCSV=w.dlCSV||function(rows,h,fn){if(!rows||!rows.length)rows=[{}];var keys=h||Object.keys(rows[0]);var L=[keys.map(function(k){return'"'+k+'"';}).join(',')];rows.forEach(function(r){L.push(keys.map(function(k){return'"'+String(r[k]!==undefined?r[k]:'').replace(/"/g,'""')+'"';}).join(','));});var blob=new Blob([L.join('\n')],{type:'text/csv;charset=utf-8;'});var url=URL.createObjectURL(blob);var a=document.createElement('a');a.href=url;a.download=(fn||'export')+'.csv';document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(url);};
+w.tdm=w.tdm||function(){var d=document.body.classList.toggle('dark-mode');localStorage.setItem('wfi_dark_mode',d?'1':'0');var b=document.getElementById('dmt')||document.getElementById('dmToggle');var i=document.getElementById('dmi')||document.getElementById('dmIcon');if(b)b.classList.toggle('on',d);if(i)i.textContent=d?'&#9728;':'&#127769;';};
+w.toggleDarkMode=w.tdm;
+w.showTab=w.showTab||function(id,btn){var lo=id.toLowerCase();var el=document.getElementById('tab'+id)||document.getElementById('tab'+id.charAt(0).toUpperCase()+id.slice(1))||document.getElementById('tab-'+id)||document.getElementById(id)||document.getElementById('section-'+id);if(!el){var all=document.querySelectorAll('[id]');for(var i=0;i<all.length;i++){if(all[i].id.toLowerCase()==='tab'+lo||all[i].id.toLowerCase()===lo||all[i].id.toLowerCase()==='section-'+lo){el=all[i];break;}}}document.querySelectorAll('[id]').forEach(function(s){var sid=s.id.toLowerCase();if((sid.startsWith('tab')||sid.startsWith('section-')||sid.startsWith('panel-'))&&sid!==lo&&sid!=='tab'+lo&&sid!=='section-'+lo)s.style.display='none';});if(el){el.style.display='';el.classList.add('on');}document.querySelectorAll('.sc').forEach(function(e){e.classList.remove('on');});var sc=document.getElementById('tab'+id)||document.getElementById('tab'+id.charAt(0).toUpperCase()+id.slice(1));if(sc)sc.classList.add('on');document.querySelectorAll('.tb,.tab-btn,[role=tab]').forEach(function(b){b.classList.remove('active');});if(btn)btn.classList.add('active');};
+w.switchTab=w.switchTab||w.showTab;
+w.showSection=w.showSection||function(id,btn){document.querySelectorAll('[id^="section-"]').forEach(function(e){e.style.display='none';});var el=document.getElementById('section-'+id)||document.getElementById(id);if(el)el.style.display='block';document.querySelectorAll('.tb,.section-btn').forEach(function(b){b.classList.remove('active');});if(btn)btn.classList.add('active');};
+w.sw=w.sw||w.showSection;
+w.st=w.st||function(msg,ok){var t=document.getElementById('toast');if(!t)return;t.textContent=msg;t.style.background=ok!==false?'linear-gradient(135deg,#059669,#047857)':'linear-gradient(135deg,#DC2626,#B91C1C)';t.classList.add('show');setTimeout(function(){t.classList.remove('show');},3000);};
+w.showToast=w.st;
+w.logout=w.logout||function(){localStorage.clear();window.location.href='login.html';};
+w.ac=w.ac||function(){var b=document.getElementById('cookieBanner')||document.getElementById('ckb');if(b){b.style.display='none';try{localStorage.setItem('wfi_ck','1');}catch(e){}}};
+w.dc=w.dc||function(){var b=document.getElementById('cookieBanner')||document.getElementById('ckb');if(b)b.style.display='none';};
+w.acceptCookies=w.ac;w.declineCookies=w.dc;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+w.closeModal=w.closeModal||function(){document.querySelectorAll('.modal,.dialog').forEach(function(m){m.style.display='none';});};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+w.closeRejectModal=w.closeRejectModal||function(){document.querySelectorAll('.modal').forEach(function(m){m.style.display='none';});};
+
+
+w.openMobSidebar=w.openMobSidebar||function(){var s=document.querySelector('.wiq-sidebar');if(s)s.classList.toggle('open');};
+w.toggleSidebar=w.toggleSidebar||function(){var s=document.querySelector('.wiq-sidebar');if(s)s.classList.toggle('collapsed');};
+w.toggleGroup=w.toggleGroup||function(id){var el=document.getElementById(id);if(el)el.style.display=el.style.display==='none'?'block':'none';};
+
+
+
+
+window.dlXLSX=window.dlXLSX||function(rows,headers,filename){
+  if(!rows||!rows.length){window.st&&window.st('No data to export',false);return;}
+  var keys=headers||Object.keys(rows[0]);
+  // Build CSV that Excel can open as XLSX-like
+  var BOM='﻿';
+  var lines=[keys.map(function(k){return'"'+String(k).replace(/"/g,'""')+'"';}).join(',')];
+  rows.forEach(function(r){lines.push(keys.map(function(k){var v=r[k]===null||r[k]===undefined?'':String(r[k]);return'"'+v.replace(/"/g,'""')+'"';}).join(','));});
+  var csv=BOM+lines.join('\n');
+  var blob=new Blob([csv],{type:'application/vnd.ms-excel;charset=utf-8'});
+  var a=document.createElement('a');a.href=URL.createObjectURL(blob);
+  a.download=(filename||'export')+'.csv';document.body.appendChild(a);a.click();
+  setTimeout(function(){URL.revokeObjectURL(a.href);document.body.removeChild(a);},1000);
+  window.st&&window.st('Excel file downloaded',true);
+};
+window.exportExcel=window.dlXLSX;
+})();
+</script>
+
+
+
+<footer class="wiq-footer" style="background:#0F172A;border-top:1px solid #1E293B;padding:16px 24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-top:auto;flex-shrink:0">
+  <div style="display:flex;align-items:center;gap:10px">
+    <div style="width:26px;height:26px;background:linear-gradient(135deg,#1D4ED8,#6D28D9);border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:.75rem">&#9889;</div>
+    <div>
+      <div style="font-size:.73rem;font-weight:800;color:#E2E8F0">Workforce Intelligence</div>
+      <div style="font-size:.60rem;color:#475569">Enterprise HRMS &bull; DPDP 2023 &bull; PoSH 2013 &bull; ISO 27001</div>
+    </div>
+  </div>
+  <div style="display:flex;gap:14px;flex-wrap:wrap">
+    <a href="privacy-policy.html" style="color:#475569;font-size:.66rem;text-decoration:none;font-weight:600" onmouseover="this.style.color='#60A5FA'" onmouseout="this.style.color='#475569'">Privacy</a>
+    <a href="cookie-policy.html" style="color:#475569;font-size:.66rem;text-decoration:none;font-weight:600" onmouseover="this.style.color='#60A5FA'" onmouseout="this.style.color='#475569'">Cookies</a>
+    <a href="security-policy.html" style="color:#475569;font-size:.66rem;text-decoration:none;font-weight:600" onmouseover="this.style.color='#60A5FA'" onmouseout="this.style.color='#475569'">Security</a>
+    <a href="company-policies.html" style="color:#475569;font-size:.66rem;text-decoration:none;font-weight:600" onmouseover="this.style.color='#60A5FA'" onmouseout="this.style.color='#475569'">Policies</a>
+    <a href="112-emergency.html" style="color:#DC2626;font-size:.66rem;text-decoration:none;font-weight:700">&#128680; Emergency</a>
+  </div>
+  <div style="font-size:.60rem;color:#334155">&copy; 2026 Workforce Intelligence. All rights reserved.</div>
+</footer>
+<script id="wiq-dd">
+(function(){
+function toggleGroup(id){
+  var b=document.getElementById(id);
+  var a=document.getElementById(id.replace('grp-','arr-'));
+  if(!b)return;
+  var o=b.classList.contains('open');
+  b.classList.toggle('open',!o);
+  if(a)a.style.transform=o?'':'rotate(-90deg)';
+}
+window.toggleGroup=toggleGroup;
+// Auto-open active group
+var cur=window.location.pathname.split('/').pop();
+document.querySelectorAll('.wiq-sidebar a[href]').forEach(function(a){
+  if(a.getAttribute('href')===cur){
+    a.classList.add('active');
+    var g=a.closest('.wiq-dropdown-body');
+    if(g){g.classList.add('open');var ar=document.getElementById(g.id.replace('grp-','arr-'));if(ar)ar.style.transform='rotate(-90deg)';}
+  }
+});
+// Mobile sidebar
+window.openMobSidebar=window.openMobSidebar||function(){var s=document.getElementById('wiqSidebar');if(s)s.classList.toggle('open');};
+document.addEventListener('click',function(e){
+  var sb=document.getElementById('wiqSidebar');var mb=document.getElementById('mobToggleBtn');
+  if(sb&&sb.classList.contains('open')&&!sb.contains(e.target)&&mb&&!mb.contains(e.target))sb.classList.remove('open');
+});
+})();
+</script>
+</body>
+
+
+
+
+<div id="cookieBanner" style="position:fixed;bottom:0;left:0;right:0;z-index:9998;background:linear-gradient(135deg,#0F172A,#1E293B);border-top:2px solid #2563EB;padding:14px 28px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;transform:translateY(100%);transition:transform .4s ease"><p style="font-size:.76rem;color:#CBD5E1;margin:0">&#127850; We use cookies. <a href="privacy-policy.html" style="color:#60A5FA;font-weight:700;text-decoration:none">Privacy Policy</a></p><div style="display:flex;gap:8px"><button onclick="window.acceptCookies&&acceptCookies()" style="background:linear-gradient(135deg,#2563EB,#4F46E5);color:#fff;border:none;border-radius:8px;padding:7px 18px;font-size:.72rem;font-weight:700;cursor:pointer;font-family:inherit">Accept All</button><button onclick="window.declineCookies&&declineCookies()" style="background:transparent;color:#64748B;border:none;font-size:.7rem;cursor:pointer;font-family:inherit">Decline</button></div></div>
+<span id="dmIcon" style="display:none">&#127769;</span><button id="dmToggle" style="display:flex"></button>
+<script>
+
+</script>
+</html>

@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Leaderboard – Workforce Intelligence v6.0</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+  body{background:#F0F4F8}
+  .pw{max-width:800px;margin:0 auto;padding:24px}
+  .card{background:#fff;border-radius:12px;padding:22px;box-shadow:0 2px 12px rgba(0,0,0,.08);border:1px solid #e2e8f0;margin-bottom:20px}
+  .srow{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:22px}
+  .sc{background:#fff;border-radius:12px;padding:16px;text-align:center;box-shadow:0 2px 10px rgba(0,0,0,.07);border:1px solid #e2e8f0}
+  .sv{font-size:26px;font-weight:700;margin-bottom:3px}
+  .sl{font-size:11px;color:#64748b;font-weight:600;text-transform:uppercase;letter-spacing:.04em}
+  .podium{display:flex;gap:12px;align-items:flex-end;justify-content:center;margin-bottom:20px}
+  .pod{flex:1;text-align:center}
+  .pod-av{width:50px;height:50px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:18px;margin:0 auto 8px}
+  .pod-name{font-size:12px;font-weight:700;margin-bottom:3px}
+  .pod-box{border-radius:8px 8px 0 0;padding:12px 8px 0;display:flex;flex-direction:column;align-items:center;gap:4px}
+  .pod-pts{font-size:15px;font-weight:700}
+  .pod-rank{font-size:20px}
+  .ldr-row{display:flex;align-items:center;gap:12px;padding:12px 14px;background:#fff;border-radius:10px;margin-bottom:8px;border:1px solid #e2e8f0;transition:transform .15s}
+  .ldr-row:hover{transform:translateX(3px);border-color:#2563eb}
+  .ldr-rank{font-size:18px;font-weight:700;width:30px;text-align:center;flex-shrink:0;font-family:monospace}
+  .r1{color:#d97706}.r2{color:#64748b}.r3{color:#b45309}
+  .ldr-av{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:14px;flex-shrink:0}
+  .ldr-info{flex:1}
+  .ldr-name{font-weight:700;font-size:14px}
+  .ldr-sub{font-size:11px;color:#64748b;margin-top:2px}
+  .pbar{height:6px;background:#f1f5f9;border-radius:3px;margin-top:6px;overflow:hidden}
+  .pfill{height:100%;border-radius:3px;background:#2563eb;transition:width 1s ease}
+  .ldr-pts{font-size:17px;font-weight:700;color:#2563eb;font-family:monospace;white-space:nowrap}
+  .ldr-rate{font-size:10px;color:#64748b;text-align:right}
+  .period-sel{display:flex;gap:6px;margin-bottom:16px;flex-wrap:wrap}
+  .period-btn{padding:6px 16px;border:1.5px solid #e2e8f0;border-radius:999px;background:#fff;font-size:12px;font-weight:600;cursor:pointer;color:#64748b;transition:all .15s}
+  .period-btn.on{background:#2563eb;border-color:#2563eb;color:#fff}
+  .badge-pill{display:inline-block;padding:2px 9px;border-radius:999px;font-size:10px;font-weight:700}
+  .bp-gold{background:#fef3c7;color:#d97706}
+  .bp-blue{background:#dbeafe;color:#2563eb}
+  .bp-green{background:#dcfce7;color:#16a34a}
+  .bp-faint{background:#f1f5f9;color:#64748b}
+  .loading{text-align:center;color:#94a3b8;padding:40px}
+</style>
+</head>
+<body>
+<nav class="navbar">
+  <div class="nav-brand">⚡ Workforce Intelligence v6.0</div>
+  <div class="nav-links">
+    <a href="analytics.html" style="color:#fff">📊 Analytics</a>
+    <a href="reports.html" style="color:#fff;margin-left:16px">📈 Reports</a>
+    <a href="javascript:history.back()" style="color:#fff;margin-left:16px">← Back</a>
+    <a href="login.html" onclick="localStorage.clear()" style="color:#fff;margin-left:16px">Logout</a>
+  </div>
+</nav>
+
+<div class="pw">
+  <h2 style="margin-bottom:18px;font-size:1.4rem">🏆 Productivity Leaderboard</h2>
+
+  <div class="period-sel">
+    <button class="period-btn on" onclick="setPeriod('month',this)">This Month</button>
+    <button class="period-btn" onclick="setPeriod('quarter',this)">This Quarter</button>
+    <button class="period-btn" onclick="setPeriod('all',this)">All Time</button>
+  </div>
+
+  <div class="srow" id="statsRow">
+    <div class="sc"><div class="sv" style="color:#d97706" id="topScore">—</div><div class="sl">Top Score</div></div>
+    <div class="sc"><div class="sv" style="color:#16a34a" id="avgRate">—</div><div class="sl">Avg Completion</div></div>
+    <div class="sc"><div class="sv" style="color:#2563eb" id="empCount">—</div><div class="sl">Ranked Employees</div></div>
+  </div>
+
+  <div class="card" id="podiumCard">
+    <div class="loading">Loading leaderboard…</div>
+  </div>
+
+  <div id="rankingList">
+    <div class="loading">Loading ranking…</div>
+  </div>
+</div>
+
+<script>
+const API   = 'http://localhost:5000/api';
+const token = localStorage.getItem('token');
+if (!token) location.href = 'login.html';
+
+const COLORS = ['hsl(200,65%,55%)','hsl(260,65%,55%)','hsl(170,60%,45%)','hsl(220,65%,50%)','hsl(30,65%,55%)','hsl(340,65%,55%)','hsl(50,70%,45%)','hsl(140,55%,45%)','hsl(310,60%,55%)','hsl(160,55%,45%)'];
+
+async function load() {
+  try {
+    const [performers, summary] = await Promise.all([
+      fetch(`${API}/analytics/performers`, {headers:{'Authorization':'Bearer '+token}}).then(r=>r.json()),
+      fetch(`${API}/analytics/summary`,    {headers:{'Authorization':'Bearer '+token}}).then(r=>r.json())
+    ]);
+
+    const list = Array.isArray(performers) ? performers : [];
+    const avgRate = list.length ? (list.reduce((s,p)=>s+(p.completion_rate||0),0)/list.length).toFixed(1) : 0;
+
+    document.getElementById('topScore').textContent  = list[0] ? list[0].total_points || list[0].productivity_score || '—' : '—';
+    document.getElementById('avgRate').textContent   = avgRate + '%';
+    document.getElementById('empCount').textContent  = list.length;
+
+    // Podium — top 3
+    const top3 = list.slice(0,3);
+    const podOrder = top3.length >= 3 ? [top3[1], top3[0], top3[2]] : top3;
+    const heights  = [85, 110, 70];
+    const medals   = top3.length >= 3 ? ['🥈','🥇','🥉'] : ['🥇','🥈','🥉'];
+    const bgColors = ['#f1f5f9','#fef3c7','#fef9c3'];
+
+    document.getElementById('podiumCard').innerHTML = `
+      <div style="font-weight:700;font-size:14px;margin-bottom:14px">🥇 Top Performers</div>
+      <div class="podium">
+        ${podOrder.map((p,i) => p ? `
+          <div class="pod">
+            <div class="pod-av" style="background:${COLORS[(list.indexOf(p))%COLORS.length]}">${(p.full_name||'?')[0]}</div>
+            <div class="pod-name">${p.full_name||'—'}</div>
+            <div class="pod-box" style="background:${bgColors[i]};min-height:${heights[i]}px">
+              <div class="pod-rank">${medals[i]}</div>
+              <div class="pod-pts" style="color:${i===1?'#d97706':'#64748b'}">${(p.total_points||p.productivity_score||0).toLocaleString()}</div>
+              <div style="font-size:9px;color:#94a3b8">pts</div>
+            </div>
+          </div>` : '<div class="pod"></div>').join('')}
+      </div>`;
+
+    // Full ranking
+    const rl = document.getElementById('rankingList');
+    rl.innerHTML = list.map((p,i) => {
+      const pts  = p.total_points || p.productivity_score || 0;
+      const rate = p.completion_rate || 0;
+      const bar  = Math.min(100, Math.round((pts / (list[0]?.total_points || list[0]?.productivity_score || 100)) * 100));
+      const dept = p.dept_name || p.department || '';
+      const des  = p.designation || '';
+      const badge = i===0 ? '<span class="badge-pill bp-gold">🏆 Top</span>' : i<3 ? '<span class="badge-pill bp-blue">⭐ Top 3</span>' : rate>=90 ? '<span class="badge-pill bp-green">🔥 Star</span>' : '';
+      return `
+        <div class="ldr-row">
+          <div class="ldr-rank ${i<3?'r'+(i+1):''}">${i+1}</div>
+          <div class="ldr-av" style="background:${COLORS[i%COLORS.length]}">${(p.full_name||'?')[0]}</div>
+          <div class="ldr-info">
+            <div class="ldr-name">${p.full_name} ${badge}</div>
+            <div class="ldr-sub">${des}${des&&dept?' · ':''}${dept}</div>
+            <div class="pbar"><div class="pfill" style="width:${bar}%"></div></div>
+          </div>
+          <div>
+            <div class="ldr-pts">${pts.toLocaleString()}</div>
+            <div class="ldr-rate">${rate}% rate</div>
+          </div>
+        </div>`;
+    }).join('') || '<div class="loading">No data found</div>';
+
+  } catch(e) { console.error(e); document.getElementById('podiumCard').innerHTML = '<div class="loading">Error loading data. Is the server running?</div>'; }
+}
+
+function setPeriod(p, btn) {
+  document.querySelectorAll('.period-btn').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  load(); // In real app, pass period param to API
+}
+
+load();
+</script>
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <a href="index.html" class="footer-brand">⚡ Workforce Intelligence Platform v6.0</a>
+    <nav class="footer-links">
+      <a href="analytics.html">Analytics</a>
+      <a href="reports.html">Reports</a>
+      <a href="salary.html">Salary</a>
+      <a href="leave.html">Leave</a>
+    </nav>
+    <p class="footer-copy">&copy; 2025 Workforce Intelligence Platform v6.0</p>
+  </div>
+</footer>
+</body>
+</html>

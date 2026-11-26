@@ -1,0 +1,1760 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<script src="/html.js"></script><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Technical Support & Help Desk – Workforce Intelligence</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+
+/* ── UNIVERSAL SIDEBAR NAV ── */
+.wiq-wrap{display:flex;min-height:100vh}
+.wiq-sidebar{width:220px;min-width:220px;background:#0a1220;border-right:1px solid rgba(255,255,255,.07);position:sticky;top:0;height:100vh;overflow-y:auto;flex-shrink:0;transition:width .2s;z-index:200}
+.wiq-sidebar::-webkit-scrollbar{width:3px}.wiq-sidebar::-webkit-scrollbar-thumb{background:#1e3a5f}
+.wiq-sidebar-header{padding:14px 14px 10px;border-bottom:1px solid rgba(255,255,255,.07)}
+.wiq-logo{font-size:.9rem;font-weight:900;color:#fff;display:flex;align-items:center;gap:7px}
+.wiq-user-pill{display:flex;align-items:center;gap:7px;padding:8px 10px;margin:8px 0 4px;background:rgba(255,255,255,.04);border-radius:8px;font-size:.7rem;color:#64748b}
+.wiq-user-name{font-weight:700;color:#cbd5e1;font-size:.72rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:120px}
+.wiq-logout-btn{display:flex;align-items:center;gap:6px;padding:7px 10px;margin:0 6px 6px;background:rgba(220,38,38,.1);border:1px solid rgba(220,38,38,.2);border-radius:7px;color:#f87171;font-size:.72rem;font-weight:700;cursor:pointer;width:calc(100% - 12px);text-decoration:none;transition:all .15s}
+.wiq-logout-btn:hover{background:rgba(220,38,38,.2)}
+.wiq-nav-group{margin-bottom:2px}
+.wiq-nav-label{font-size:.59rem;font-weight:800;color:#1e3a5f;text-transform:uppercase;letter-spacing:.09em;padding:8px 14px 3px;cursor:pointer;display:flex;align-items:center;justify-content:space-between}
+.wiq-nav-label:hover{color:#334155}
+.wiq-nav-label .arr{font-size:.6rem;transition:.2s;color:#1e3a5f}
+.wiq-nav-items{display:flex;flex-direction:column;gap:1px;padding:0 6px 4px}
+.wiq-nav-item{display:flex;align-items:center;gap:7px;padding:5px 8px;border-radius:6px;font-size:.71rem;font-weight:600;color:#475569;text-decoration:none;transition:all .15s;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.wiq-nav-item:hover{background:rgba(37,99,235,.12);color:#60a5fa}
+.wiq-nav-item.active{background:rgba(37,99,235,.18);color:#60a5fa;font-weight:800}
+.wiq-nav-item .ico{font-size:.8rem;flex-shrink:0;width:16px;text-align:center}
+.wiq-main{flex:1;min-width:0;overflow-x:hidden}
+.wiq-collapsed .wiq-sidebar{width:48px}
+.wiq-collapsed .wiq-nav-item span,.wiq-collapsed .wiq-nav-label span:first-child,.wiq-collapsed .wiq-user-name,.wiq-collapsed .wiq-logo span,.wiq-collapsed .wiq-logout-btn span{display:none}
+.wiq-collapsed .wiq-nav-items{padding:0 3px}
+.wiq-collapsed .wiq-nav-item{justify-content:center;padding:6px}
+.wiq-collapsed .wiq-logout-btn{justify-content:center;padding:7px;margin:0 3px 4px}
+.wiq-toggle{background:none;border:none;color:#475569;cursor:pointer;padding:4px 8px;font-size:.75rem;display:flex;align-items:center;gap:4px;margin-left:auto}
+.wiq-toggle:hover{color:#60a5fa}
+@media(max-width:768px){.wiq-sidebar{position:fixed;left:-220px;top:0;transition:left .2s}.wiq-sidebar.open{left:0;box-shadow:4px 0 20px rgba(0,0,0,.5)}.wiq-mob-toggle{display:flex!important}}
+.wiq-mob-toggle{display:none;position:fixed;top:12px;left:12px;z-index:300;background:#1e3a5f;border:none;border-radius:8px;padding:7px 10px;color:#fff;font-size:.8rem;cursor:pointer}
+
+:root{--pri:#0891b2;--pri2:#0e7490;--ok:#16a34a;--warn:#d97706;--danger:#dc2626;--bg:#f0f9ff;--border:#bae6fd;--text:#1e293b;--muted:#64748b}
+body{background:var(--bg)}
+.page{max-width:1060px;margin:0 auto;padding:24px}
+.hdr{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:22px}
+.hdr h1{font-size:1.5rem;font-weight:900;color:var(--text)}
+.hdr p{color:var(--muted);font-size:.87rem;margin-top:2px}
+.tab-nav{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:20px;background:#e0f2fe;padding:8px;border-radius:14px}
+.tab-btn{padding:8px 16px;border:none;border-radius:10px;cursor:pointer;font-size:.84rem;font-weight:600;background:transparent;color:var(--muted);transition:all .2s}
+.tab-btn.active{background:#fff;color:var(--pri);box-shadow:0 2px 8px rgba(8,145,178,.18)}
+.tab-panel{display:none}.tab-panel.active{display:block}
+.stat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:12px;margin-bottom:20px}
+.stat-box{background:#fff;border-radius:14px;padding:16px;text-align:center;border:1.5px solid var(--border)}
+.stat-num{font-size:1.8rem;font-weight:900}.stat-lbl{font-size:.68rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-top:3px}
+.card{background:#fff;border-radius:14px;box-shadow:0 2px 12px rgba(0,0,0,.06);padding:22px;margin-bottom:16px;border:1.5px solid var(--border)}
+.ticket-card{background:#fff;border:1.5px solid var(--border);border-radius:13px;padding:18px;margin-bottom:12px;cursor:pointer;transition:all .2s}
+.ticket-card:hover{border-color:var(--pri);box-shadow:0 4px 16px rgba(8,145,178,.12)}
+.ticket-card.critical{border-left:4px solid #dc2626}
+.ticket-card.high{border-left:4px solid #ea580c}
+.ticket-card.medium{border-left:4px solid #d97706}
+.ticket-card.low{border-left:4px solid #22c55e}
+.tc-title{font-weight:800;font-size:.92rem;color:var(--text)}
+.tc-meta{font-size:.75rem;color:var(--muted);margin-top:4px;display:flex;flex-wrap:wrap;gap:8px}
+.priority-badge{padding:3px 10px;border-radius:999px;font-size:.7rem;font-weight:800}
+.p-critical{background:#fee2e2;color:#dc2626}.p-high{background:#fff7ed;color:#ea580c}
+.p-medium{background:#fef9c3;color:#854d0e}.p-low{background:#f0fdf4;color:#15803d}
+.status-pill{display:inline-block;padding:3px 10px;border-radius:999px;font-size:.72rem;font-weight:700}
+.st-open{background:#ede9fe;color:#6d28d9}.st-in_progress{background:#dbeafe;color:#1d4ed8}
+.st-pending_user{background:#fef9c3;color:#854d0e}.st-resolved{background:#dcfce7;color:#15803d}
+.st-closed{background:#f1f5f9;color:#475569}.st-escalated{background:#fee2e2;color:#dc2626}
+.cat-badge{font-size:.7rem;font-weight:700;padding:2px 8px;border-radius:999px;background:#e0f2fe;color:var(--pri)}
+.sla-bar{background:#e2e8f0;border-radius:999px;height:5px;margin-top:4px;overflow:hidden}
+.sla-fill{border-radius:999px;height:5px;transition:width .4s}
+.form-group{margin-bottom:14px}
+.form-group label{font-size:.81rem;font-weight:700;color:#475569;display:block;margin-bottom:5px}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
+.fi{width:100%;padding:9px 12px;border:1.5px solid #e2e8f0;border-radius:9px;font-size:.86rem;background:#f8fafc;font-family:var(--wfi-font);color:var(--text);box-sizing:border-box}
+.fi:focus{outline:none;border-color:var(--pri);background:#fff}
+textarea.fi{resize:vertical;min-height:110px}
+.btn-pri{background:var(--pri);color:#fff;border:none;padding:10px 22px;border-radius:10px;font-size:.86rem;font-weight:700;cursor:pointer;transition:all .2s}
+.btn-pri:hover{background:var(--pri2)}
+.btn-sec{padding:9px 18px;border:1.5px solid #e2e8f0;border-radius:9px;background:#fff;cursor:pointer;font-size:.84rem;font-weight:600;color:var(--muted)}
+.btn-sm{padding:5px 12px;font-size:.75rem;border-radius:7px}
+.btn-ok{background:#dcfce7;color:#15803d;border:none;padding:5px 12px;border-radius:7px;font-size:.75rem;font-weight:700;cursor:pointer}
+.btn-danger{background:#fee2e2;color:#dc2626;border:1px solid #fca5a5;padding:5px 12px;border-radius:7px;font-size:.75rem;font-weight:700;cursor:pointer}
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:999;align-items:flex-start;justify-content:center;padding-top:30px;overflow-y:auto}
+.modal-overlay.open{display:flex}
+.modal-box{background:#fff;border-radius:18px;padding:28px;width:min(740px,95vw);margin:auto;max-height:90vh;overflow-y:auto}
+.modal-title{font-size:1.05rem;font-weight:900;margin-bottom:16px;color:var(--text)}
+.modal-footer{display:flex;gap:8px;justify-content:flex-end;margin-top:20px}
+.comment-item{padding:12px 14px;border-radius:10px;margin-bottom:8px;font-size:.83rem;line-height:1.6}
+.comment-me{background:#e0f2fe;border:1px solid var(--border);margin-left:20px}
+.comment-other{background:#f8fafc;border:1px solid #e2e8f0}
+.comment-internal{background:#fef9c3;border:1px solid #fde047}
+.comment-author{font-weight:700;font-size:.78rem;margin-bottom:4px}
+.comment-time{font-size:.7rem;color:#94a3b8;margin-top:4px}
+.cat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin-bottom:20px}
+.cat-tile{background:#f8fafc;border:2px solid #e2e8f0;border-radius:12px;padding:14px 10px;text-align:center;cursor:pointer;transition:all .2s}
+.cat-tile:hover,.cat-tile.sel{border-color:var(--pri);background:#e0f2fe}
+.cat-tile .ico{font-size:1.6rem;display:block;margin-bottom:5px}
+.cat-tile .lbl{font-size:.76rem;font-weight:700;color:var(--text)}
+.sla-info{background:#eff6ff;border:1px solid #bfdbfe;border-radius:10px;padding:12px 14px;font-size:.78rem;color:#1d4ed8;margin-bottom:16px}
+.sla-info table{width:100%;border-collapse:collapse;margin-top:8px}
+.sla-info td{padding:3px 8px;font-size:.76rem}
+.kb-card{background:#fff;border:1.5px solid var(--border);border-radius:12px;padding:16px;margin-bottom:10px;cursor:pointer;transition:all .2s}
+.kb-card:hover{border-color:var(--pri);box-shadow:0 3px 12px rgba(8,145,178,.1)}
+.kb-title{font-weight:800;color:var(--text);font-size:.9rem}
+.kb-preview{font-size:.8rem;color:var(--muted);margin-top:5px;line-height:1.5}
+.steps-indicator{display:flex;gap:0;margin-bottom:20px}
+.step-i{flex:1;text-align:center;padding:8px 4px;font-size:.72rem;font-weight:700;border-bottom:2px solid #e2e8f0;color:var(--muted)}
+.step-i.active{border-bottom-color:var(--pri);color:var(--pri)}
+.step-i.done{border-bottom-color:var(--ok);color:var(--ok)}
+.filter-bar{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px}
+.empty-state{text-align:center;padding:50px 20px;color:var(--muted)}
+.empty-state .ico{font-size:2.8rem;margin-bottom:12px}
+.toast{position:fixed;bottom:24px;right:24px;background:#1e293b;color:#fff;padding:13px 22px;border-radius:12px;font-size:.87rem;font-weight:600;z-index:9999;transform:translateY(80px);opacity:0;transition:all .3s}
+.toast.show{transform:translateY(0);opacity:1}
+.escalation-banner{background:#fee2e2;border:1px solid #fca5a5;border-radius:10px;padding:12px 14px;font-size:.82rem;color:#991b1b;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center}
+@media(max-width:600px){.form-row{grid-template-columns:1fr}.stat-grid{grid-template-columns:repeat(2,1fr)}.cat-grid{grid-template-columns:repeat(3,1fr)}}
+
+/* ── TOPBAR FIXES  ─────────────────────────────── */
+.navbar,.wiq-topbar,nav.topbar{
+  display:flex!important;align-items:center!important;
+  padding:0 20px!important;height:54px!important;
+  background:#fff!important;
+  border-bottom:2px solid #e8f0ff!important;
+  position:sticky!important;top:0!important;z-index:100!important;
+  gap:12px!important;flex-wrap:nowrap!important;
+  box-shadow:0 1px 8px rgba(37,99,235,.08)!important;
+}
+.nav-brand{
+  font-size:.88rem!important;font-weight:900!important;
+  color:#1E3A5F!important;white-space:nowrap!important;
+  display:flex!important;align-items:center!important;gap:6px!important;
+  flex-shrink:0!important;letter-spacing:-.01em!important;
+}
+.nav-brand .logo-icon{
+  width:28px!important;height:28px!important;
+  background:linear-gradient(135deg,#2563EB,#7C3AED)!important;
+  border-radius:7px!important;display:inline-flex!important;
+  align-items:center!important;justify-content:center!important;
+  font-size:.9rem!important;flex-shrink:0!important;
+}
+.nav-brand .logo-text{
+  font-size:.85rem!important;font-weight:900!important;color:#1E3A5F!important;
+}
+.nav-brand .logo-version{
+  font-size:.55rem!important;font-weight:700!important;
+  color:#2563EB!important;background:#EFF6FF!important;
+  padding:1px 5px!important;border-radius:4px!important;
+  border:1px solid #BFDBFE!important;
+}
+.nav-info{
+  display:flex!important;align-items:center!important;
+  gap:8px!important;flex-shrink:0!important;margin-left:auto!important;
+}
+.nav-divider{width:1px!important;height:20px!important;background:#E2E8F0!important}
+
+/* ── CARD COLOR SHADOWS ─────────────────────────────── */
+.card,.wiq-card,[class*="-card"]{
+  transition:all .25s cubic-bezier(.34,1.56,.64,1)!important;
+  border-radius:12px!important;
+}
+.card:hover,.wiq-card:hover{
+  transform:translateY(-4px) scale(1.006)!important;
+  box-shadow:0 12px 32px rgba(37,99,235,.18),
+             0 2px 8px rgba(37,99,235,.1)!important;
+}
+/* Module-specific card shadows */
+.card-payroll:hover{box-shadow:0 12px 32px rgba(5,150,105,.18)!important}
+.card-leave:hover{box-shadow:0 12px 32px rgba(245,158,11,.18)!important}
+.card-alert:hover{box-shadow:0 12px 32px rgba(220,38,38,.18)!important}
+
+/* ── BUTTON SYSTEM ─────────────────────────────────── */
+.btn{
+  display:inline-flex!important;align-items:center!important;
+  gap:5px!important;padding:7px 16px!important;
+  border-radius:8px!important;font-size:.76rem!important;
+  font-weight:700!important;cursor:pointer!important;
+  border:none!important;transition:all .2s!important;
+  white-space:nowrap!important;font-family:var(--wfi-font);
+}
+.btn-primary{
+  background:linear-gradient(135deg,#2563EB,#1D4ED8)!important;
+  color:#fff!important;
+  box-shadow:0 2px 8px rgba(37,99,235,.3)!important;
+}
+.btn-primary:hover{
+  background:linear-gradient(135deg,#1D4ED8,#1E40AF)!important;
+  box-shadow:0 4px 14px rgba(37,99,235,.4)!important;
+  transform:translateY(-1px)!important;
+}
+.btn-outline,.btn-sm.btn-outline{
+  background:#fff!important;color:#2563EB!important;
+  border:1.5px solid #BFDBFE!important;
+  padding:5px 13px!important;font-size:.72rem!important;
+}
+.btn-outline:hover{
+  background:#EFF6FF!important;
+  border-color:#2563EB!important;
+  box-shadow:0 2px 8px rgba(37,99,235,.15)!important;
+}
+.btn-danger{
+  background:linear-gradient(135deg,#DC2626,#B91C1C)!important;
+  color:#fff!important;
+}
+.btn-danger:hover{box-shadow:0 4px 14px rgba(220,38,38,.35)!important}
+.btn-success{
+  background:linear-gradient(135deg,#059669,#047857)!important;
+  color:#fff!important;
+}
+.btn-success:hover{box-shadow:0 4px 14px rgba(5,150,105,.35)!important}
+.btn-sm{padding:5px 12px!important;font-size:.7rem!important}
+.btn-lg{padding:10px 22px!important;font-size:.82rem!important}
+
+/* ── STATUS BADGES ─────────────────────────────────── */
+.badge,.status-badge,[class*=badge]{
+  display:inline-flex!important;align-items:center!important;
+  padding:3px 10px!important;border-radius:999px!important;
+  font-size:.62rem!important;font-weight:800!important;
+  text-transform:uppercase!important;letter-spacing:.04em!important;
+}
+
+/* ── SIDEBAR BRAND ─────────────────────────────────── */
+.wiq-logo{
+  display:flex!important;align-items:center!important;
+  gap:8px!important;padding:0 4px!important;
+}
+.wiq-logo .logo-mark{
+  width:32px!important;height:32px!important;
+  background:linear-gradient(135deg,#2563EB,#7C3AED)!important;
+  border-radius:9px!important;display:flex!important;
+  align-items:center!important;justify-content:center!important;
+  font-size:1rem!important;flex-shrink:0!important;
+  box-shadow:0 4px 12px rgba(37,99,235,.35)!important;
+}
+.wiq-logo span{
+  font-weight:900!important;font-size:.82rem!important;
+  color:#F8FAFC!important;letter-spacing:-.01em!important;
+}
+
+/* ═══ DARK/LIGHT MODE  ════════════════════════════════════ */
+:root{--dm-bg:#F8FAFC;--dm-card:#ffffff;--dm-text:#1e293b;--dm-muted:#64748b;--dm-border:#e2e8f0;--dm-sidebar:#0a1220;--dm-topbar:#ffffff;--dm-input:#ffffff;--dm-hover:#f1f5f9}
+body.dark-mode{--dm-bg:#0B1120;--dm-card:#111827;--dm-text:#e2e8f0;--dm-muted:#94a3b8;--dm-border:#1e2d4a;--dm-sidebar:#060d18;--dm-topbar:#111827;--dm-input:#1e2d4a;--dm-hover:#1e293b}
+body{background:var(--dm-bg)!important;color:var(--dm-text)!important;transition:background .25s,color .25s}
+.wiq-sidebar,aside{background:var(--dm-sidebar)!important}
+.navbar,.wiq-topbar,nav{background:var(--dm-topbar)!important;border-bottom-color:var(--dm-border)!important}
+.card,.wiq-card,.stat-card,.kpi-card{background:var(--dm-card)!important;border-color:var(--dm-border)!important}
+main,.main-content,.wiq-content,.page-wrap{background:var(--dm-bg)!important}
+input:not([type=checkbox]):not([type=radio]),select,textarea,.form-input{background:var(--dm-input)!important;border-color:var(--dm-border)!important;color:var(--dm-text)!important}
+table{background:var(--dm-card)!important}thead tr{background:#1e3a5f!important}tbody tr:hover{background:var(--dm-hover)!important}
+h1,h2,h3,h4,h5,h6,p,span,label,li,td,th{color:inherit}
+.dm-toggle{width:40px;height:22px;border-radius:999px;border:none;cursor:pointer;position:relative;background:#e2e8f0;transition:background .3s;flex-shrink:0;outline:none}
+.dm-toggle.on{background:linear-gradient(135deg,#4f46e5,#7c3aed)}
+.dm-toggle::after{content:'';position:absolute;top:2px;left:2px;width:18px;height:18px;border-radius:50%;background:#fff;transition:transform .3s;box-shadow:0 1px 4px rgba(0,0,0,.2)}
+.dm-toggle.on::after{transform:translateX(18px)}
+.dm-icon{font-size:.85rem;cursor:pointer}
+
+
+/* ═══ COOKIE CONSENT BANNER ════════════════════════════════ */
+#cookieBanner{
+  position:fixed;bottom:0;left:0;right:0;z-index:9998;
+  background:linear-gradient(135deg,#0F172A,#1E293B);
+  border-top:2px solid #2563EB;
+  padding:16px 32px;
+  display:flex;align-items:center;justify-content:space-between;
+  flex-wrap:wrap;gap:12px;
+  box-shadow:0 -4px 24px rgba(0,0,0,.3);
+  transform:translateY(100%);transition:transform .4s ease;
+}
+#cookieBanner.visible{transform:translateY(0)}
+.cookie-text{font-size:.78rem;color:#CBD5E1;line-height:1.6;max-width:700px}
+.cookie-text a{color:#60A5FA;text-decoration:none;font-weight:600}
+.cookie-text a:hover{text-decoration:underline}
+.cookie-actions{display:flex;gap:8px;flex-shrink:0}
+.cookie-btn-accept{
+  background:linear-gradient(135deg,#2563EB,#4F46E5);color:#fff;
+  border:none;border-radius:8px;padding:8px 20px;font-size:.74rem;
+  font-weight:700;cursor:pointer;font-family:var(--wfi-font);
+  box-shadow:0 4px 12px rgba(37,99,235,.4);transition:all .2s;
+}
+.cookie-btn-accept:hover{transform:translateY(-1px);box-shadow:0 6px 16px rgba(37,99,235,.5)}
+.cookie-btn-settings{
+  background:transparent;color:#94A3B8;
+  border:1.5px solid #334155;border-radius:8px;padding:8px 16px;font-size:.74rem;
+  font-weight:700;cursor:pointer;font-family:var(--wfi-font);transition:all .2s;
+}
+.cookie-btn-settings:hover{color:#F1F5F9;border-color:#64748B}
+.cookie-btn-decline{
+  background:transparent;color:#64748B;border:none;
+  font-size:.7rem;cursor:pointer;font-family:var(--wfi-font);padding:4px 8px;
+}
+
+</style>
+
+<style id="wfi-card-fix">
+.card,.stat-card,.kpi-card{margin-bottom:12px}
+.grid,.stats-grid{gap:14px}
+.export-bar{padding:10px 0;margin-bottom:12px}
+.tab-panel{padding:4px 0}
+.wiq-main{padding:16px 20px}
+@media(max-width:768px){.wiq-main{padding:12px}}
+/* Dark mode button always visible */
+#dmt,#dmToggle{display:flex!important;opacity:1!important;visibility:visible!important}
+/* Print improvements */
+@media print{
+  .wiq-sidebar,.navbar,.topbar,.export-bar,.wiq-mob-toggle{display:none!important}
+  .wiq-main,.main{margin:0!important;padding:20px!important;max-width:100%!important}
+  table{page-break-inside:avoid}
+  .card{page-break-inside:avoid;border:1px solid #e2e8f0!important}
+}
+</style>
+
+<style id="wiq-sb-css">
+
+
+/* ── UNIVERSAL SIDEBAR NAV ── */
+.wiq-wrap{display:flex;min-height:100vh}
+.wiq-sidebar{width:220px;min-width:220px;background:#0a1220;border-right:1px solid rgba(255,255,255,.07);position:sticky;top:0;height:100vh;overflow-y:auto;flex-shrink:0;transition:width .2s;z-index:200}
+.wiq-sidebar::-webkit-scrollbar{width:3px}.wiq-sidebar::-webkit-scrollbar-thumb{background:#1e3a5f}
+.wiq-sidebar-header{padding:14px 14px 10px;border-bottom:1px solid rgba(255,255,255,.07)}
+.wiq-logo{font-size:.9rem;font-weight:900;color:#fff;display:flex;align-items:center;gap:7px}
+.wiq-user-pill{display:flex;align-items:center;gap:7px;padding:8px 10px;margin:8px 0 4px;background:rgba(255,255,255,.04);border-radius:8px;font-size:.7rem;color:#64748b}
+.wiq-user-name{font-weight:700;color:#cbd5e1;font-size:.72rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:120px}
+.wiq-logout-btn{display:flex;align-items:center;gap:6px;padding:7px 10px;margin:0 6px 6px;background:rgba(220,38,38,.1);border:1px solid rgba(220,38,38,.2);border-radius:7px;color:#f87171;font-size:.72rem;font-weight:700;cursor:pointer;width:calc(100% - 12px);text-decoration:none;transition:all .15s}
+.wiq-logout-btn:hover{background:rgba(220,38,38,.2)}
+.wiq-nav-group{margin-bottom:2px}
+.wiq-nav-label{font-size:.59rem;font-weight:800;color:#1e3a5f;text-transform:uppercase;letter-spacing:.09em;padding:8px 14px 3px;cursor:pointer;display:flex;align-items:center;justify-content:space-between}
+.wiq-nav-label:hover{color:#334155}
+.wiq-nav-label .arr{font-size:.6rem;transition:.2s;color:#1e3a5f}
+.wiq-nav-items{display:flex;flex-direction:column;gap:1px;padding:0 6px 4px}
+.wiq-nav-item{display:flex;align-items:center;gap:7px;padding:5px 8px;border-radius:6px;font-size:.71rem;font-weight:600;color:#475569;text-decoration:none;transition:all .15s;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.wiq-nav-item:hover{background:rgba(37,99,235,.12);color:#60a5fa}
+.wiq-nav-item.active{background:rgba(37,99,235,.18);color:#60a5fa;font-weight:800}
+.wiq-nav-item .ico{font-size:.8rem;flex-shrink:0;width:16px;text-align:center}
+.wiq-main{flex:1;min-width:0;overflow-x:hidden}
+.wiq-collapsed .wiq-sidebar{width:48px}
+.wiq-collapsed .wiq-nav-item span,.wiq-collapsed .wiq-nav-label span:first-child,.wiq-collapsed .wiq-user-name,.wiq-collapsed .wiq-logo span,.wiq-collapsed .wiq-logout-btn span{display:none}
+.wiq-collapsed .wiq-nav-items{padding:0 3px}
+.wiq-collapsed .wiq-nav-item{justify-content:center;padding:6px}
+.wiq-collapsed .wiq-logout-btn{justify-content:center;padding:7px;margin:0 3px 4px}
+.wiq-toggle{background:none;border:none;color:#475569;cursor:pointer;padding:4px 8px;font-size:.75rem;display:flex;align-items:center;gap:4px;margin-left:auto}
+.wiq-toggle:hover{color:#60a5fa}
+@media(max-width:768px){.wiq-sidebar{position:fixed;left:-220px;top:0;transition:left .2s}.wiq-sidebar.open{left:0;box-shadow:4px 0 20px rgba(0,0,0,.5)}.wiq-mob-toggle{display:flex!important}}
+.wiq-mob-toggle{display:none;position:fixed;top:12px;left:12px;z-index:300;background:#1e3a5f;border:none;border-radius:8px;padding:7px 10px;color:#fff;font-size:.8rem;cursor:pointer}
+
+  body{background:#F0F4F8}
+  .page-wrap{max-width:1200px;margin:0 auto;padding:24px}
+  .card{background:#fff;border-radius:12px;padding:24px;margin-bottom:24px;box-shadow:0 2px 12px rgba(0,0,0,.08)}
+  .card h3{margin-top:0;color:#1B4F8A;font-size:1.1rem;margin-bottom:16px}
+  .btn{padding:9px 22px;border:none;border-radius:7px;font-weight:600;cursor:pointer;font-size:14px;transition:.15s}
+  .btn-primary{background:#1B4F8A;color:#fff} .btn-primary:hover{background:#1a3f72}
+  .btn-success{background:#27AE60;color:#fff} .btn-success:hover{background:#1e8449}
+  .btn-danger{background:#C0392B;color:#fff}  .btn-danger:hover{background:#a93226}
+  .btn-sm{padding:5px 14px;font-size:12px;border-radius:5px;border:none;font-weight:600;cursor:pointer}
+  .btn-outline{background:#fff;border:1.5px solid #1B4F8A;color:#1B4F8A}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+  .grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+  @media(max-width:700px){.grid2,.grid4{grid-template-columns:1fr}}
+  table{width:100%;border-collapse:collapse;font-size:13px}
+  th{background:#1B4F8A;color:#fff;padding:10px 12px;text-align:left;white-space:nowrap}
+  td{padding:9px 12px;border-bottom:1px solid #EEF2F7;vertical-align:middle}
+  tr:hover td{background:#F8FAFB}
+  .badge{padding:3px 10px;border-radius:12px;font-size:11px;font-weight:700}
+  .badge.present{background:#D5F5E3;color:#1E8449}
+  .badge.absent{background:#FADBD8;color:#C0392B}
+  .badge.late{background:#FEF9E7;color:#D4AC0D}
+  .badge.half_day{background:#D6EAF8;color:#1B4F8A}
+  .badge.leave{background:#EEF2F7;color:#5D6D7E}
+  #msg{padding:11px 16px;border-radius:8px;margin-bottom:16px;display:none;font-weight:600}
+  #msg.success{background:#D5F5E3;color:#1E8449;display:block}
+  #msg.error{background:#FADBD8;color:#C0392B;display:block}
+  .tabs{display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap}
+  .tab{padding:9px 22px;border-radius:8px;border:2px solid #BDC3C7;background:#fff;color:#5D6D7E;font-weight:600;cursor:pointer;font-size:14px}
+  .tab.active{background:#1B4F8A;color:#fff;border-color:#1B4F8A}
+  /* Clock widget */
+  .clock-card{background:linear-gradient(135deg,#1B4F8A,#2563eb);border-radius:12px;padding:28px;color:#fff;text-align:center}
+  .clock-time{font-size:3rem;font-weight:800;letter-spacing:2px;font-family:var(--wfi-font);margin-bottom:6px}
+  .clock-date{font-size:.95rem;opacity:.8;margin-bottom:20px}
+  .clock-status{background:rgba(255,255,255,.15);border-radius:8px;padding:10px 16px;font-size:.95rem;margin-bottom:20px}
+  .clock-status.clocked-in{background:rgba(39,174,96,.3)}
+  .clock-status.clocked-out{background:rgba(192,57,43,.2)}
+  .clock-btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+  .clock-btn{padding:12px 28px;border:none;border-radius:8px;font-size:15px;font-weight:700;cursor:pointer;transition:.15s}
+  .clock-btn.in{background:#27AE60;color:#fff} .clock-btn.in:hover{background:#1e8449}
+  .clock-btn.out{background:#C0392B;color:#fff} .clock-btn.out:hover{background:#a93226}
+  .clock-btn:disabled{opacity:.4;cursor:not-allowed}
+  /* Stat cards */
+  .stat-card{background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:10px;padding:16px;text-align:center}
+  .stat-num{font-size:2rem;font-weight:800;color:#1B4F8A}
+  .stat-label{font-size:.8rem;font-weight:700;color:#64748b;margin-top:3px;text-transform:uppercase;letter-spacing:.05em}
+  .stat-sub{font-size:.75rem;color:#94a3b8;margin-top:3px}
+  /* Today dot */
+  .today-dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px}
+  .dot-present{background:#27AE60}
+  .dot-absent{background:#C0392B}
+  .dot-late{background:#D4AC0D}
+  /* Form */
+  .form-group{margin-bottom:14px}
+  .form-group label{display:block;font-weight:600;color:#1B4F8A;margin-bottom:5px;font-size:13px}
+  .form-group input,.form-group select,.form-group textarea{width:100%;padding:9px 12px;border:1px solid #BDC3C7;border-radius:7px;font-size:14px;box-sizing:border-box}
+  .pbar{height:8px;background:#e2e8f0;border-radius:4px;overflow:hidden;margin-top:6px}
+  .pfill{height:100%;border-radius:4px;transition:width 1s ease}
+.toast{position:fixed;bottom:24px;right:24px;background:#1e293b;color:#fff;padding:13px 22px;border-radius:12px;font-size:.87rem;font-weight:600;z-index:9999;transform:translateY(80px);opacity:0;transition:all .3s;max-width:360px;word-break:break-word;box-shadow:0 8px 30px rgba(0,0,0,.25)}
+.toast.show{transform:translateY(0);opacity:1}
+.toast.success{background:#16a34a}
+.toast.error{background:#dc2626}
+.toast.warn{background:#d97706}
+
+/* ── TOPBAR FIXES  ─────────────────────────────── */
+.navbar,.wiq-topbar,nav.topbar{
+  display:flex!important;align-items:center!important;
+  padding:0 20px!important;height:54px!important;
+  background:#fff!important;
+  border-bottom:2px solid #e8f0ff!important;
+  position:sticky!important;top:0!important;z-index:100!important;
+  gap:12px!important;flex-wrap:nowrap!important;
+  box-shadow:0 1px 8px rgba(37,99,235,.08)!important;
+}
+.nav-brand{
+  font-size:.88rem!important;font-weight:900!important;
+  color:#1E3A5F!important;white-space:nowrap!important;
+  display:flex!important;align-items:center!important;gap:6px!important;
+  flex-shrink:0!important;letter-spacing:-.01em!important;
+}
+.nav-brand .logo-icon{
+  width:28px!important;height:28px!important;
+  background:linear-gradient(135deg,#2563EB,#7C3AED)!important;
+  border-radius:7px!important;display:inline-flex!important;
+  align-items:center!important;justify-content:center!important;
+  font-size:.9rem!important;flex-shrink:0!important;
+}
+.nav-brand .logo-text{
+  font-size:.85rem!important;font-weight:900!important;color:#1E3A5F!important;
+}
+.nav-brand .logo-version{
+  font-size:.55rem!important;font-weight:700!important;
+  color:#2563EB!important;background:#EFF6FF!important;
+  padding:1px 5px!important;border-radius:4px!important;
+  border:1px solid #BFDBFE!important;
+}
+.nav-info{
+  display:flex!important;align-items:center!important;
+  gap:8px!important;flex-shrink:0!important;margin-left:auto!important;
+}
+.nav-divider{width:1px!important;height:20px!important;background:#E2E8F0!important}
+
+/* ── CARD COLOR SHADOWS ─────────────────────────────── */
+.card,.wiq-card,[class*="-card"]{
+  transition:all .25s cubic-bezier(.34,1.56,.64,1)!important;
+  border-radius:12px!important;
+}
+.card:hover,.wiq-card:hover{
+  transform:translateY(-4px) scale(1.006)!important;
+  box-shadow:0 12px 32px rgba(37,99,235,.18),
+             0 2px 8px rgba(37,99,235,.1)!important;
+}
+/* Module-specific card shadows */
+.card-payroll:hover{box-shadow:0 12px 32px rgba(5,150,105,.18)!important}
+.card-leave:hover{box-shadow:0 12px 32px rgba(245,158,11,.18)!important}
+.card-alert:hover{box-shadow:0 12px 32px rgba(220,38,38,.18)!important}
+
+/* ── BUTTON SYSTEM ─────────────────────────────────── */
+.btn{
+  display:inline-flex!important;align-items:center!important;
+  gap:5px!important;padding:7px 16px!important;
+  border-radius:8px!important;font-size:.76rem!important;
+  font-weight:700!important;cursor:pointer!important;
+  border:none!important;transition:all .2s!important;
+  white-space:nowrap!important;font-family:var(--wfi-font);
+}
+.btn-primary{
+  background:linear-gradient(135deg,#2563EB,#1D4ED8)!important;
+  color:#fff!important;
+  box-shadow:0 2px 8px rgba(37,99,235,.3)!important;
+}
+.btn-primary:hover{
+  background:linear-gradient(135deg,#1D4ED8,#1E40AF)!important;
+  box-shadow:0 4px 14px rgba(37,99,235,.4)!important;
+  transform:translateY(-1px)!important;
+}
+.btn-outline,.btn-sm.btn-outline{
+  background:#fff!important;color:#2563EB!important;
+  border:1.5px solid #BFDBFE!important;
+  padding:5px 13px!important;font-size:.72rem!important;
+}
+.btn-outline:hover{
+  background:#EFF6FF!important;
+  border-color:#2563EB!important;
+  box-shadow:0 2px 8px rgba(37,99,235,.15)!important;
+}
+.btn-danger{
+  background:linear-gradient(135deg,#DC2626,#B91C1C)!important;
+  color:#fff!important;
+}
+.btn-danger:hover{box-shadow:0 4px 14px rgba(220,38,38,.35)!important}
+.btn-success{
+  background:linear-gradient(135deg,#059669,#047857)!important;
+  color:#fff!important;
+}
+.btn-success:hover{box-shadow:0 4px 14px rgba(5,150,105,.35)!important}
+.btn-sm{padding:5px 12px!important;font-size:.7rem!important}
+.btn-lg{padding:10px 22px!important;font-size:.82rem!important}
+
+/* ── STATUS BADGES ─────────────────────────────────── */
+.badge,.status-badge,[class*=badge]{
+  display:inline-flex!important;align-items:center!important;
+  padding:3px 10px!important;border-radius:999px!important;
+  font-size:.62rem!important;font-weight:800!important;
+  text-transform:uppercase!important;letter-spacing:.04em!important;
+}
+
+/* ── SIDEBAR BRAND ─────────────────────────────────── */
+.wiq-logo{
+  display:flex!important;align-items:center!important;
+  gap:8px!important;padding:0 4px!important;
+}
+.wiq-logo .logo-mark{
+  width:32px!important;height:32px!important;
+  background:linear-gradient(135deg,#2563EB,#7C3AED)!important;
+  border-radius:9px!important;display:flex!important;
+  align-items:center!important;justify-content:center!important;
+  font-size:1rem!important;flex-shrink:0!important;
+  box-shadow:0 4px 12px rgba(37,99,235,.35)!important;
+}
+.wiq-logo span{
+  font-weight:900!important;font-size:.82rem!important;
+  color:#F8FAFC!important;letter-spacing:-.01em!important;
+}
+
+/* ═══ DARK/LIGHT MODE  ════════════════════════════════════ */
+:root{--dm-bg:#F8FAFC;--dm-card:#ffffff;--dm-text:#1e293b;--dm-muted:#64748b;--dm-border:#e2e8f0;--dm-sidebar:#0a1220;--dm-topbar:#ffffff;--dm-input:#ffffff;--dm-hover:#f1f5f9}
+body.dark-mode{--dm-bg:#0B1120;--dm-card:#111827;--dm-text:#e2e8f0;--dm-muted:#94a3b8;--dm-border:#1e2d4a;--dm-sidebar:#060d18;--dm-topbar:#111827;--dm-input:#1e2d4a;--dm-hover:#1e293b}
+body{background:var(--dm-bg)!important;color:var(--dm-text)!important;transition:background .25s,color .25s}
+.wiq-sidebar,aside{background:var(--dm-sidebar)!important}
+.navbar,.wiq-topbar,nav{background:var(--dm-topbar)!important;border-bottom-color:var(--dm-border)!important}
+.card,.wiq-card,.stat-card,.kpi-card{background:var(--dm-card)!important;border-color:var(--dm-border)!important}
+main,.main-content,.wiq-content,.page-wrap{background:var(--dm-bg)!important}
+input:not([type=checkbox]):not([type=radio]),select,textarea,.form-input{background:var(--dm-input)!important;border-color:var(--dm-border)!important;color:var(--dm-text)!important}
+table{background:var(--dm-card)!important}thead tr{background:#1e3a5f!important}tbody tr:hover{background:var(--dm-hover)!important}
+h1,h2,h3,h4,h5,h6,p,span,label,li,td,th{color:inherit}
+.dm-toggle{width:40px;height:22px;border-radius:999px;border:none;cursor:pointer;position:relative;background:#e2e8f0;transition:background .3s;flex-shrink:0;outline:none}
+.dm-toggle.on{background:linear-gradient(135deg,#4f46e5,#7c3aed)}
+.dm-toggle::after{content:'';position:absolute;top:2px;left:2px;width:18px;height:18px;border-radius:50%;background:#fff;transition:transform .3s;box-shadow:0 1px 4px rgba(0,0,0,.2)}
+.dm-toggle.on::after{transform:translateX(18px)}
+.dm-icon{font-size:.85rem;cursor:pointer}
+
+
+/* ═══ COOKIE CONSENT BANNER ════════════════════════════════ */
+#cookieBanner{
+  position:fixed;bottom:0;left:0;right:0;z-index:9998;
+  background:linear-gradient(135deg,#0F172A,#1E293B);
+  border-top:2px solid #2563EB;
+  padding:16px 32px;
+  display:flex;align-items:center;justify-content:space-between;
+  flex-wrap:wrap;gap:12px;
+  box-shadow:0 -4px 24px rgba(0,0,0,.3);
+  transform:translateY(100%);transition:transform .4s ease;
+}
+#cookieBanner.visible{transform:translateY(0)}
+.cookie-text{font-size:.78rem;color:#CBD5E1;line-height:1.6;max-width:700px}
+.cookie-text a{color:#60A5FA;text-decoration:none;font-weight:600}
+.cookie-text a:hover{text-decoration:underline}
+.cookie-actions{display:flex;gap:8px;flex-shrink:0}
+.cookie-btn-accept{
+  background:linear-gradient(135deg,#2563EB,#4F46E5);color:#fff;
+  border:none;border-radius:8px;padding:8px 20px;font-size:.74rem;
+  font-weight:700;cursor:pointer;font-family:var(--wfi-font);
+  box-shadow:0 4px 12px rgba(37,99,235,.4);transition:all .2s;
+}
+.cookie-btn-accept:hover{transform:translateY(-1px);box-shadow:0 6px 16px rgba(37,99,235,.5)}
+.cookie-btn-settings{
+  background:transparent;color:#94A3B8;
+  border:1.5px solid #334155;border-radius:8px;padding:8px 16px;font-size:.74rem;
+  font-weight:700;cursor:pointer;font-family:var(--wfi-font);transition:all .2s;
+}
+.cookie-btn-settings:hover{color:#F1F5F9;border-color:#64748B}
+.cookie-btn-decline{
+  background:transparent;color:#64748B;border:none;
+  font-size:.7rem;cursor:pointer;font-family:var(--wfi-font);padding:4px 8px;
+}
+
+
+/* ── Dropdown nav groups ── */
+.wiq-nav-group-label{cursor:pointer;user-select:none;display:flex;align-items:center;justify-content:space-between;padding:7px 16px;font-size:.67rem;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:#64748B}
+.wiq-dropdown-toggle:hover{color:#93C5FD;background:rgba(37,99,235,.07);border-radius:8px}
+.wiq-arrow{font-size:.6rem;transition:transform .2s;flex-shrink:0}
+.wiq-dropdown-body{max-height:0;overflow:hidden;transition:max-height .3s ease}
+.wiq-dropdown-body.open{max-height:800px}
+/* ── Nav icons ── */
+.wiq-nav-item a .ico{width:20px;text-align:center;font-size:.88rem;flex-shrink:0}
+/* ── Active link highlight ── */
+.wiq-nav-item a.active,.wiq-nav-item a:has(.ico):hover{background:rgba(37,99,235,.15);color:#93C5FD}
+/* ── Logo ── */
+.wiq-logo-icon{width:32px;height:32px;background:linear-gradient(135deg,#1D4ED8,#6D28D9);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0}
+.wiq-logo-name{font-size:.78rem;font-weight:900;color:#E2E8F0;line-height:1.2}
+.wiq-logo-badge{font-size:.55rem;color:#60A5FA;background:rgba(37,99,235,.2);padding:1px 7px;border-radius:999px;margin-top:3px;display:inline-block;font-weight:700;letter-spacing:.05em}
+/* ── Card & Margin global fixes ── */
+.card,.stat-card,.kpi-card,.metric-card{margin-bottom:14px!important;border-radius:12px!important}
+.grid,.stats-grid,.kpi-grid{gap:14px!important}
+.wiq-main{padding:20px 24px!important;display:flex;flex-direction:column;min-height:100vh}
+.export-bar{padding:10px 0!important;margin-bottom:12px!important;display:flex;gap:8px;flex-wrap:wrap}
+@media(max-width:768px){
+  .wiq-mob-toggle{display:flex!important;align-items:center;justify-content:center}
+  .wiq-sidebar{position:fixed!important;left:-270px;top:0;height:100vh;z-index:500;transition:left .3s;overflow-y:auto}
+  .wiq-sidebar.open{left:0!important;box-shadow:4px 0 20px rgba(0,0,0,.5)}
+  .wiq-wrap{flex-direction:column}
+  .wiq-main{margin-left:0!important;padding:14px 16px!important}
+}
+/* ── Print ── */
+@media print{.wiq-sidebar,.wiq-mob-toggle,.export-bar,.cookie-banner,#ckb,#cookieBanner{display:none!important}.wiq-main{margin:0!important;padding:20px!important;max-width:100%!important}.card{page-break-inside:avoid;border:1px solid #e2e8f0!important}}
+</style>
+  <link rel="stylesheet" href="/workspace.css">
+  <script src="/workspace.js" defer></script>
+  <link rel="stylesheet" href="/navigation.css">
+  <script src="/navigation.js" defer></script>
+
+<script src="/appearance.js" defer></script>
+
+<link rel="stylesheet" href="/preferences.css">
+<link rel="stylesheet" href="/theme.css">
+</head>
+<body><button class="wiq-mob-toggle" onclick="openMobSidebar()" id="mobToggleBtn" style="display:none;position:fixed;top:14px;left:14px;z-index:600;background:#2563EB;color:#fff;border:none;border-radius:9px;padding:9px 13px;cursor:pointer;font-size:1rem;box-shadow:0 4px 16px rgba(37,99,235,.45)">&#9776;</button>
+<div class="wiq-wrap">
+<div class="wiq-sidebar" id="wiqSidebar">
+  <div class="wiq-sidebar-header">
+    <div class="wiq-logo">
+      <div class="wiq-logo-icon">&#9889;</div>
+      <div class="wiq-logo-text">
+        <span class="wiq-logo-name">Workforce<br>Intelligence</span>
+        <span class="wiq-logo-badge">Enterprise HRMS</span>
+      </div>
+    </div>
+    <div class="wiq-user-pill">
+      <span class="wiq-user-avatar">&#128100;</span>
+      <span class="wiq-user-name" id="sidebarUserName">Loading...</span>
+      <button class="wiq-tog" onclick="window.tdm&&window.tdm()" id="dmt" title="Toggle dark mode" style="width:28px;height:16px;border-radius:8px;border:none;background:#334155;cursor:pointer;flex-shrink:0"></button>
+    </div>
+  </div>
+  <nav class="wiq-nav">
+
+    <!-- DASHBOARDS -->
+    <div class="wiq-nav-group">
+      <div class="wiq-nav-group-label">Dashboards</div>
+      <div class="wiq-nav-item"><a href="admin-dashboard.html"><span class="ico">&#9711;</span><span>Admin Dashboard</span></a></div>
+      <div class="wiq-nav-item"><a href="employee-dashboard.html"><span class="ico">&#128100;</span><span>Employee Dashboard</span></a></div>
+      <div class="wiq-nav-item"><a href="manager.html"><span class="ico">&#128084;</span><span>Manager Dashboard</span></a></div>
+      <div class="wiq-nav-item"><a href="activity-history.html"><span class="ico">&#128203;</span><span>Activity History</span></a></div>
+    </div>
+
+    <!-- HR MANAGEMENT (dropdown) -->
+    <div class="wiq-nav-group">
+      <div class="wiq-nav-group-label wiq-dropdown-toggle" onclick="toggleGroup('grp-hr')">
+        &#128101; HR Management <span class="wiq-arrow" id="arr-hr">&#9660;</span>
+      </div>
+      <div id="grp-hr" class="wiq-dropdown-body">
+        <div class="wiq-nav-item"><a href="attendance.html"><span class="ico">&#128336;</span><span>Attendance</span></a></div>
+        <div class="wiq-nav-item"><a href="leave.html"><span class="ico">&#127964;</span><span>Leave Management</span></a></div>
+        <div class="wiq-nav-item"><a href="hiring.html"><span class="ico">&#127919;</span><span>Hiring & ATS</span></a></div>
+        <div class="wiq-nav-item"><a href="onboarding.html"><span class="ico">&#128640;</span><span>Onboarding</span></a></div>
+        <div class="wiq-nav-item"><a href="performance.html"><span class="ico">&#128202;</span><span>Performance</span></a></div>
+        <div class="wiq-nav-item"><a href="training.html"><span class="ico">&#127891;</span><span>Training & LMS</span></a></div>
+        <div class="wiq-nav-item"><a href="goals-okr.html"><span class="ico">&#127942;</span><span>Goals & OKR</span></a></div>
+        <div class="wiq-nav-item"><a href="exit.html"><span class="ico">&#128682;</span><span>Exit Management</span></a></div>
+        <div class="wiq-nav-item"><a href="employee-directory.html"><span class="ico">&#128101;</span><span>Employee Directory</span></a></div>
+        <div class="wiq-nav-item"><a href="org-chart.html"><span class="ico">&#127961;</span><span>Org Chart</span></a></div>
+        <div class="wiq-nav-item"><a href="shift-roster.html"><span class="ico">&#128197;</span><span>Shift Roster</span></a></div>
+        <div class="wiq-nav-item"><a href="shift-bidding.html"><span class="ico">&#128260;</span><span>Shift Bidding</span></a></div>
+        <div class="wiq-nav-item"><a href="wfh-tracker.html"><span class="ico">&#127968;</span><span>WFH Tracker</span></a></div>
+        <div class="wiq-nav-item"><a href="time-tracker.html"><span class="ico">&#9201;</span><span>Time Tracker</span></a></div>
+        <div class="wiq-nav-item"><a href="regularization.html"><span class="ico">&#128393;</span><span>Regularisation</span></a></div>
+      </div>
+    </div>
+
+    <!-- PAYROLL & FINANCE (dropdown) -->
+    <div class="wiq-nav-group">
+      <div class="wiq-nav-group-label wiq-dropdown-toggle" onclick="toggleGroup('grp-pay')">
+        &#128176; Payroll & Finance <span class="wiq-arrow" id="arr-pay">&#9660;</span>
+      </div>
+      <div id="grp-pay" class="wiq-dropdown-body">
+        <div class="wiq-nav-item"><a href="salary.html"><span class="ico">&#128176;</span><span>Payroll Processing</span></a></div>
+        <div class="wiq-nav-item"><a href="payslip-portal.html"><span class="ico">&#128196;</span><span>Payslip Portal</span></a></div>
+        <div class="wiq-nav-item"><a href="salary-revision.html"><span class="ico">&#128200;</span><span>Salary Revision</span></a></div>
+        <div class="wiq-nav-item"><a href="salary-advance.html"><span class="ico">&#128179;</span><span>Salary Advance</span></a></div>
+        <div class="wiq-nav-item"><a href="tax-portal.html"><span class="ico">&#129534;</span><span>TDS / Tax Portal</span></a></div>
+        <div class="wiq-nav-item"><a href="investment-declaration.html"><span class="ico">&#128209;</span><span>IT Declaration</span></a></div>
+        <div class="wiq-nav-item"><a href="form-24q.html"><span class="ico">&#127963;</span><span>Form 24Q</span></a></div>
+        <div class="wiq-nav-item"><a href="statutory-bonus.html"><span class="ico">&#127873;</span><span>Statutory Bonus</span></a></div>
+        <div class="wiq-nav-item"><a href="lwf-tracker.html"><span class="ico">&#127963;</span><span>LWF Tracker</span></a></div>
+        <div class="wiq-nav-item"><a href="benefits.html"><span class="ico">&#127973;</span><span>Benefits & Perks</span></a></div>
+        <div class="wiq-nav-item"><a href="loan-portal.html"><span class="ico">&#127991;</span><span>Loan Portal</span></a></div>
+        <div class="wiq-nav-item"><a href="banking.html"><span class="ico">&#127970;</span><span>Banking</span></a></div>
+      </div>
+    </div>
+
+    <!-- COMPLIANCE (dropdown) -->
+    <div class="wiq-nav-group">
+      <div class="wiq-nav-group-label wiq-dropdown-toggle" onclick="toggleGroup('grp-comp')">
+        &#9878;&#65039; Compliance <span class="wiq-arrow" id="arr-comp">&#9660;</span>
+      </div>
+      <div id="grp-comp" class="wiq-dropdown-body">
+        <div class="wiq-nav-item"><a href="compliance.html"><span class="ico">&#9878;&#65039;</span><span>Statutory Compliance</span></a></div>
+        <div class="wiq-nav-item"><a href="posh-complaints.html"><span class="ico">&#128737;</span><span>POSH / ICC</span></a></div>
+        <div class="wiq-nav-item"><a href="privacy-policy.html"><span class="ico">&#128274;</span><span>Privacy Policy</span></a></div>
+        <div class="wiq-nav-item"><a href="cookie-policy.html"><span class="ico">&#127850;</span><span>Cookie Policy</span></a></div>
+        <div class="wiq-nav-item"><a href="security-policy.html"><span class="ico">&#128737;</span><span>Security Policy</span></a></div>
+        <div class="wiq-nav-item"><a href="company-policies.html"><span class="ico">&#128220;</span><span>Company Policies</span></a></div>
+      </div>
+    </div>
+
+    <!-- AI & INTELLIGENCE -->
+    <div class="wiq-nav-group">
+      <div class="wiq-nav-group-label wiq-dropdown-toggle" onclick="toggleGroup('grp-ai')">
+        &#129302; AI & Intelligence <span class="wiq-arrow" id="arr-ai">&#9660;</span>
+      </div>
+      <div id="grp-ai" class="wiq-dropdown-body">
+        <div class="wiq-nav-item"><a href="ai-assistant.html"><span class="ico">&#129302;</span><span>AI Assistant</span></a></div>
+        <div class="wiq-nav-item"><a href="hr-copilot.html"><span class="ico">&#129504;</span><span>HR Copilot</span></a></div>
+        <div class="wiq-nav-item"><a href="ai-insights.html"><span class="ico">&#128202;</span><span>AI Insights</span></a></div>
+      </div>
+    </div>
+
+    <!-- SECURITY (dropdown) -->
+    <div class="wiq-nav-group">
+      <div class="wiq-nav-group-label wiq-dropdown-toggle" onclick="toggleGroup('grp-sec')">
+        &#128737; Security <span class="wiq-arrow" id="arr-sec">&#9660;</span>
+      </div>
+      <div id="grp-sec" class="wiq-dropdown-body">
+        <div class="wiq-nav-item"><a href="fraud-detection.html"><span class="ico">&#128269;</span><span>Fraud Detection</span></a></div>
+        <div class="wiq-nav-item"><a href="cybersecurity.html"><span class="ico">&#128737;</span><span>Cybersecurity</span></a></div>
+        <div class="wiq-nav-item"><a href="threat-monitor.html"><span class="ico">&#128308;</span><span>Threat Monitor</span></a></div>
+        <div class="wiq-nav-item"><a href="audit-log.html"><span class="ico">&#128196;</span><span>Audit Log</span></a></div>
+        <div class="wiq-nav-item"><a href="session-management.html"><span class="ico">&#128273;</span><span>Session Mgmt</span></a></div>
+      </div>
+    </div>
+
+    <!-- ANALYTICS (dropdown) -->
+    <div class="wiq-nav-group">
+      <div class="wiq-nav-group-label wiq-dropdown-toggle" onclick="toggleGroup('grp-ana')">
+        &#128202; Analytics <span class="wiq-arrow" id="arr-ana">&#9660;</span>
+      </div>
+      <div id="grp-ana" class="wiq-dropdown-body">
+        <div class="wiq-nav-item"><a href="analytics.html"><span class="ico">&#128200;</span><span>Analytics Dashboard</span></a></div>
+        <div class="wiq-nav-item"><a href="reports.html"><span class="ico">&#128209;</span><span>Reports Center</span></a></div>
+        <div class="wiq-nav-item"><a href="workforce-planning.html"><span class="ico">&#128202;</span><span>Workforce Planning</span></a></div>
+        <div class="wiq-nav-item"><a href="real-time-monitor.html"><span class="ico">&#128225;</span><span>Real-Time Monitor</span></a></div>
+        <div class="wiq-nav-item"><a href="headcount.html"><span class="ico">&#128101;</span><span>Headcount</span></a></div>
+        <div class="wiq-nav-item"><a href="diversity.html"><span class="ico">&#127752;</span><span>Diversity & DEI</span></a></div>
+      </div>
+    </div>
+
+    <!-- SAFETY & WELFARE (dropdown) -->
+    <div class="wiq-nav-group">
+      <div class="wiq-nav-group-label wiq-dropdown-toggle" onclick="toggleGroup('grp-safe')">
+        &#10084;&#65039; Welfare & Safety <span class="wiq-arrow" id="arr-safe">&#9660;</span>
+      </div>
+      <div id="grp-safe" class="wiq-dropdown-body">
+        <div class="wiq-nav-item"><a href="mental-health.html"><span class="ico">&#128156;</span><span>Mental Health & EAP</span></a></div>
+        <div class="wiq-nav-item"><a href="112-emergency.html"><span class="ico">&#128680;</span><span>112 Emergency & SOS</span></a></div>
+        <div class="wiq-nav-item"><a href="women-safety-policy.html"><span class="ico">&#127800;</span><span>Women Safety</span></a></div>
+        <div class="wiq-nav-item"><a href="cab-booking.html"><span class="ico">&#128663;</span><span>Cab & Transport</span></a></div>
+        <div class="wiq-nav-item"><a href="visitor-management.html"><span class="ico">&#127970;</span><span>Visitor Management</span></a></div>
+        <div class="wiq-nav-item"><a href="welfare.html"><span class="ico">&#10084;&#65039;</span><span>Welfare Hub</span></a></div>
+        <div class="wiq-nav-item"><a href="pulse-survey.html"><span class="ico">&#128202;</span><span>Pulse Survey</span></a></div>
+      </div>
+    </div>
+
+    <!-- EMPLOYEE SELF-SERVICE (dropdown) -->
+    <div class="wiq-nav-group">
+      <div class="wiq-nav-group-label wiq-dropdown-toggle" onclick="toggleGroup('grp-ess')">
+        &#128111; Self-Service <span class="wiq-arrow" id="arr-ess">&#9660;</span>
+      </div>
+      <div id="grp-ess" class="wiq-dropdown-body">
+        <div class="wiq-nav-item"><a href="employee-self-service.html"><span class="ico">&#128111;</span><span>Self-Service Portal</span></a></div>
+        <div class="wiq-nav-item"><a href="profile.html"><span class="ico">&#128100;</span><span>My Profile</span></a></div>
+        <div class="wiq-nav-item"><a href="document-vault.html"><span class="ico">&#128193;</span><span>Document Vault</span></a></div>
+        <div class="wiq-nav-item"><a href="expenses.html"><span class="ico">&#128184;</span><span>Expenses</span></a></div>
+        <div class="wiq-nav-item"><a href="tasks.html"><span class="ico">&#9989;</span><span>My Tasks</span></a></div>
+        <div class="wiq-nav-item"><a href="helpdesk.html"><span class="ico">&#127916;</span><span>IT Helpdesk</span></a></div>
+        <div class="wiq-nav-item"><a href="announcements.html"><span class="ico">&#128226;</span><span>Announcements</span></a></div>
+        <div class="wiq-nav-item"><a href="notifications.html"><span class="ico">&#128276;</span><span>Notifications</span></a></div>
+        <div class="wiq-nav-item"><a href="festival-calendar.html"><span class="ico">&#127881;</span><span>Festival Calendar</span></a></div>
+      </div>
+    </div>
+
+    <!-- BIOMETRICS (dropdown) -->
+    <div class="wiq-nav-group">
+      <div class="wiq-nav-group-label wiq-dropdown-toggle" onclick="toggleGroup('grp-bio')">
+        &#128272; Biometrics <span class="wiq-arrow" id="arr-bio">&#9660;</span>
+      </div>
+      <div id="grp-bio" class="wiq-dropdown-body">
+        <div class="wiq-nav-item"><a href="face-recognition.html"><span class="ico">&#128065;&#65039;</span><span>Face Recognition</span></a></div>
+        <div class="wiq-nav-item"><a href="biometric-enrollment.html"><span class="ico">&#128272;</span><span>Biometric Enrollment</span></a></div>
+      </div>
+    </div>
+
+    <!-- ADMIN (dropdown) -->
+    <div class="wiq-nav-group">
+      <div class="wiq-nav-group-label wiq-dropdown-toggle" onclick="toggleGroup('grp-adm')">
+        &#9881;&#65039; Administration <span class="wiq-arrow" id="arr-adm">&#9660;</span>
+      </div>
+      <div id="grp-adm" class="wiq-dropdown-body">
+        <div class="wiq-nav-item"><a href="settings.html"><span class="ico">&#9881;&#65039;</span><span>Settings</span></a></div>
+        <div class="wiq-nav-item"><a href="employee-grades.html"><span class="ico">&#127885;</span><span>Employee Grades</span></a></div>
+        <div class="wiq-nav-item"><a href="assets.html"><span class="ico">&#127963;</span><span>Assets</span></a></div>
+        <div class="wiq-nav-item"><a href="data-export.html"><span class="ico">&#128228;</span><span>Data Export</span></a></div>
+        <div class="wiq-nav-item"><a href="registration-tracker.html"><span class="ico">&#128203;</span><span>Registration Tracker</span></a></div>
+      </div>
+    </div>
+
+    <!-- LOGOUT -->
+    <div class="wiq-nav-group" style="margin-top:auto;padding-top:8px;border-top:1px solid rgba(255,255,255,.07)">
+      <div class="wiq-nav-item"><a href="#" onclick="window.logout&&window.logout();return false;" style="color:#EF4444!important"><span class="ico">&#128682;</span><span>Logout</span></a></div>
+    </div>
+
+  </nav>
+</div>
+
+<div class="wiq-main">
+
+<nav class="navbar">
+  <div class="nav-brand">
+      <span class="logo-icon">&#9889;</span>
+      <span class="logo-text">Workforce Intelligence</span>
+      <span class="logo-version"></span>
+    </div>
+  <div class="nav-info">
+    <a href="employee-dashboard.html" class="btn btn-sm btn-outline">← Dashboard</a>
+    <a href="cab-issues.html" class="btn btn-sm btn-outline">🚗 Cab Support</a>
+    <span id="userName" class="nav-user"></span>
+    <button onclick="logout()" class="btn btn-sm btn-outline">Logout</button>
+  </div>
+</nav>
+<div class="page">
+  <div class="hdr">
+    <div>
+      <h1>🎧 Technical Support & Help Desk</h1>
+      <p>IT support · HR queries · Access requests · Facilities · Knowledge base · SLA tracking</p>
+    </div>
+    <button class="btn-pri" onclick="startNewTicket()">+ New Ticket</button>
+  </div>
+
+  <!-- Stats -->
+  <div class="stat-grid">
+    <div class="stat-box"><div class="stat-num" id="s-total" style="color:var(--pri)">–</div><div class="stat-lbl">Total</div></div>
+    <div class="stat-box"><div class="stat-num" id="s-open" style="color:#6d28d9">–</div><div class="stat-lbl">Open</div></div>
+    <div class="stat-box"><div class="stat-num" id="s-inprog" style="color:#1d4ed8">–</div><div class="stat-lbl">In Progress</div></div>
+    <div class="stat-box"><div class="stat-num" id="s-resolved" style="color:#15803d">–</div><div class="stat-lbl">Resolved</div></div>
+    <div class="stat-box"><div class="stat-num" id="s-critical" style="color:#dc2626">–</div><div class="stat-lbl">Critical</div></div>
+    <div class="stat-box"><div class="stat-num" id="s-csat" style="color:var(--warn)">–</div><div class="stat-lbl">Avg CSAT</div></div>
+  </div>
+
+  <div class="tab-nav">
+    <button class="tab-btn active" onclick="switchTab('my',this)">📋 My Tickets</button>
+    <button class="tab-btn" onclick="switchTab('kb',this)">📚 Knowledge Base</button>
+    <button class="tab-btn" id="allTabBtn" style="display:none" onclick="switchTab('all',this)">🔧 All Tickets</button>
+    <button class="tab-btn" id="slaTabBtn" style="display:none" onclick="switchTab('sla',this)">⏱ SLA / Settings</button>
+  </div>
+
+  <!-- MY TICKETS -->
+  <div class="tab-panel active" id="tab-my">
+    <div id="myTicketsList"><div class="empty-state"><div class="ico">📋</div>Loading…</div></div>
+  </div>
+
+  <!-- KNOWLEDGE BASE -->
+  <div class="tab-panel" id="tab-kb">
+    <div class="filter-bar">
+      <input class="fi" id="kbSearch" placeholder="Search KB articles…" oninput="loadKB()" style="flex:1">
+      <select class="fi" id="kbCat" style="width:190px;flex:0 0 auto" onchange="loadKB()">
+        <option value="">All Categories</option>
+        <option value="it_hardware">💻 IT Hardware</option>
+        <option value="it_software">🖥️ IT Software</option>
+        <option value="access">🔑 Access</option>
+        <option value="hr_query">👥 HR</option>
+        <option value="payroll">💰 Payroll</option>
+        <option value="facilities">🏢 Facilities</option>
+      </select>
+      <button class="btn-sec btn-sm" id="addKBBtn" style="display:none" onclick="openAddKBModal()">+ Add Article</button>
+    </div>
+    <div id="kbList"><div class="empty-state"><div class="ico">📚</div>Loading articles…</div></div>
+  </div>
+
+  <!-- ALL TICKETS (Admin/IT) -->
+  <div class="tab-panel" id="tab-all">
+    <div class="filter-bar">
+      <select class="fi" id="statusFilter" style="width:160px;flex:0 0 auto" onchange="loadAllTickets()">
+        <option value="">All Status</option>
+        <option value="open">Open</option>
+        <option value="in_progress">In Progress</option>
+        <option value="pending_user">Pending User</option>
+        <option value="resolved">Resolved</option>
+        <option value="closed">Closed</option>
+        <option value="escalated">Escalated</option>
+      </select>
+      <select class="fi" id="catFilter" style="width:180px;flex:0 0 auto" onchange="loadAllTickets()">
+        <option value="">All Categories</option>
+        <option value="it_hardware">💻 IT Hardware</option>
+        <option value="it_software">🖥️ IT Software</option>
+        <option value="access">🔑 Access</option>
+        <option value="hr_query">👥 HR Query</option>
+        <option value="payroll">💰 Payroll</option>
+        <option value="facilities">🏢 Facilities</option>
+      </select>
+      <select class="fi" id="priFilter" style="width:150px;flex:0 0 auto" onchange="loadAllTickets()">
+        <option value="">All Priority</option>
+        <option value="critical">🔴 Critical</option>
+        <option value="high">🟠 High</option>
+        <option value="medium">🟡 Medium</option>
+        <option value="low">🟢 Low</option>
+      </select>
+    </div>
+    <div id="allTicketsList"><div class="empty-state"><div class="ico">🔧</div>Loading…</div></div>
+  </div>
+
+  <!-- SLA / SETTINGS -->
+  <div class="tab-panel" id="tab-sla">
+    <div class="card">
+      <h3 style="font-weight:900;margin-bottom:16px">⏱ SLA Configuration</h3>
+      <div id="slaTable"><div class="empty-state">Loading SLA…</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ NEW TICKET MODAL (3-step) ═══ -->
+<div class="modal-overlay" id="newTicketModal">
+  <div class="modal-box">
+    <div class="modal-title">🎧 Raise a Support Ticket</div>
+    <div class="steps-indicator">
+      <div class="step-i active" id="si1">1. Category</div>
+      <div class="step-i" id="si2">2. Details</div>
+      <div class="step-i" id="si3">3. Confirm</div>
+    </div>
+
+    <!-- Step 1: Category -->
+    <div id="ntStep1">
+      <p style="font-size:.83rem;color:var(--muted);margin-bottom:14px">What do you need help with?</p>
+      <input type="hidden" id="ntCat">
+      <div class="cat-grid">
+        <button type="button" class="cat-tile" onclick="selectCat('it_hardware','💻','IT Hardware',this)"><span class="ico">💻</span><span class="lbl">IT Hardware<br><small style="color:var(--muted);font-weight:400">Laptop, Mouse, Monitor</small></span></button>
+        <button type="button" class="cat-tile" onclick="selectCat('it_software','🖥️','IT Software',this)"><span class="ico">🖥️</span><span class="lbl">IT Software<br><small style="color:var(--muted);font-weight:400">Apps, VPN, Email</small></span></button>
+        <button type="button" class="cat-tile" onclick="selectCat('access','🔑','Access',this)"><span class="ico">🔑</span><span class="lbl">Access / Perms<br><small style="color:var(--muted);font-weight:400">Login, System access</small></span></button>
+        <button type="button" class="cat-tile" onclick="selectCat('hr_query','👥','HR Query',this)"><span class="ico">👥</span><span class="lbl">HR Query<br><small style="color:var(--muted);font-weight:400">Leave, Policies, Docs</small></span></button>
+        <button type="button" class="cat-tile" onclick="selectCat('payroll','💰','Payroll',this)"><span class="ico">💰</span><span class="lbl">Payroll Issue<br><small style="color:var(--muted);font-weight:400">Salary, Deductions</small></span></button>
+        <button type="button" class="cat-tile" onclick="selectCat('facilities','🏢','Facilities',this)"><span class="ico">🏢</span><span class="lbl">Facilities<br><small style="color:var(--muted);font-weight:400">AC, Seating, Cleaning</small></span></button>
+        <button type="button" class="cat-tile" onclick="selectCat('other','📋','Other',this)"><span class="ico">📋</span><span class="lbl">Other<br><small style="color:var(--muted);font-weight:400">Anything else</small></span></button>
+      </div>
+      <!-- Suggested KB articles will appear here -->
+      <div id="kbSuggestions" style="display:none;margin-bottom:16px">
+        <div style="font-size:.8rem;font-weight:700;color:var(--pri);margin-bottom:8px">💡 Related articles — check these first:</div>
+        <div id="kbSuggList"></div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-sec" onclick="closeModal('newTicketModal')">Cancel</button>
+        <button class="btn-pri" id="nt1Next" disabled onclick="ntGoStep(2)">Next →</button>
+      </div>
+    </div>
+
+    <!-- Step 2: Details -->
+    <div id="ntStep2" style="display:none">
+      <div class="form-row">
+        <div class="form-group"><label for="ntPriority">Priority</label>
+          <select class="fi" id="ntPriority">
+            <option value="low">🟢 Low — Not blocking work</option>
+            <option value="medium" selected>🟡 Medium — Need within 24 hrs</option>
+            <option value="high">🟠 High — Need today</option>
+            <option value="critical">🔴 Critical — Completely blocked</option>
+          </select>
+        </div>
+        <div class="form-group"><label for="ntSubtype">Sub-type</label>
+          <select class="fi" id="ntSubtype"><option value="">General</option></select>
+        </div>
+      </div>
+      <div class="form-group"><label for="ntSubject">Subject *</label>
+        <input class="fi" id="ntSubject" placeholder="Brief, clear description of the issue">
+      </div>
+      <div class="form-group"><label for="ntDesc">Detailed Description *</label>
+        <textarea class="fi" id="ntDesc" placeholder="Describe the issue in detail:&#10;• What were you trying to do?&#10;• What happened instead?&#10;• Any error messages?&#10;• What have you already tried?&#10;• Since when is this happening?"></textarea>
+      </div>
+      <div id="ntSLAInfo" class="sla-info">
+        ⏱ <b>SLA Target:</b> <span id="slaTarget">48 hrs resolution</span>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-sec" onclick="ntGoStep(1)">← Back</button>
+        <button class="btn-pri" onclick="ntGoStep(3)">Next →</button>
+      </div>
+    </div>
+
+    <!-- Step 3: Confirm -->
+    <div id="ntStep3" style="display:none">
+      <div class="card" style="margin-bottom:14px;background:#f8fafc">
+        <div style="font-weight:800;margin-bottom:10px">📋 Ticket Summary</div>
+        <div id="ntSummary" style="font-size:.84rem;line-height:1.9;color:var(--text)"></div>
+      </div>
+      <div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:10px;padding:12px 14px;font-size:.8rem;color:#1d4ed8;margin-bottom:16px">
+        🔔 You'll receive status updates here. For critical issues, a technician will contact you within 1 hour.
+      </div>
+      <div class="modal-footer">
+        <button class="btn-sec" onclick="ntGoStep(2)">← Back</button>
+        <button class="btn-pri" onclick="submitTicket()">📤 Submit Ticket</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Ticket Detail Modal -->
+<div class="modal-overlay" id="ticketModal">
+  <div class="modal-box" style="max-width:740px">
+    <div id="ticketDetailContent"></div>
+
+    <!-- Comment section -->
+    <div style="margin-top:18px;border-top:1.5px solid var(--border);padding-top:16px">
+      <div style="font-size:.85rem;font-weight:800;margin-bottom:10px;color:var(--text)">💬 Comments & Updates</div>
+      <div id="commentsList" style="margin-bottom:12px"></div>
+      <div style="display:flex;gap:8px">
+        <input class="fi" id="commentText" placeholder="Ask a follow-up, provide more info…" style="flex:1">
+        <label style="display:flex;align-items:center;gap:6px;font-size:.78rem;color:var(--muted)">
+          <input type="checkbox" id="commentInternal"> Internal
+        </label>
+        <button class="btn-pri btn-sm" onclick="addComment()">Send</button>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-sec" onclick="closeModal('ticketModal')">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- KB Article Modal -->
+<div class="modal-overlay" id="kbArticleModal">
+  <div class="modal-box">
+    <div class="modal-title" id="kbArtTitle">Article</div>
+    <div id="kbArtContent" style="font-size:.86rem;line-height:1.9;white-space:pre-wrap;color:var(--text);margin-bottom:18px"></div>
+    <div style="display:flex;gap:10px;margin-bottom:16px">
+      <button class="btn-ok" onclick="rateKB(currentKBId,true)">👍 Helpful</button>
+      <button class="btn-sec btn-sm" onclick="rateKB(currentKBId,false)">👎 Not helpful</button>
+    </div>
+    <div style="background:#e0f2fe;border-radius:10px;padding:12px 14px;font-size:.82rem;color:#0369a1">
+      Still need help? <a href="#" onclick="closeModal('kbArticleModal');startNewTicket();return false;" style="font-weight:700">Raise a ticket →</a>
+    </div>
+    <div class="modal-footer"><button class="btn-sec" onclick="closeModal('kbArticleModal')">Close</button></div>
+  </div>
+</div>
+
+<!-- Add KB Article Modal -->
+<div class="modal-overlay" id="addKBModal">
+  <div class="modal-box">
+    <div class="modal-title">📝 Add Knowledge Base Article</div>
+    <div class="form-row">
+      <div class="form-group"><label>Category *</label>
+        <select class="fi" id="kbNewCat">
+          <option value="it_hardware">💻 IT Hardware</option>
+          <option value="it_software">🖥️ IT Software</option>
+          <option value="access">🔑 Access</option>
+          <option value="hr_query">👥 HR Query</option>
+          <option value="payroll">💰 Payroll</option>
+          <option value="facilities">🏢 Facilities</option>
+          <option value="other">📋 Other</option>
+        </select>
+      </div>
+      <div class="form-group"><label>Tags (comma-separated)</label>
+        <input class="fi" id="kbNewTags" placeholder="vpn, password, reset">
+      </div>
+    </div>
+    <div class="form-group"><label>Article Title *</label>
+      <input class="fi" id="kbNewTitle" placeholder="How to reset VPN credentials">
+    </div>
+    <div class="form-group"><label>Content *</label>
+      <textarea class="fi" id="kbNewContent" style="min-height:160px" placeholder="Step-by-step instructions…&#10;1. Go to...&#10;2. Click...&#10;3. Enter your..."></textarea>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-sec" onclick="closeModal('addKBModal')">Cancel</button>
+      <button class="btn-pri" onclick="submitKBArticle()">Publish Article</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+<script>
+const API = '/api';
+const tok = () => localStorage.getItem('token');
+const headers = () => ({ 'Content-Type':'application/json', Authorization:`Bearer ${tok()}` });
+const fmtDate = d => d ? new Date(d).toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'}) : '–';
+const fmtDT   = d => d ? new Date(d).toLocaleString('en-IN',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'}) : '–';
+
+let currentUser = null, currentTicketId = null, currentKBId = null;
+let ntCatLabel = '', slaData = [];
+
+const catLabel = {it_hardware:'💻 IT Hardware', it_software:'🖥️ IT Software', access:'🔑 Access', hr_query:'👥 HR Query', payroll:'💰 Payroll', facilities:'🏢 Facilities', other:'📋 Other'};
+const priLabel  = {critical:'🔴 Critical', high:'🟠 High', medium:'🟡 Medium', low:'🟢 Low'};
+const subtypes  = {
+  it_hardware: ['Laptop issue','Monitor issue','Keyboard/Mouse','Printer','Phone/Headset','Docking station','Other hardware'],
+  it_software: ['Cannot login','Application crash','VPN issue','Email issue','Teams/Zoom','Slow performance','Software installation','License issue'],
+  access: ['New system access','Access revoked','Password reset','MFA issue','Drive/folder access','Application permission'],
+  hr_query: ['Leave policy','Attendance correction','Document request','Certificate','Transfer query','Policy clarification'],
+  payroll: ['Salary not credited','Wrong deduction','Reimbursement','Arrears','Form 16','TDS query'],
+  facilities: ['AC not working','Seating issue','Cleaning request','Meeting room','Printer/Copier','Cafeteria'],
+  other: ['General query','Feedback','Other']
+};
+
+async function api(path, opts = {}) {
+  const r = await fetch(API + path, { headers: headers(), ...opts });
+  return r.json();
+}
+
+function showToast(msg, ok = true) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.className = 'toast show';
+  t.style.background = ok ? '#1e293b' : '#dc2626';
+  setTimeout(() => t.className = 'toast', 3200);
+}
+
+function switchTab(id, btn) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + id).classList.add('active');
+  if (btn) btn.classList.add('active');
+  if (id === 'my')  loadMyTickets();
+  if (id === 'kb')  loadKB();
+  if (id === 'all') loadAllTickets();
+  if (id === 'sla') loadSLA();
+}
+
+function openModal(id)  { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+// ── STATS ─────────────────────────────────────────────────────
+async function loadStats() {
+  try {
+    const d = await api('/helpdesk/stats');
+    document.getElementById('s-total').textContent    = d.total || 0;
+    document.getElementById('s-open').textContent     = d.open_count || 0;
+    document.getElementById('s-inprog').textContent   = d.in_progress || 0;
+    document.getElementById('s-resolved').textContent = d.resolved || 0;
+    document.getElementById('s-critical').textContent = d.critical || 0;
+    document.getElementById('s-csat').textContent     = d.avg_satisfaction ? Number(d.avg_satisfaction).toFixed(1) + '★' : '–';
+  } catch(e) {}
+}
+
+// ── MY TICKETS ────────────────────────────────────────────────
+async function loadMyTickets() {
+  const el = document.getElementById('myTicketsList');
+  const data = await api('/helpdesk/my');
+  if (!data?.length) {
+    el.innerHTML = `<div class="empty-state"><div class="ico">\u2705</div><b>No open tickets</b><br><span style="font-size:.82rem">Need help? Click <b>+ New Ticket</b> to get started.</span></div>`;
+    return;
+  }
+  el.innerHTML = data.map(t => renderTicketCard(t, false)).join('');
+}
+
+async function loadAllTickets() {
+  const el = document.getElementById('allTicketsList');
+  const st = document.getElementById('statusFilter')?.value || '';
+  const cat = document.getElementById('catFilter')?.value || '';
+  const pri = document.getElementById('priFilter')?.value || '';
+  const data = await api(`/helpdesk/?status=${st}&category=${cat}&priority=${pri}`);
+  if (!data?.length) { el.innerHTML = `<div class="empty-state"><div class="ico">🎉</div>No tickets found</div>`; return; }
+  el.innerHTML = data.map(t => renderTicketCard(t, true)).join('');
+}
+
+function renderTicketCard(t, admin) {
+  const age = Math.floor((Date.now() - new Date(t.created_at)) / 36e5);
+  const sla = slaData.find(s => s.priority === t.priority);
+  const slaUsed = sla ? Math.min(100, Math.round((age / sla.resolve_hours) * 100)) : 0;
+  const slaColor = slaUsed >= 80 ? '#dc2626' : slaUsed >= 50 ? '#d97706' : '#16a34a';
+  return `<div class="ticket-card ${t.priority}">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px">
+      <div>
+        <div class="tc-title">${wfiText(t.subject)}</div>
+        <div class="tc-meta">
+          <span>#${t.ticket_id}</span>
+          <span class="cat-badge">${catLabel[t.category] || t.category}</span>
+          ${admin ? `<span>👤 ${wfiText(t.full_name)}</span>` : ''}
+          <span>📅 ${fmtDT(t.created_at)}</span>
+          ${t.assignee_name ? `<span>🔧 ${wfiText(t.assignee_name)}</span>` : ''}
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:5px">
+        <span class="priority-badge p-${t.priority}">${priLabel[t.priority] || t.priority}</span>
+        <span class="status-pill st-${t.status}">${t.status.replace(/_/g,' ').toUpperCase()}</span>
+      </div>
+    </div>
+    <div style="font-size:.78rem;color:var(--muted);line-height:1.4;margin-top:6px">${wfiText((t.description||'').slice(0,130))}${(t.description||'').length>130?'…':''}</div>
+    ${sla && !['resolved','closed'].includes(t.status) ? `
+    <div style="margin-top:8px">
+      <div style="font-size:.7rem;color:var(--muted);margin-bottom:3px">SLA: ${age}h / ${sla.resolve_hours}h (${slaUsed}%)</div>
+      <div class="sla-bar"><div class="sla-fill" style="width:${slaUsed}%;background:${slaColor}"></div></div>
+    </div>` : ''}
+    <button type="button" class="btn-sec btn-sm" onclick="openTicket(${t.ticket_id})">View ticket</button>
+  </div>`;
+}
+
+// ── TICKET DETAIL ─────────────────────────────────────────────
+async function openTicket(id) {
+  currentTicketId = id;
+  document.getElementById('ticketDetailContent').innerHTML = '<div style="color:var(--muted);text-align:center;padding:30px">Loading…</div>';
+  openModal('ticketModal');
+  const [allMy, allTickets, comments] = await Promise.all([
+    api('/helpdesk/my'),
+    canManage() ? api('/helpdesk/') : Promise.resolve([]),
+    api(`/helpdesk/${id}/comments`)
+  ]);
+  const t = [...(allMy||[]), ...(allTickets||[])].find(x => x.ticket_id === id) || { ticket_id: id, subject: 'Ticket #'+id, description: '', category: 'other', priority: 'medium', status: 'open' };
+  document.getElementById('ticketDetailContent').innerHTML = `
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px;margin-bottom:14px">
+      <div>
+        <div style="font-size:1rem;font-weight:900;color:var(--text)">#${t.ticket_id} -- ${wfiText(t.subject)}</div>
+        <div style="font-size:.76rem;color:var(--muted);margin-top:4px">
+          ${catLabel[t.category]||t.category} · ${fmtDT(t.created_at)}
+          ${t.full_name ? ` · 👤 ${wfiText(t.full_name)}` : ''}
+          ${t.assignee_name ? ` · 🔧 Assigned: ${wfiText(t.assignee_name)}` : ''}
+        </div>
+      </div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap">
+        <span class="priority-badge p-${t.priority}">${priLabel[t.priority]}</span>
+        <span class="status-pill st-${t.status}">${t.status.replace(/_/g,' ').toUpperCase()}</span>
+      </div>
+    </div>
+    <div style="background:#f8fafc;border-radius:10px;padding:14px;font-size:.84rem;line-height:1.7;color:var(--text);margin-bottom:12px;white-space:pre-wrap">${wfiText(t.description||'')}</div>
+    ${t.resolution ? `<div style="background:#dcfce7;border:1px solid #86efac;border-radius:10px;padding:12px 14px;font-size:.84rem;margin-bottom:12px"><b>\u2705 Resolution:</b><br>${wfiText(t.resolution)}</div>` : ''}
+    ${t.user_id === currentUser?.user_id && ['open','in_progress','pending_user'].includes(t.status) ?
+      '<button type="button" class="btn-sec" id="closeOwnTicket">Close my ticket</button>' : ''}
+    ${canReviewTicket(t) && t.status !== 'closed' ? `
+    <div style="background:#f8f7ff;border-radius:12px;padding:14px;border:1.5px solid #ede9fe;margin-bottom:12px">
+      <div style="font-size:.8rem;font-weight:800;color:#6d28d9;margin-bottom:10px">🔧 Admin Actions</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <select class="fi" id="tkStatus" style="flex:1;min-width:150px">
+          ${['open','in_progress','pending_user','resolved','closed'].map(s=>`<option value="${s}" ${t.status===s?'selected':''}>${s.replace(/_/g,' ').toUpperCase()}</option>`).join('')}
+        </select>
+        <input class="fi" id="tkResolution" placeholder="Resolution note (required for resolved)…" style="flex:2;min-width:200px" value="${wfiText(t.resolution||'')}">
+        <button class="btn-pri btn-sm" onclick="updateTicket(${t.ticket_id})">Update</button>
+        <button class="btn-danger" onclick="openEscalateModal(${t.ticket_id})">⬆ Escalate</button>
+      </div>
+    </div>` : ''}`;
+  document.getElementById('closeOwnTicket')?.addEventListener('click', async event => {
+    if (!confirm('Close this ticket? Its comments and history will stay available.')) return;
+    const control = event.currentTarget;
+    control.disabled = true;
+    try {
+      const result = await api('/helpdesk/my/' + id + '/close', { method: 'POST' });
+      showToast(result.message || 'Could not close ticket.', result.closed === true);
+      if (result.closed) {
+        await Promise.all([loadMyTickets(), openTicket(id)]);
+        if (canManage()) { loadAllTickets(); loadStats(); }
+      }
+    } catch {
+      showToast('Could not close ticket. Try again.', false);
+    } finally {
+      control.disabled = false;
+    }
+  });
+  // Render comments
+  const cl = document.getElementById('commentsList');
+  cl.innerHTML = (comments||[]).length ? (comments||[]).map(c => `
+    <div class="comment-item ${c.is_internal?'comment-internal':c.user_id===currentUser?.user_id?'comment-me':'comment-other'}">
+      <div class="comment-author">${wfiText(c.full_name)} ${c.is_internal?'<span style="font-size:.65rem;background:#fef9c3;color:#854d0e;padding:1px 6px;border-radius:4px">internal</span>':''}</div>
+      ${wfiText(c.message)}
+      <div class="comment-time">${fmtDT(c.created_at)}</div>
+    </div>`).join('') : `<div style="font-size:.82rem;color:var(--muted);text-align:center;padding:10px">No comments yet</div>`;
+}
+
+async function addComment() {
+  const msg = document.getElementById('commentText').value.trim();
+  const internal = document.getElementById('commentInternal').checked;
+  if (!msg) return;
+  const r = await api(`/helpdesk/${currentTicketId}/comments`, { method:'POST', body:JSON.stringify({message:msg, is_internal:internal}) });
+  showToast('Comment added'); document.getElementById('commentText').value = '';
+  await openTicket(currentTicketId);
+}
+
+async function updateTicket(id) {
+  const status = document.getElementById('tkStatus').value;
+  const resolution = document.getElementById('tkResolution').value;
+  if (status === 'resolved' && !resolution) { showToast('Please enter a resolution note', false); return; }
+  const r = await api(`/helpdesk/${id}`, { method:'PATCH', body:JSON.stringify({status, resolution}) });
+  if (r.message !== 'Ticket updated') { showToast(r.message || 'Could not update ticket.', false); return; }
+  showToast(r.message); loadAllTickets(); loadMyTickets(); loadStats();
+  await openTicket(id);
+}
+
+// ── NEW TICKET FLOW ───────────────────────────────────────────
+function startNewTicket() {
+  document.getElementById('ntCat').value = '';
+  document.querySelectorAll('.cat-tile').forEach(t => t.classList.remove('sel'));
+  document.getElementById('nt1Next').disabled = true;
+  document.getElementById('kbSuggestions').style.display = 'none';
+  ntGoStep(1);
+  openModal('newTicketModal');
+}
+
+async function selectCat(cat, ico, label, el) {
+  document.getElementById('ntCat').value = cat;
+  ntCatLabel = label;
+  document.querySelectorAll('.cat-tile').forEach(t => t.classList.remove('sel'));
+  el.classList.add('sel');
+  document.getElementById('nt1Next').disabled = false;
+  // Populate subtypes
+  const stSel = document.getElementById('ntSubtype');
+  stSel.innerHTML = `<option value="">General</option>` + (subtypes[cat]||[]).map(s=>`<option value="${s}">${s}</option>`).join('');
+  // Show KB suggestions
+  try {
+    const kbs = await api(`/helpdesk/kb?category=${cat}`);
+    const sugg = kbs?.slice(0,3)||[];
+    if (sugg.length) {
+      document.getElementById('kbSuggestions').style.display = '';
+      document.getElementById('kbSuggList').innerHTML = sugg.map(a=>`
+        <div style="background:#f0f9ff;border:1px solid var(--border);border-radius:8px;padding:9px 12px;margin-bottom:6px;cursor:pointer;font-size:.8rem;font-weight:600;color:var(--pri)" onclick="openKBArticle(${a.kb_id},'${encodeURIComponent(a.title)}','${encodeURIComponent(a.content)}')">
+          📄 ${wfiText(a.title)} <span style="color:var(--muted);font-weight:400">-></span>
+        </div>`).join('');
+    } else document.getElementById('kbSuggestions').style.display = 'none';
+  } catch(e) { document.getElementById('kbSuggestions').style.display = 'none'; }
+}
+
+function ntGoStep(n) {
+  [1,2,3].forEach(i => {
+    document.getElementById('ntStep'+i).style.display = i===n?'block':'none';
+    const si = document.getElementById('si'+i);
+    si.className = 'step-i' + (i<n?' done':i===n?' active':'');
+  });
+  if (n===2) {
+    const pri = document.getElementById('ntPriority').value;
+    const slaMap = {low:'72 hrs',medium:'48 hrs',high:'24 hrs',critical:'4 hrs'};
+    document.getElementById('slaTarget').textContent = slaMap[pri] + ' resolution';
+    document.getElementById('ntPriority').onchange = ()=>{
+      const p=document.getElementById('ntPriority').value;
+      document.getElementById('slaTarget').textContent=slaMap[p]+' resolution';
+    };
+  }
+  if (n===3) {
+    const sub = document.getElementById('ntSubject').value;
+    const desc = document.getElementById('ntDesc').value;
+    if (!sub||!desc) { ntGoStep(2); showToast('Please fill subject and description',false); return; }
+    const pri = document.getElementById('ntPriority').value;
+    const subtype = document.getElementById('ntSubtype').value;
+    document.getElementById('ntSummary').innerHTML = `
+      <div style="display:grid;grid-template-columns:120px 1fr;gap:6px">
+        <b>Category:</b><span>${ntCatLabel}</span>
+        ${subtype?`<b>Sub-type:</b><span>${subtype}</span>`:''}
+        <b>Priority:</b><span class="priority-badge p-${pri}" style="width:fit-content">${priLabel[pri]}</span>
+        <b>Subject:</b><span>${wfiText(sub)}</span>
+        <b>Description:</b><span>${wfiText(desc.slice(0,200))}${desc.length>200?'…':''}</span>
+      </div>`;
+  }
+}
+
+async function submitTicket() {
+  const body = {
+    category: document.getElementById('ntCat').value,
+    priority: document.getElementById('ntPriority').value,
+    subject: document.getElementById('ntSubject').value,
+    description: document.getElementById('ntDesc').value
+  };
+  const r = await api('/helpdesk/', { method:'POST', body:JSON.stringify(body) });
+  if (r.ticket_id) {
+    showToast(`\u2705 Ticket #${r.ticket_id} raised! We'll update you soon.`);
+    closeModal('newTicketModal');
+    document.getElementById('ntSubject').value='';
+    document.getElementById('ntDesc').value='';
+    loadMyTickets(); loadStats();
+  } else showToast(r.message||'Error',false);
+}
+
+// ── KNOWLEDGE BASE ────────────────────────────────────────────
+async function loadKB() {
+  const search = document.getElementById('kbSearch')?.value||'';
+  const cat = document.getElementById('kbCat')?.value||'';
+  const data = await api(`/helpdesk/kb?search=${encodeURIComponent(search)}&category=${cat}`);
+  const el = document.getElementById('kbList');
+  if (!data?.length) { el.innerHTML = `<div class="empty-state"><div class="ico">🔍</div>No articles found</div>`; return; }
+  el.innerHTML = data.map(a => `
+    <div class="kb-card" onclick="openKBArticle(${a.kb_id},'${encodeURIComponent(a.title)}','${encodeURIComponent(a.content)}')">
+      <span class="cat-badge" style="display:inline-block;margin-bottom:6px">${catLabel[a.category]||a.category}</span>
+      <div class="kb-title">${wfiText(a.title)}</div>
+      <div class="kb-preview">${(a.content||'').slice(0,150)}…</div>
+      <div style="display:flex;gap:12px;margin-top:8px;font-size:.72rem;color:var(--muted)">
+        <span>👍 ${a.helpful_count} helpful</span>
+        <span>👎 ${a.not_helpful_count} not helpful</span>
+        ${a.tags?`<span>🏷 ${a.tags}</span>`:''}
+      </div>
+    </div>`).join('');
+}
+
+function openKBArticle(id, title, content) {
+  currentKBId = id;
+  document.getElementById('kbArtTitle').textContent = decodeURIComponent(title);
+  document.getElementById('kbArtContent').textContent = decodeURIComponent(content);
+  openModal('kbArticleModal');
+}
+
+async function rateKB(id, helpful) {
+  await api(`/helpdesk/kb/${id}/rate`, { method:'POST', body:JSON.stringify({helpful}) });
+  showToast(helpful ? '👍 Thanks for rating!' : 'Thanks for your feedback!');
+  closeModal('kbArticleModal'); loadKB();
+}
+
+function openAddKBModal() { openModal('addKBModal'); }
+
+async function submitKBArticle() {
+  const body = {
+    category: document.getElementById('kbNewCat').value,
+    title: document.getElementById('kbNewTitle').value,
+    content: document.getElementById('kbNewContent').value,
+    tags: document.getElementById('kbNewTags').value
+  };
+  if (!body.title||!body.content) { showToast('Title and content required',false); return; }
+  const r = await api('/helpdesk/kb', { method:'POST', body:JSON.stringify(body) });
+  if (r.kb_id) { showToast('Article published!'); closeModal('addKBModal'); loadKB(); }
+  else showToast(r.message||'Error',false);
+}
+
+// ── SLA ───────────────────────────────────────────────────────
+async function loadSLA() {
+  const data = await api('/helpdesk/sla');
+  slaData = data||[];
+  const el = document.getElementById('slaTable');
+  el.innerHTML = `<table style="width:100%;border-collapse:collapse;font-size:.85rem">
+    <thead><tr style="background:#f0f9ff">
+      <th style="padding:10px;text-align:left;border-bottom:2px solid var(--border)">Priority</th>
+      <th style="padding:10px;text-align:center;border-bottom:2px solid var(--border)">First Response</th>
+      <th style="padding:10px;text-align:center;border-bottom:2px solid var(--border)">Resolution Target</th>
+      <th style="padding:10px;text-align:center;border-bottom:2px solid var(--border)">Escalate After</th>
+    </tr></thead>
+    <tbody>${(data||[]).map(s=>`<tr style="border-bottom:1px solid var(--border)">
+      <td style="padding:10px"><span class="priority-badge p-${s.priority}">${priLabel[s.priority]||s.priority}</span></td>
+      <td style="padding:10px;text-align:center;font-weight:700">${s.response_hours} hrs</td>
+      <td style="padding:10px;text-align:center;font-weight:700;color:var(--pri)">${s.resolve_hours} hrs</td>
+      <td style="padding:10px;text-align:center;font-weight:700;color:#dc2626">${s.escalate_hours} hrs</td>
+    </tr>`).join('')}</tbody>
+  </table>`;
+}
+
+// ── ESCALATE ──────────────────────────────────────────────────
+function openEscalateModal(id) {
+  const reason = prompt('Reason for escalation:');
+  if (!reason) return;
+  api(`/helpdesk/${id}/escalate`, { method:'POST', body:JSON.stringify({reason}) })
+    .then(r => { showToast(r.message || 'Could not escalate ticket.', r.message === 'Ticket escalated'); openTicket(id); });
+}
+
+function canManage() { return currentUser && [1,3,4].includes(currentUser.role_id); }
+function canReviewTicket(ticket) {
+  return currentUser && ([1,4].includes(currentUser.role_id) ||
+    (currentUser.role_id === 3 && ticket.assigned_to === currentUser.user_id));
+}
+function logout() { localStorage.clear(); window.location.href='login.html'; }
+
+async function init() {
+  const token = tok();
+  if (!token) { window.location.href='login.html'; return; }
+  const me = await api('/auth/me');
+  currentUser = me;
+  document.getElementById('userName').textContent = me.full_name||me.email;
+  if (canManage()) {
+    document.getElementById('allTabBtn').style.display = '';
+    document.getElementById('slaTabBtn').style.display = '';
+    document.getElementById('addKBBtn').style.display = '';
+  }
+  // Load SLA silently for bar rendering
+  api('/helpdesk/sla').then(d => { slaData = d||[]; });
+  await loadStats();
+  await loadMyTickets();
+}
+init();
+</script>
+</div></div>
+<script>
+
+function toggleGroup(el){
+  const items=el.nextElementSibling;
+  const arr=el.querySelector('.arr');
+  const collapsed=items.style.display==='none';
+  items.style.display=collapsed?'flex':'none';
+  if(arr)arr.style.transform=collapsed?'':'rotate(-90deg)';
+}
+function toggleSidebar(){
+  const w=document.querySelector('.wiq-wrap');
+  const btn=document.querySelector('.wiq-toggle');
+  if(!w)return;
+  const collapsed=w.classList.toggle('wiq-collapsed');
+  if(btn)btn.textContent=collapsed?'▶':'◀';
+}
+function openMobSidebar(){
+  document.getElementById('wiqSidebar').classList.toggle('open');
+}
+// Set active page highlight
+(function(){
+  const cur=location.pathname.split('/').pop()||'index.html';
+  document.querySelectorAll('.wiq-nav-item').forEach(a=>{
+    if(a.getAttribute('href')===cur)a.classList.add('active');
+  });
+})();
+// Set sidebar username
+(function(){
+  const name=document.getElementById('sidebarUserName');
+  if(!name)return;
+  const tok=localStorage.getItem('token');
+  if(!tok){name.textContent='Guest';return;}
+  fetch(('/api')+'/auth/me',
+    {headers:{'Authorization':'Bearer '+tok}})
+    .then(r=>r.json()).then(d=>{if(name)name.textContent=d.full_name||d.email||'User';}).catch(()=>{});
+})();
+
+
+
+function filterKB() {
+  var q=(document.getElementById('kbSearchInput').value||'').toLowerCase();
+  document.querySelectorAll('#kbArticles > div').forEach(function(el){
+    el.style.display=(!q||el.textContent.toLowerCase().includes(q))?'':'none';
+  });
+}
+
+
+// Dark/Light Mode
+window.toggleDarkMode=function(){
+  var d=document.body.classList.toggle('dark-mode');
+  localStorage.setItem('wfi_dark_mode',d?'1':'0');
+  var btn=document.getElementById('dmToggle');
+  var icon=document.getElementById('dmIcon');
+  if(btn)btn.classList.toggle('on',d);
+  if(icon)icon.textContent=d?'\u2600\uFE0F':'\uD83C\uDF19';
+};
+(function(){
+  if(localStorage.getItem('wfi_dark_mode')==='1'){
+    document.body.classList.add('dark-mode');
+    var btn=document.getElementById('dmToggle');if(btn)btn.classList.add('on');
+    var icon=document.getElementById('dmIcon');if(icon)icon.textContent='\u2600\uFE0F';
+  }
+})();
+
+
+
+// ── Universal Function Stubs  ─────────────────────────────
+// Sidebar/Mobile
+window.openMobSidebar = window.openMobSidebar || function(){
+  var s=document.querySelector('.wiq-sidebar,aside');
+  if(s){s.style.transform='translateX(0)';s.style.zIndex='999';}
+};
+window.toggleSidebar = window.toggleSidebar || function(){
+  var s=document.querySelector('.wiq-sidebar,aside');
+  if(s){var open=s.style.transform==='translateX(0)';s.style.transform=open?'':'translateX(0)';}
+};
+window.toggleGroup = window.toggleGroup || function(el){
+  var p=el&&el.closest?el.closest('.wiq-nav-group'):null;
+  if(p){var sub=p.querySelector('.wiq-sub');if(sub)sub.style.display=sub.style.display==='none'?'block':'none';}
+};
+// Tab switching
+window.switchTab = window.switchTab || function(tab,section){
+  var tabs=document.querySelectorAll('[onclick*=switchTab]');
+  tabs.forEach(function(t){t.classList.remove('active','btn-primary');t.classList.add('btn-outline');});
+  if(event&&event.target){event.target.classList.add('active','btn-primary');event.target.classList.remove('btn-outline');}
+  var sections=document.querySelectorAll('[id$="-section"],[id$="Tab"],[id$="-tab"],[class*=tab-pane]');
+  sections.forEach(function(s){s.style.display='none';});
+  var target=section?document.getElementById(section):null;
+  if(!target&&tab)target=document.getElementById(tab);
+  if(target)target.style.display='';
+};
+// CSV Download
+window.dlCSV=window.dlCSV||function(rows,headers,fn){var lines=[(headers||[]).join(',')];(rows||[]).forEach(function(r){lines.push((headers||[]).map(function(h){var v=String(r[h]!==undefined?r[h]:'').replace(/"/g,'""');return v.indexOf(',')>-1?'"'+v+'"':v;}).join(','));});var a=document.createElement('a');a.href=URL.createObjectURL(new Blob([lines.join('\n')],{type:'text/csv'}));a.download=(fn||'export')+'_'+new Date().toISOString().slice(0,10)+'.csv';document.body.appendChild(a);a.click();document.body.removeChild(a);if(typeof showToast==='function')showToast('Downloaded',true);};
+
+window.acceptCookies = function() {
+  localStorage.setItem('wfi_cookie_consent','all');
+  localStorage.setItem('wfi_cookie_pref','1');
+  localStorage.setItem('wfi_cookie_analytics','1');
+  var banner = document.getElementById('cookieBanner');
+  if(banner){banner.style.transform='translateY(100%)';setTimeout(function(){banner.style.display='none';},400);}
+  if(typeof showToast==='function') showToast('Cookie preferences saved ✅',true);
+};
+window.declineCookies = function() {
+  localStorage.setItem('wfi_cookie_consent','essential');
+  var banner = document.getElementById('cookieBanner');
+  if(banner){banner.style.transform='translateY(100%)';setTimeout(function(){banner.style.display='none';},400);}
+};
+window.showCookieSettings = function() {
+  var m = document.getElementById('cookieModal');
+  if(m){m.style.display='flex';}
+};
+window.closeCookieModal = function() {
+  var m = document.getElementById('cookieModal');
+  if(m){m.style.display='none';}
+};
+window.saveCookieSettings = function() {
+  var pref = document.getElementById('ckPref');
+  var analytics = document.getElementById('ckAnalytics');
+  localStorage.setItem('wfi_cookie_consent','custom');
+  if(pref) localStorage.setItem('wfi_cookie_pref',pref.checked?'1':'0');
+  if(analytics) localStorage.setItem('wfi_cookie_analytics',analytics.checked?'1':'0');
+  closeCookieModal();
+  var banner = document.getElementById('cookieBanner');
+  if(banner){banner.style.transform='translateY(100%)';}
+  if(typeof showToast==='function') showToast('Cookie preferences saved ✅',true);
+};
+
+</script>
+
+  <div class="card" style="margin-top:14px">
+    <div class="card-title">&#128218; Self-Service Knowledge Base</div>
+    <input id="kbSearchInput" class="form-input" placeholder="&#128269; Search FAQs -- payslip, leave, tax, IT..." oninput="filterKB()" style="width:100%;margin-bottom:10px"/>
+    <div id="kbArticles" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:10px">
+      <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:12px;cursor:pointer" onclick="showToast('Payslip Portal > Current Month > Download PDF \u2705',true)">
+        <div style="font-size:.74rem;font-weight:800;color:#2563eb;margin-bottom:4px">&#128176; How to download my payslip?</div>
+        <div style="font-size:.68rem;color:#64748b">Payslip Portal > Select month > Download PDF</div>
+        <div style="font-size:.6rem;color:#94a3b8;margin-top:5px">&#128077; 94% helpful</div>
+      </div>
+      <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:12px;cursor:pointer" onclick="showToast('Leave Management > Request Leave > Select dates \u2705',true)">
+        <div style="font-size:.74rem;font-weight:800;color:#2563eb;margin-bottom:4px">&#128197; How to apply for leave?</div>
+        <div style="font-size:.68rem;color:#64748b">Leave Management > Request Leave > Submit</div>
+        <div style="font-size:.6rem;color:#94a3b8;margin-top:5px">&#128077; 91% helpful</div>
+      </div>
+      <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:12px;cursor:pointer" onclick="showToast('Tax Portal > My Declaration > Submit by Jan 31 \u2705',true)">
+        <div style="font-size:.74rem;font-weight:800;color:#2563eb;margin-bottom:4px">&#128200; How to submit tax declaration?</div>
+        <div style="font-size:.68rem;color:#64748b">Tax Portal > My Declaration > Fill 80C/80D</div>
+        <div style="font-size:.6rem;color:#94a3b8;margin-top:5px">&#128077; 97% helpful</div>
+      </div>
+      <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:12px;cursor:pointer" onclick="showToast('Helpdesk > New Ticket > IT Hardware Request \u2705',true)">
+        <div style="font-size:.74rem;font-weight:800;color:#2563eb;margin-bottom:4px">&#128187; How to request a new laptop?</div>
+        <div style="font-size:.68rem;color:#64748b">Helpdesk > New Ticket > IT Hardware Request</div>
+        <div style="font-size:.6rem;color:#94a3b8;margin-top:5px">&#128077; 88% helpful</div>
+      </div>
+    </div>
+  </div>
+<script id="wfi-utils">
+(function(){
+var w=window;
+w.dlPrint=w.dlPrint||function(t,c){var wi=window.open('','_blank','width=1100,height=800');if(!wi)return;var h='<html><head><title>'+(t||'Report')+'<\/title><style>*{box-sizing:border-box}body{font-family:Segoe UI,sans-serif;padding:28px;color:#1e293b;max-width:960px;margin:0 auto}.hdr{display:flex;justify-content:space-between;align-items:center;border-bottom:2px solid #2563EB;padding-bottom:12px;margin-bottom:20px}.brand{font-weight:900;color:#2563EB;font-size:1rem}.meta{font-size:.72rem;color:#64748b}h2{color:#1e293b;margin-bottom:14px}table{width:100%;border-collapse:collapse;margin-top:10px}th{background:#1e3a5f;color:#fff;padding:8px 12px;text-align:left;font-size:.72rem;font-weight:700;text-transform:uppercase}td{padding:8px 12px;border-bottom:1px solid #e2e8f0;font-size:.8rem}tr:nth-child(even)td{background:#f8fafc}.ftr{margin-top:20px;padding-top:10px;border-top:1px solid #e2e8f0;font-size:.7rem;color:#94a3b8;display:flex;justify-content:space-between}.btn{background:#2563EB;color:#fff;border:none;padding:9px 24px;border-radius:7px;font-weight:700;cursor:pointer;font-size:.8rem;margin-top:14px}@media print{.btn{display:none}}<\/style><\/head><body><div class="hdr"><div class="brand">&#9889; WFI<\/div><div class="meta">'+new Date().toLocaleString()+'<\/div><\/div><h2>'+(t||'Report')+'<\/h2>'+(c||'<p>No data.<\/p>')+'<div class="ftr"><span>WFI<\/span><span>'+new Date().toLocaleDateString()+'<\/span><\/div><button class="btn" onclick="window.print()">Print \/ PDF<\/button><\/body><\/html>';wi.document.write(h);wi.document.close();};
+w.dlCSV=w.dlCSV||function(rows,h,fn){if(!rows||!rows.length)rows=[{}];var keys=h||Object.keys(rows[0]);var L=[keys.map(function(k){return'"'+k+'"';}).join(',')];rows.forEach(function(r){L.push(keys.map(function(k){return'"'+String(r[k]!==undefined?r[k]:'').replace(/"/g,'""')+'"';}).join(','));});var blob=new Blob([L.join('\n')],{type:'text/csv;charset=utf-8;'});var url=URL.createObjectURL(blob);var a=document.createElement('a');a.href=url;a.download=(fn||'export')+'.csv';document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(url);};
+w.tdm=w.tdm||function(){var d=document.body.classList.toggle('dark-mode');localStorage.setItem('wfi_dark_mode',d?'1':'0');var b=document.getElementById('dmt')||document.getElementById('dmToggle');var i=document.getElementById('dmi')||document.getElementById('dmIcon');if(b)b.classList.toggle('on',d);if(i)i.textContent=d?'&#9728;':'&#127769;';};
+w.toggleDarkMode=w.tdm;
+w.showTab=w.showTab||function(id,btn){var lo=id.toLowerCase();var el=document.getElementById('tab'+id)||document.getElementById('tab'+id.charAt(0).toUpperCase()+id.slice(1))||document.getElementById('tab-'+id)||document.getElementById(id)||document.getElementById('section-'+id);if(!el){var all=document.querySelectorAll('[id]');for(var i=0;i<all.length;i++){if(all[i].id.toLowerCase()==='tab'+lo||all[i].id.toLowerCase()===lo||all[i].id.toLowerCase()==='section-'+lo){el=all[i];break;}}}document.querySelectorAll('[id]').forEach(function(s){var sid=s.id.toLowerCase();if((sid.startsWith('tab')||sid.startsWith('section-')||sid.startsWith('panel-'))&&sid!==lo&&sid!=='tab'+lo&&sid!=='section-'+lo)s.style.display='none';});if(el){el.style.display='';el.classList.add('on');}document.querySelectorAll('.sc').forEach(function(e){e.classList.remove('on');});var sc=document.getElementById('tab'+id)||document.getElementById('tab'+id.charAt(0).toUpperCase()+id.slice(1));if(sc)sc.classList.add('on');document.querySelectorAll('.tb,.tab-btn,[role=tab]').forEach(function(b){b.classList.remove('active');});if(btn)btn.classList.add('active');};
+w.switchTab=w.switchTab||w.showTab;
+w.showSection=w.showSection||function(id,btn){document.querySelectorAll('[id^="section-"]').forEach(function(e){e.style.display='none';});var el=document.getElementById('section-'+id)||document.getElementById(id);if(el)el.style.display='block';document.querySelectorAll('.tb,.section-btn').forEach(function(b){b.classList.remove('active');});if(btn)btn.classList.add('active');};
+w.sw=w.sw||w.showSection;
+w.st=w.st||function(msg,ok){var t=document.getElementById('toast');if(!t)return;t.textContent=msg;t.style.background=ok!==false?'linear-gradient(135deg,#059669,#047857)':'linear-gradient(135deg,#DC2626,#B91C1C)';t.classList.add('show');setTimeout(function(){t.classList.remove('show');},3000);};
+w.showToast=w.st;
+w.logout=w.logout||function(){localStorage.clear();window.location.href='login.html';};
+w.ac=w.ac||function(){var b=document.getElementById('cookieBanner')||document.getElementById('ckb');if(b){b.style.display='none';try{localStorage.setItem('wfi_ck','1');}catch(e){}}};
+w.dc=w.dc||function(){var b=document.getElementById('cookieBanner')||document.getElementById('ckb');if(b)b.style.display='none';};
+w.acceptCookies=w.ac;w.declineCookies=w.dc;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+w.closeModal=w.closeModal||function(){document.querySelectorAll('.modal,.dialog').forEach(function(m){m.style.display='none';});};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+w.closeRejectModal=w.closeRejectModal||function(){document.querySelectorAll('.modal').forEach(function(m){m.style.display='none';});};
+
+
+w.openMobSidebar=w.openMobSidebar||function(){var s=document.querySelector('.wiq-sidebar');if(s)s.classList.toggle('open');};
+w.toggleSidebar=w.toggleSidebar||function(){var s=document.querySelector('.wiq-sidebar');if(s)s.classList.toggle('collapsed');};
+w.toggleGroup=w.toggleGroup||function(id){var el=document.getElementById(id);if(el)el.style.display=el.style.display==='none'?'block':'none';};
+
+
+
+
+window.dlXLSX=window.dlXLSX||function(rows,headers,filename){
+  if(!rows||!rows.length){window.st&&window.st('No data to export',false);return;}
+  var keys=headers||Object.keys(rows[0]);
+  // Build CSV that Excel can open as XLSX-like
+  var BOM='﻿';
+  var lines=[keys.map(function(k){return'"'+String(k).replace(/"/g,'""')+'"';}).join(',')];
+  rows.forEach(function(r){lines.push(keys.map(function(k){var v=r[k]===null||r[k]===undefined?'':String(r[k]);return'"'+v.replace(/"/g,'""')+'"';}).join(','));});
+  var csv=BOM+lines.join('\n');
+  var blob=new Blob([csv],{type:'application/vnd.ms-excel;charset=utf-8'});
+  var a=document.createElement('a');a.href=URL.createObjectURL(blob);
+  a.download=(filename||'export')+'.csv';document.body.appendChild(a);a.click();
+  setTimeout(function(){URL.revokeObjectURL(a.href);document.body.removeChild(a);},1000);
+  window.st&&window.st('Excel file downloaded',true);
+};
+window.exportExcel=window.dlXLSX;
+})();
+</script>
+
+
+
+<footer class="wiq-footer" style="background:#0F172A;border-top:1px solid #1E293B;padding:16px 24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-top:auto;flex-shrink:0">
+  <div style="display:flex;align-items:center;gap:10px">
+    <div style="width:26px;height:26px;background:linear-gradient(135deg,#1D4ED8,#6D28D9);border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:.75rem">&#9889;</div>
+    <div>
+      <div style="font-size:.73rem;font-weight:800;color:#E2E8F0">Workforce Intelligence</div>
+      <div style="font-size:.60rem;color:#475569">Enterprise HRMS &bull; DPDP 2023 &bull; PoSH 2013 &bull; ISO 27001</div>
+    </div>
+  </div>
+  <div style="display:flex;gap:14px;flex-wrap:wrap">
+    <a href="privacy-policy.html" style="color:#475569;font-size:.66rem;text-decoration:none;font-weight:600" onmouseover="this.style.color='#60A5FA'" onmouseout="this.style.color='#475569'">Privacy</a>
+    <a href="cookie-policy.html" style="color:#475569;font-size:.66rem;text-decoration:none;font-weight:600" onmouseover="this.style.color='#60A5FA'" onmouseout="this.style.color='#475569'">Cookies</a>
+    <a href="security-policy.html" style="color:#475569;font-size:.66rem;text-decoration:none;font-weight:600" onmouseover="this.style.color='#60A5FA'" onmouseout="this.style.color='#475569'">Security</a>
+    <a href="company-policies.html" style="color:#475569;font-size:.66rem;text-decoration:none;font-weight:600" onmouseover="this.style.color='#60A5FA'" onmouseout="this.style.color='#475569'">Policies</a>
+    <a href="112-emergency.html" style="color:#DC2626;font-size:.66rem;text-decoration:none;font-weight:700">&#128680; Emergency</a>
+  </div>
+  <div style="font-size:.60rem;color:#334155">&copy; 2026 Workforce Intelligence. All rights reserved.</div>
+</footer>
+<script id="wiq-dd">
+(function(){
+function toggleGroup(id){
+  var b=document.getElementById(id);
+  var a=document.getElementById(id.replace('grp-','arr-'));
+  if(!b)return;
+  var o=b.classList.contains('open');
+  b.classList.toggle('open',!o);
+  if(a)a.style.transform=o?'':'rotate(-90deg)';
+}
+window.toggleGroup=toggleGroup;
+// Auto-open active group
+var cur=window.location.pathname.split('/').pop();
+document.querySelectorAll('.wiq-sidebar a[href]').forEach(function(a){
+  if(a.getAttribute('href')===cur){
+    a.classList.add('active');
+    var g=a.closest('.wiq-dropdown-body');
+    if(g){g.classList.add('open');var ar=document.getElementById(g.id.replace('grp-','arr-'));if(ar)ar.style.transform='rotate(-90deg)';}
+  }
+});
+// Mobile sidebar
+window.openMobSidebar=window.openMobSidebar||function(){var s=document.getElementById('wiqSidebar');if(s)s.classList.toggle('open');};
+document.addEventListener('click',function(e){
+  var sb=document.getElementById('wiqSidebar');var mb=document.getElementById('mobToggleBtn');
+  if(sb&&sb.classList.contains('open')&&!sb.contains(e.target)&&mb&&!mb.contains(e.target))sb.classList.remove('open');
+});
+})();
+</script>
+</body>
+
+
+
+
+<div id="cookieBanner" style="position:fixed;bottom:0;left:0;right:0;z-index:9998;background:linear-gradient(135deg,#0F172A,#1E293B);border-top:2px solid #2563EB;padding:14px 28px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;transform:translateY(100%);transition:transform .4s ease"><p style="font-size:.76rem;color:#CBD5E1;margin:0">&#127850; We use cookies. <a href="privacy-policy.html" style="color:#60A5FA;font-weight:700;text-decoration:none">Privacy Policy</a></p><div style="display:flex;gap:8px"><button onclick="window.acceptCookies&&acceptCookies()" style="background:linear-gradient(135deg,#2563EB,#4F46E5);color:#fff;border:none;border-radius:8px;padding:7px 18px;font-size:.72rem;font-weight:700;cursor:pointer;font-family:inherit">Accept All</button><button onclick="window.declineCookies&&declineCookies()" style="background:transparent;color:#64748B;border:none;font-size:.7rem;cursor:pointer;font-family:inherit">Decline</button></div></div>
+<span id="dmIcon" style="display:none">&#127769;</span><button id="dmToggle" style="display:flex"></button>
+<script>
+
+</script>
+</html>

@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Assistant – Workforce Intelligence</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="chat.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Sora:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="chat-page">
+
+  <nav class="navbar">
+    <div class="nav-brand">⚡ Workforce Intelligence</div>
+    <div class="nav-info">
+      <a href="admin-dashboard.html" class="btn btn-sm btn-outline" id="dashLink">← Dashboard</a>
+      <span id="chatUserName" class="nav-user"></span>
+      <button onclick="logout()" class="btn btn-sm btn-outline">Logout</button>
+    </div>
+  </nav>
+
+  <div class="chat-layout">
+
+    <!-- Sidebar -->
+    <aside class="chat-sidebar">
+      <div class="sidebar-section">
+        <div class="sidebar-title">🧠 AI Assistant</div>
+        <p class="sidebar-desc">Ask anything about your workforce — tasks, employees, productivity trends, or upload files for analysis.</p>
+      </div>
+
+      <div class="sidebar-section">
+        <div class="sidebar-label">QUICK PROMPTS</div>
+        <button class="quick-btn" onclick="sendQuick('Summarize all overdue tasks and who is responsible')">⚠ Overdue tasks summary</button>
+        <button class="quick-btn" onclick="sendQuick('Which employee has the highest productivity score?')">🏆 Top performer</button>
+        <button class="quick-btn" onclick="sendQuick('Analyze weekly task completion trends for the last month')">📈 Weekly trends</button>
+        <button class="quick-btn" onclick="sendQuick('Generate a monthly productivity report summary')">📄 Monthly report</button>
+        <button class="quick-btn" onclick="sendQuick('Which tasks are high priority and still pending?')">🔴 High priority pending</button>
+        <button class="quick-btn" onclick="sendQuick('Give me an annual overview of task completion rates')">📅 Annual overview</button>
+      </div>
+
+      <div class="sidebar-section">
+        <div class="sidebar-label">⚙️ AI PROVIDER</div>
+        <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:10px 12px;font-size:.78rem;">
+          <div style="margin-bottom:6px;color:#374151;font-weight:600">Active model shown above after first message.</div>
+          <div style="color:#64748b;margin-bottom:8px">Switch provider in <code style="background:#f1f5f9;padding:2px 5px;border-radius:4px">.env</code> file:</div>
+          <div style="display:flex;flex-direction:column;gap:4px">
+            <div style="background:#dcfce7;border-radius:6px;padding:5px 8px;color:#15803d;font-size:.72rem;font-weight:700">🆓 OpenRouter — FREE</div>
+            <div style="background:#dbeafe;border-radius:6px;padding:5px 8px;color:#1d4ed8;font-size:.72rem;font-weight:700">🤖 OpenAI (GPT-3.5/4)</div>
+            <div style="background:#ede9fe;border-radius:6px;padding:5px 8px;color:#6d28d9;font-size:.72rem;font-weight:700">⚡ Anthropic Claude</div>
+          </div>
+          <a href="https://openrouter.ai" target="_blank" style="display:block;margin-top:8px;background:#16a34a;color:#fff;text-align:center;padding:6px;border-radius:7px;font-size:.72rem;font-weight:700;text-decoration:none">Get FREE API Key →</a>
+        </div>
+      </div>
+
+      <div class="sidebar-section">
+        <div class="sidebar-label">UPLOAD DATA</div>
+        <div class="upload-zone" id="uploadZone">
+          <input type="file" id="fileInput" accept=".csv,.xlsx,.xls,.pdf,.txt,.json" style="display:none" onchange="handleFileUpload(event)">
+          <div class="upload-icon">📂</div>
+          <div class="upload-text">Drop file or click to upload</div>
+          <div class="upload-sub">CSV, Excel, PDF, JSON, TXT</div>
+          <button class="btn btn-sm" onclick="document.getElementById('fileInput').click()" style="margin-top:10px">Choose File</button>
+        </div>
+        <div id="uploadStatus" class="upload-status"></div>
+      </div>
+
+      <div class="sidebar-section">
+        <div class="sidebar-label">DATA CONTEXT</div>
+        <div id="aiProviderBadge" style="display:none;background:linear-gradient(135deg,#1e3a8a,#0891b2);color:#fff;border-radius:8px;padding:5px 10px;font-size:.72rem;font-weight:700;margin-bottom:8px;word-break:break-all"></div>
+        <div id="contextStats" class="context-stats">
+          <div class="ctx-item"><span class="ctx-dot blue"></span><span id="ctxTasks">– tasks</span></div>
+          <div class="ctx-item"><span class="ctx-dot green"></span><span id="ctxEmployees">– employees</span></div>
+          <div class="ctx-item"><span class="ctx-dot orange"></span><span id="ctxReports">– reports</span></div>
+          <div class="ctx-item"><span class="ctx-dot purple"></span><span id="ctxFile">No file loaded</span></div>
+        </div>
+        <button class="btn btn-sm btn-outline" onclick="refreshContext()" style="width:100%;margin-top:8px">↻ Refresh Context</button>
+      </div>
+    </aside>
+
+    <!-- Chat Main -->
+    <main class="chat-main">
+      <div class="chat-messages" id="chatMessages">
+        <div class="chat-welcome">
+          <div class="welcome-icon">🤖</div>
+          <h2>Workforce AI Assistant</h2>
+          <p>I have live access to your task database, employee records, and productivity data. Ask me anything, or upload a file for analysis.</p>
+          <div class="welcome-chips">
+            <span class="chip" onclick="sendQuick('What is the overall team productivity this month?')">Team productivity</span>
+            <span class="chip" onclick="sendQuick('List all employees and their task counts')">Employee overview</span>
+            <span class="chip" onclick="sendQuick('Are there any critical alerts I should know about?')">Critical alerts</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="chat-input-area">
+        <div class="chat-input-row">
+          <div class="input-wrapper">
+            <textarea
+              id="chatInput"
+              placeholder="Ask about tasks, employees, productivity trends, or uploaded data..."
+              rows="1"
+              onkeydown="handleKey(event)"
+              oninput="autoResize(this)"
+            ></textarea>
+          </div>
+          <button class="send-btn" onclick="sendMessage()" id="sendBtn">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <line x1="22" y1="2" x2="11" y2="13"></line>
+              <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+            </svg>
+          </button>
+        </div>
+        <div class="input-hint">Press Enter to send · Shift+Enter for new line · Upload files in the sidebar</div>
+      </div>
+    </main>
+
+  </div>
+
+  <script src="app.js"></script>
+  <script src="chat.js"></script>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <a href="index.html" class="footer-brand">⚡ Workforce Intelligence Platform</a>
+      <nav class="footer-links">
+        <a href="employee-dashboard.html">Dashboard</a>
+        <a href="tasks.html">Tasks</a>
+        <a href="analytics.html">Analytics</a>
+        <a href="reports.html">Reports</a>
+        <a href="leave.html">Leave</a>
+        <a href="leaderboard.html">Leaderboard</a>
+        <a href="chat.html">AI Chat</a>
+        <a href="notifications.html">Notifications</a>
+        <a href="profile.html">Profile</a>
+      </nav>
+      <p class="footer-copy">&copy; 2025 Workforce Intelligence Platform v6.0 — AI-Powered HR, Payroll & Workforce Management</p>
+    </div>
+  </footer>
+</body>
+</html>

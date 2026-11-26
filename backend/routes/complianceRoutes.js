@@ -1,0 +1,13 @@
+const r = require('express').Router(), c = require('../controllers/complianceController');
+const p = require('../middleware/authMiddleware');
+const { hrOrAbove } = require('../middleware/authMiddleware');
+r.get('/summary',         p, hrOrAbove, c.getComplianceSummary);
+r.get('/pf',              p, hrOrAbove, c.getPFRecords);
+r.post('/pf/calculate',   p, hrOrAbove, c.calculatePF);
+r.get('/pf/challan',      p, hrOrAbove,    c.generatePFChallan);
+r.get('/esi',             p, hrOrAbove, c.getESIRecords);
+r.post('/esi/calculate',  p, hrOrAbove, c.calculateESI);
+r.get('/gratuity',        p, hrOrAbove, c.getGratuityEstimate);
+r.get('/gratuity/:employee_id', p, hrOrAbove,               c.calculateGratuity);
+r.post('/pt/calculate',   p, hrOrAbove, c.calculatePT);
+module.exports = r;

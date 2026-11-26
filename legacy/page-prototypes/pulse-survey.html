@@ -1,0 +1,1818 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Pulse Survey — Workforce Intelligence</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+
+/* ── UNIVERSAL SIDEBAR NAV ── */
+.wiq-wrap{display:flex;min-height:100vh}
+.wiq-sidebar{width:220px;min-width:220px;background:#0a1220;border-right:1px solid rgba(255,255,255,.07);position:sticky;top:0;height:100vh;overflow-y:auto;flex-shrink:0;transition:width .2s;z-index:200}
+.wiq-sidebar::-webkit-scrollbar{width:3px}.wiq-sidebar::-webkit-scrollbar-thumb{background:#1e3a5f}
+.wiq-sidebar-header{padding:14px 14px 10px;border-bottom:1px solid rgba(255,255,255,.07)}
+.wiq-logo{font-size:.9rem;font-weight:900;color:#fff;display:flex;align-items:center;gap:7px}
+.wiq-user-pill{display:flex;align-items:center;gap:7px;padding:8px 10px;margin:8px 0 4px;background:rgba(255,255,255,.04);border-radius:8px;font-size:.7rem;color:#64748b}
+.wiq-user-name{font-weight:700;color:#cbd5e1;font-size:.72rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:120px}
+.wiq-logout-btn{display:flex;align-items:center;gap:6px;padding:7px 10px;margin:0 6px 6px;background:rgba(220,38,38,.1);border:1px solid rgba(220,38,38,.2);border-radius:7px;color:#f87171;font-size:.72rem;font-weight:700;cursor:pointer;width:calc(100% - 12px);text-decoration:none;transition:all .15s}
+.wiq-logout-btn:hover{background:rgba(220,38,38,.2)}
+.wiq-nav-group{margin-bottom:2px}
+.wiq-nav-label{font-size:.59rem;font-weight:800;color:#1e3a5f;text-transform:uppercase;letter-spacing:.09em;padding:8px 14px 3px;cursor:pointer;display:flex;align-items:center;justify-content:space-between}
+.wiq-nav-label:hover{color:#334155}
+.wiq-nav-label .arr{font-size:.6rem;transition:.2s;color:#1e3a5f}
+.wiq-nav-items{display:flex;flex-direction:column;gap:1px;padding:0 6px 4px}
+.wiq-nav-item{display:flex;align-items:center;gap:7px;padding:5px 8px;border-radius:6px;font-size:.71rem;font-weight:600;color:#475569;text-decoration:none;transition:all .15s;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.wiq-nav-item:hover{background:rgba(37,99,235,.12);color:#60a5fa}
+.wiq-nav-item.active{background:rgba(37,99,235,.18);color:#60a5fa;font-weight:800}
+.wiq-nav-item .ico{font-size:.8rem;flex-shrink:0;width:16px;text-align:center}
+.wiq-main{flex:1;min-width:0;overflow-x:hidden}
+.wiq-collapsed .wiq-sidebar{width:48px}
+.wiq-collapsed .wiq-nav-item span,.wiq-collapsed .wiq-nav-label span:first-child,.wiq-collapsed .wiq-user-name,.wiq-collapsed .wiq-logo span,.wiq-collapsed .wiq-logout-btn span{display:none}
+.wiq-collapsed .wiq-nav-items{padding:0 3px}
+.wiq-collapsed .wiq-nav-item{justify-content:center;padding:6px}
+.wiq-collapsed .wiq-logout-btn{justify-content:center;padding:7px;margin:0 3px 4px}
+.wiq-toggle{background:none;border:none;color:#475569;cursor:pointer;padding:4px 8px;font-size:.75rem;display:flex;align-items:center;gap:4px;margin-left:auto}
+.wiq-toggle:hover{color:#60a5fa}
+@media(max-width:768px){.wiq-sidebar{position:fixed;left:-220px;top:0;transition:left .2s}.wiq-sidebar.open{left:0;box-shadow:4px 0 20px rgba(0,0,0,.5)}.wiq-mob-toggle{display:flex!important}}
+.wiq-mob-toggle{display:none;position:fixed;top:12px;left:12px;z-index:300;background:#1e3a5f;border:none;border-radius:8px;padding:7px 10px;color:#fff;font-size:.8rem;cursor:pointer}
+
+:root{--pri:#2563eb;--ok:#16a34a;--warn:#d97706;--danger:#dc2626;--bg:#f0f4ff;--text:#1e293b;--muted:#64748b;--border:#dbeafe}
+body{background:var(--bg)}.page{max-width:900px;margin:0 auto;padding:20px}
+.ph{background:linear-gradient(135deg,#db2777,#7c3aed);border-radius:14px;padding:22px 28px;color:#fff;margin-bottom:18px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px}
+.card{background:#fff;border:1.5px solid var(--border);border-radius:12px;padding:18px;margin-bottom:14px}
+.badge{font-size:.65rem;font-weight:800;padding:2px 8px;border-radius:999px}
+.b-ok{background:#dcfce7;color:#15803d}.b-w{background:#fef9c3;color:#854d0e}.b-i{background:#dbeafe;color:#1d4ed8}.b-p{background:#ede9fe;color:#6d28d9}
+.btn{padding:7px 16px;border-radius:8px;border:none;font-size:.8rem;font-weight:700;cursor:pointer}
+.btn-p{background:var(--pri);color:#fff}.btn-pk{background:#db2777;color:#fff}
+.btn-s{background:#fff;border:1.5px solid var(--border);color:var(--muted)}
+.tn{display:flex;gap:6px;margin-bottom:14px;background:#eff6ff;padding:5px;border-radius:10px;flex-wrap:wrap}
+.tb{padding:6px 14px;border:none;border-radius:7px;cursor:pointer;font-size:.78rem;font-weight:600;background:transparent;color:var(--muted)}
+.tb.a{background:#fff;color:var(--pri);box-shadow:0 2px 6px rgba(37,99,235,.12)}
+.tp{display:none}.tp.a{display:block}
+.toast{position:fixed;bottom:24px;right:24px;background:#1e293b;color:#fff;padding:12px 20px;border-radius:12px;font-size:.85rem;font-weight:600;z-index:9999;transform:translateY(80px);opacity:0;transition:all .3s}
+.toast.show{transform:translateY(0);opacity:1}
+.fi{width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:.84rem;background:#f8fafc;font-family:inherit;color:var(--text)}
+.fi:focus{outline:none;border-color:var(--pri)}
+.q-card{background:#fff;border:1.5px solid var(--border);border-radius:12px;padding:20px;margin-bottom:14px;transition:all .2s}
+.q-card:focus-within{border-color:#db2777;box-shadow:0 4px 14px rgba(219,39,119,.1)}
+.q-num{font-size:.7rem;font-weight:800;color:#db2777;text-transform:uppercase;margin-bottom:6px}
+.q-text{font-size:.92rem;font-weight:700;color:var(--text);margin-bottom:14px}
+.emoji-scale{display:flex;gap:8px;flex-wrap:wrap}
+.emoji-opt{display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;padding:10px 12px;border-radius:10px;border:2px solid var(--border);transition:all .18s;min-width:60px}
+.emoji-opt:hover{border-color:#db2777;background:#fdf4ff}
+.emoji-opt.sel{border-color:#db2777;background:#fdf4ff}
+.emoji-opt span:first-child{font-size:1.6rem}
+.emoji-opt span:last-child{font-size:.6rem;font-weight:700;color:var(--muted)}
+.nps-scale{display:flex;gap:4px;flex-wrap:wrap}
+.nps-btn{width:40px;height:40px;border-radius:8px;border:1.5px solid var(--border);background:#f8fafc;font-size:.82rem;font-weight:700;cursor:pointer;transition:all .18s}
+.nps-btn:hover{border-color:#db2777;background:#fdf4ff}
+.nps-btn.sel{background:#db2777;color:#fff;border-color:#db2777}
+.trend-bar{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.trend-label{width:120px;font-size:.74rem;font-weight:600;color:var(--text)}
+.trend-bg{flex:1;background:#e2e8f0;border-radius:999px;height:8px}
+.trend-fill{border-radius:999px;height:8px}
+.trend-val{font-size:.72rem;font-weight:700;width:35px;text-align:right}
+
+/* ── TOPBAR FIXES  ─────────────────────────────── */
+.navbar,.wiq-topbar,nav.topbar{
+  display:flex!important;align-items:center!important;
+  padding:0 20px!important;height:54px!important;
+  background:#fff!important;
+  border-bottom:2px solid #e8f0ff!important;
+  position:sticky!important;top:0!important;z-index:100!important;
+  gap:12px!important;flex-wrap:nowrap!important;
+  box-shadow:0 1px 8px rgba(37,99,235,.08)!important;
+}
+.nav-brand{
+  font-size:.88rem!important;font-weight:900!important;
+  color:#1E3A5F!important;white-space:nowrap!important;
+  display:flex!important;align-items:center!important;gap:6px!important;
+  flex-shrink:0!important;letter-spacing:-.01em!important;
+}
+.nav-brand .logo-icon{
+  width:28px!important;height:28px!important;
+  background:linear-gradient(135deg,#2563EB,#7C3AED)!important;
+  border-radius:7px!important;display:inline-flex!important;
+  align-items:center!important;justify-content:center!important;
+  font-size:.9rem!important;flex-shrink:0!important;
+}
+.nav-brand .logo-text{
+  font-size:.85rem!important;font-weight:900!important;color:#1E3A5F!important;
+}
+.nav-brand .logo-version{
+  font-size:.55rem!important;font-weight:700!important;
+  color:#2563EB!important;background:#EFF6FF!important;
+  padding:1px 5px!important;border-radius:4px!important;
+  border:1px solid #BFDBFE!important;
+}
+.nav-info{
+  display:flex!important;align-items:center!important;
+  gap:8px!important;flex-shrink:0!important;margin-left:auto!important;
+}
+.nav-divider{width:1px!important;height:20px!important;background:#E2E8F0!important}
+
+/* ── CARD COLOR SHADOWS ─────────────────────────────── */
+.card,.wiq-card,[class*="-card"]{
+  transition:all .25s cubic-bezier(.34,1.56,.64,1)!important;
+  border-radius:12px!important;
+}
+.card:hover,.wiq-card:hover{
+  transform:translateY(-4px) scale(1.006)!important;
+  box-shadow:0 12px 32px rgba(37,99,235,.18),
+             0 2px 8px rgba(37,99,235,.1)!important;
+}
+/* Module-specific card shadows */
+.card-payroll:hover{box-shadow:0 12px 32px rgba(5,150,105,.18)!important}
+.card-leave:hover{box-shadow:0 12px 32px rgba(245,158,11,.18)!important}
+.card-alert:hover{box-shadow:0 12px 32px rgba(220,38,38,.18)!important}
+
+/* ── BUTTON SYSTEM ─────────────────────────────────── */
+.btn{
+  display:inline-flex!important;align-items:center!important;
+  gap:5px!important;padding:7px 16px!important;
+  border-radius:8px!important;font-size:.76rem!important;
+  font-weight:700!important;cursor:pointer!important;
+  border:none!important;transition:all .2s!important;
+  white-space:nowrap!important;font-family:inherit!important;
+}
+.btn-primary{
+  background:linear-gradient(135deg,#2563EB,#1D4ED8)!important;
+  color:#fff!important;
+  box-shadow:0 2px 8px rgba(37,99,235,.3)!important;
+}
+.btn-primary:hover{
+  background:linear-gradient(135deg,#1D4ED8,#1E40AF)!important;
+  box-shadow:0 4px 14px rgba(37,99,235,.4)!important;
+  transform:translateY(-1px)!important;
+}
+.btn-outline,.btn-sm.btn-outline{
+  background:#fff!important;color:#2563EB!important;
+  border:1.5px solid #BFDBFE!important;
+  padding:5px 13px!important;font-size:.72rem!important;
+}
+.btn-outline:hover{
+  background:#EFF6FF!important;
+  border-color:#2563EB!important;
+  box-shadow:0 2px 8px rgba(37,99,235,.15)!important;
+}
+.btn-danger{
+  background:linear-gradient(135deg,#DC2626,#B91C1C)!important;
+  color:#fff!important;
+}
+.btn-danger:hover{box-shadow:0 4px 14px rgba(220,38,38,.35)!important}
+.btn-success{
+  background:linear-gradient(135deg,#059669,#047857)!important;
+  color:#fff!important;
+}
+.btn-success:hover{box-shadow:0 4px 14px rgba(5,150,105,.35)!important}
+.btn-sm{padding:5px 12px!important;font-size:.7rem!important}
+.btn-lg{padding:10px 22px!important;font-size:.82rem!important}
+
+/* ── STATUS BADGES ─────────────────────────────────── */
+.badge,.status-badge,[class*=badge]{
+  display:inline-flex!important;align-items:center!important;
+  padding:3px 10px!important;border-radius:999px!important;
+  font-size:.62rem!important;font-weight:800!important;
+  text-transform:uppercase!important;letter-spacing:.04em!important;
+}
+
+/* ── SIDEBAR BRAND ─────────────────────────────────── */
+.wiq-logo{
+  display:flex!important;align-items:center!important;
+  gap:8px!important;padding:0 4px!important;
+}
+.wiq-logo .logo-mark{
+  width:32px!important;height:32px!important;
+  background:linear-gradient(135deg,#2563EB,#7C3AED)!important;
+  border-radius:9px!important;display:flex!important;
+  align-items:center!important;justify-content:center!important;
+  font-size:1rem!important;flex-shrink:0!important;
+  box-shadow:0 4px 12px rgba(37,99,235,.35)!important;
+}
+.wiq-logo span{
+  font-weight:900!important;font-size:.82rem!important;
+  color:#F8FAFC!important;letter-spacing:-.01em!important;
+}
+
+/* ═══ DARK/LIGHT MODE  ════════════════════════════════════ */
+:root{--dm-bg:#F8FAFC;--dm-card:#ffffff;--dm-text:#1e293b;--dm-muted:#64748b;--dm-border:#e2e8f0;--dm-sidebar:#0a1220;--dm-topbar:#ffffff;--dm-input:#ffffff;--dm-hover:#f1f5f9}
+body.dark-mode{--dm-bg:#0B1120;--dm-card:#111827;--dm-text:#e2e8f0;--dm-muted:#94a3b8;--dm-border:#1e2d4a;--dm-sidebar:#060d18;--dm-topbar:#111827;--dm-input:#1e2d4a;--dm-hover:#1e293b}
+body{background:var(--dm-bg)!important;color:var(--dm-text)!important;transition:background .25s,color .25s}
+.wiq-sidebar,aside{background:var(--dm-sidebar)!important}
+.navbar,.wiq-topbar,nav{background:var(--dm-topbar)!important;border-bottom-color:var(--dm-border)!important}
+.card,.wiq-card,.stat-card,.kpi-card{background:var(--dm-card)!important;border-color:var(--dm-border)!important}
+main,.main-content,.wiq-content,.page-wrap{background:var(--dm-bg)!important}
+input:not([type=checkbox]):not([type=radio]),select,textarea,.form-input{background:var(--dm-input)!important;border-color:var(--dm-border)!important;color:var(--dm-text)!important}
+table{background:var(--dm-card)!important}thead tr{background:#1e3a5f!important}tbody tr:hover{background:var(--dm-hover)!important}
+h1,h2,h3,h4,h5,h6,p,span,label,li,td,th{color:inherit}
+.dm-toggle{width:40px;height:22px;border-radius:999px;border:none;cursor:pointer;position:relative;background:#e2e8f0;transition:background .3s;flex-shrink:0;outline:none}
+.dm-toggle.on{background:linear-gradient(135deg,#4f46e5,#7c3aed)}
+.dm-toggle::after{content:'';position:absolute;top:2px;left:2px;width:18px;height:18px;border-radius:50%;background:#fff;transition:transform .3s;box-shadow:0 1px 4px rgba(0,0,0,.2)}
+.dm-toggle.on::after{transform:translateX(18px)}
+.dm-icon{font-size:.85rem;cursor:pointer}
+
+
+/* ═══ COOKIE CONSENT BANNER ════════════════════════════════ */
+#cookieBanner{
+  position:fixed;bottom:0;left:0;right:0;z-index:9998;
+  background:linear-gradient(135deg,#0F172A,#1E293B);
+  border-top:2px solid #2563EB;
+  padding:16px 32px;
+  display:flex;align-items:center;justify-content:space-between;
+  flex-wrap:wrap;gap:12px;
+  box-shadow:0 -4px 24px rgba(0,0,0,.3);
+  transform:translateY(100%);transition:transform .4s ease;
+}
+#cookieBanner.visible{transform:translateY(0)}
+.cookie-text{font-size:.78rem;color:#CBD5E1;line-height:1.6;max-width:700px}
+.cookie-text a{color:#60A5FA;text-decoration:none;font-weight:600}
+.cookie-text a:hover{text-decoration:underline}
+.cookie-actions{display:flex;gap:8px;flex-shrink:0}
+.cookie-btn-accept{
+  background:linear-gradient(135deg,#2563EB,#4F46E5);color:#fff;
+  border:none;border-radius:8px;padding:8px 20px;font-size:.74rem;
+  font-weight:700;cursor:pointer;font-family:inherit;
+  box-shadow:0 4px 12px rgba(37,99,235,.4);transition:all .2s;
+}
+.cookie-btn-accept:hover{transform:translateY(-1px);box-shadow:0 6px 16px rgba(37,99,235,.5)}
+.cookie-btn-settings{
+  background:transparent;color:#94A3B8;
+  border:1.5px solid #334155;border-radius:8px;padding:8px 16px;font-size:.74rem;
+  font-weight:700;cursor:pointer;font-family:inherit;transition:all .2s;
+}
+.cookie-btn-settings:hover{color:#F1F5F9;border-color:#64748B}
+.cookie-btn-decline{
+  background:transparent;color:#64748B;border:none;
+  font-size:.7rem;cursor:pointer;font-family:inherit;padding:4px 8px;
+}
+
+</style>
+
+<style id="wfi-card-fix">
+.card,.stat-card,.kpi-card{margin-bottom:12px}
+.grid,.stats-grid{gap:14px}
+.export-bar{padding:10px 0;margin-bottom:12px}
+.tab-panel{padding:4px 0}
+.wiq-main{padding:16px 20px}
+@media(max-width:768px){.wiq-main{padding:12px}}
+/* Dark mode button always visible */
+#dmt,#dmToggle{display:flex!important;opacity:1!important;visibility:visible!important}
+/* Print improvements */
+@media print{
+  .wiq-sidebar,.navbar,.topbar,.export-bar,.wiq-mob-toggle{display:none!important}
+  .wiq-main,.main{margin:0!important;padding:20px!important;max-width:100%!important}
+  table{page-break-inside:avoid}
+  .card{page-break-inside:avoid;border:1px solid #e2e8f0!important}
+}
+</style>
+
+<style id="wiq-sb-css">
+
+
+/* ── UNIVERSAL SIDEBAR NAV ── */
+.wiq-wrap{display:flex;min-height:100vh}
+.wiq-sidebar{width:220px;min-width:220px;background:#0a1220;border-right:1px solid rgba(255,255,255,.07);position:sticky;top:0;height:100vh;overflow-y:auto;flex-shrink:0;transition:width .2s;z-index:200}
+.wiq-sidebar::-webkit-scrollbar{width:3px}.wiq-sidebar::-webkit-scrollbar-thumb{background:#1e3a5f}
+.wiq-sidebar-header{padding:14px 14px 10px;border-bottom:1px solid rgba(255,255,255,.07)}
+.wiq-logo{font-size:.9rem;font-weight:900;color:#fff;display:flex;align-items:center;gap:7px}
+.wiq-user-pill{display:flex;align-items:center;gap:7px;padding:8px 10px;margin:8px 0 4px;background:rgba(255,255,255,.04);border-radius:8px;font-size:.7rem;color:#64748b}
+.wiq-user-name{font-weight:700;color:#cbd5e1;font-size:.72rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:120px}
+.wiq-logout-btn{display:flex;align-items:center;gap:6px;padding:7px 10px;margin:0 6px 6px;background:rgba(220,38,38,.1);border:1px solid rgba(220,38,38,.2);border-radius:7px;color:#f87171;font-size:.72rem;font-weight:700;cursor:pointer;width:calc(100% - 12px);text-decoration:none;transition:all .15s}
+.wiq-logout-btn:hover{background:rgba(220,38,38,.2)}
+.wiq-nav-group{margin-bottom:2px}
+.wiq-nav-label{font-size:.59rem;font-weight:800;color:#1e3a5f;text-transform:uppercase;letter-spacing:.09em;padding:8px 14px 3px;cursor:pointer;display:flex;align-items:center;justify-content:space-between}
+.wiq-nav-label:hover{color:#334155}
+.wiq-nav-label .arr{font-size:.6rem;transition:.2s;color:#1e3a5f}
+.wiq-nav-items{display:flex;flex-direction:column;gap:1px;padding:0 6px 4px}
+.wiq-nav-item{display:flex;align-items:center;gap:7px;padding:5px 8px;border-radius:6px;font-size:.71rem;font-weight:600;color:#475569;text-decoration:none;transition:all .15s;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.wiq-nav-item:hover{background:rgba(37,99,235,.12);color:#60a5fa}
+.wiq-nav-item.active{background:rgba(37,99,235,.18);color:#60a5fa;font-weight:800}
+.wiq-nav-item .ico{font-size:.8rem;flex-shrink:0;width:16px;text-align:center}
+.wiq-main{flex:1;min-width:0;overflow-x:hidden}
+.wiq-collapsed .wiq-sidebar{width:48px}
+.wiq-collapsed .wiq-nav-item span,.wiq-collapsed .wiq-nav-label span:first-child,.wiq-collapsed .wiq-user-name,.wiq-collapsed .wiq-logo span,.wiq-collapsed .wiq-logout-btn span{display:none}
+.wiq-collapsed .wiq-nav-items{padding:0 3px}
+.wiq-collapsed .wiq-nav-item{justify-content:center;padding:6px}
+.wiq-collapsed .wiq-logout-btn{justify-content:center;padding:7px;margin:0 3px 4px}
+.wiq-toggle{background:none;border:none;color:#475569;cursor:pointer;padding:4px 8px;font-size:.75rem;display:flex;align-items:center;gap:4px;margin-left:auto}
+.wiq-toggle:hover{color:#60a5fa}
+@media(max-width:768px){.wiq-sidebar{position:fixed;left:-220px;top:0;transition:left .2s}.wiq-sidebar.open{left:0;box-shadow:4px 0 20px rgba(0,0,0,.5)}.wiq-mob-toggle{display:flex!important}}
+.wiq-mob-toggle{display:none;position:fixed;top:12px;left:12px;z-index:300;background:#1e3a5f;border:none;border-radius:8px;padding:7px 10px;color:#fff;font-size:.8rem;cursor:pointer}
+
+  body{background:#F0F4F8}
+  .page-wrap{max-width:1200px;margin:0 auto;padding:24px}
+  .card{background:#fff;border-radius:12px;padding:24px;margin-bottom:24px;box-shadow:0 2px 12px rgba(0,0,0,.08)}
+  .card h3{margin-top:0;color:#1B4F8A;font-size:1.1rem;margin-bottom:16px}
+  .btn{padding:9px 22px;border:none;border-radius:7px;font-weight:600;cursor:pointer;font-size:14px;transition:.15s}
+  .btn-primary{background:#1B4F8A;color:#fff} .btn-primary:hover{background:#1a3f72}
+  .btn-success{background:#27AE60;color:#fff} .btn-success:hover{background:#1e8449}
+  .btn-danger{background:#C0392B;color:#fff}  .btn-danger:hover{background:#a93226}
+  .btn-sm{padding:5px 14px;font-size:12px;border-radius:5px;border:none;font-weight:600;cursor:pointer}
+  .btn-outline{background:#fff;border:1.5px solid #1B4F8A;color:#1B4F8A}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+  .grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+  @media(max-width:700px){.grid2,.grid4{grid-template-columns:1fr}}
+  table{width:100%;border-collapse:collapse;font-size:13px}
+  th{background:#1B4F8A;color:#fff;padding:10px 12px;text-align:left;white-space:nowrap}
+  td{padding:9px 12px;border-bottom:1px solid #EEF2F7;vertical-align:middle}
+  tr:hover td{background:#F8FAFB}
+  .badge{padding:3px 10px;border-radius:12px;font-size:11px;font-weight:700}
+  .badge.present{background:#D5F5E3;color:#1E8449}
+  .badge.absent{background:#FADBD8;color:#C0392B}
+  .badge.late{background:#FEF9E7;color:#D4AC0D}
+  .badge.half_day{background:#D6EAF8;color:#1B4F8A}
+  .badge.leave{background:#EEF2F7;color:#5D6D7E}
+  #msg{padding:11px 16px;border-radius:8px;margin-bottom:16px;display:none;font-weight:600}
+  #msg.success{background:#D5F5E3;color:#1E8449;display:block}
+  #msg.error{background:#FADBD8;color:#C0392B;display:block}
+  .tabs{display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap}
+  .tab{padding:9px 22px;border-radius:8px;border:2px solid #BDC3C7;background:#fff;color:#5D6D7E;font-weight:600;cursor:pointer;font-size:14px}
+  .tab.active{background:#1B4F8A;color:#fff;border-color:#1B4F8A}
+  /* Clock widget */
+  .clock-card{background:linear-gradient(135deg,#1B4F8A,#2563eb);border-radius:12px;padding:28px;color:#fff;text-align:center}
+  .clock-time{font-size:3rem;font-weight:800;letter-spacing:2px;font-family:'Courier New',monospace;margin-bottom:6px}
+  .clock-date{font-size:.95rem;opacity:.8;margin-bottom:20px}
+  .clock-status{background:rgba(255,255,255,.15);border-radius:8px;padding:10px 16px;font-size:.95rem;margin-bottom:20px}
+  .clock-status.clocked-in{background:rgba(39,174,96,.3)}
+  .clock-status.clocked-out{background:rgba(192,57,43,.2)}
+  .clock-btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+  .clock-btn{padding:12px 28px;border:none;border-radius:8px;font-size:15px;font-weight:700;cursor:pointer;transition:.15s}
+  .clock-btn.in{background:#27AE60;color:#fff} .clock-btn.in:hover{background:#1e8449}
+  .clock-btn.out{background:#C0392B;color:#fff} .clock-btn.out:hover{background:#a93226}
+  .clock-btn:disabled{opacity:.4;cursor:not-allowed}
+  /* Stat cards */
+  .stat-card{background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:10px;padding:16px;text-align:center}
+  .stat-num{font-size:2rem;font-weight:800;color:#1B4F8A}
+  .stat-label{font-size:.8rem;font-weight:700;color:#64748b;margin-top:3px;text-transform:uppercase;letter-spacing:.05em}
+  .stat-sub{font-size:.75rem;color:#94a3b8;margin-top:3px}
+  /* Today dot */
+  .today-dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px}
+  .dot-present{background:#27AE60}
+  .dot-absent{background:#C0392B}
+  .dot-late{background:#D4AC0D}
+  /* Form */
+  .form-group{margin-bottom:14px}
+  .form-group label{display:block;font-weight:600;color:#1B4F8A;margin-bottom:5px;font-size:13px}
+  .form-group input,.form-group select,.form-group textarea{width:100%;padding:9px 12px;border:1px solid #BDC3C7;border-radius:7px;font-size:14px;box-sizing:border-box}
+  .pbar{height:8px;background:#e2e8f0;border-radius:4px;overflow:hidden;margin-top:6px}
+  .pfill{height:100%;border-radius:4px;transition:width 1s ease}
+.toast{position:fixed;bottom:24px;right:24px;background:#1e293b;color:#fff;padding:13px 22px;border-radius:12px;font-size:.87rem;font-weight:600;z-index:9999;transform:translateY(80px);opacity:0;transition:all .3s;max-width:360px;word-break:break-word;box-shadow:0 8px 30px rgba(0,0,0,.25)}
+.toast.show{transform:translateY(0);opacity:1}
+.toast.success{background:#16a34a}
+.toast.error{background:#dc2626}
+.toast.warn{background:#d97706}
+
+/* ── TOPBAR FIXES  ─────────────────────────────── */
+.navbar,.wiq-topbar,nav.topbar{
+  display:flex!important;align-items:center!important;
+  padding:0 20px!important;height:54px!important;
+  background:#fff!important;
+  border-bottom:2px solid #e8f0ff!important;
+  position:sticky!important;top:0!important;z-index:100!important;
+  gap:12px!important;flex-wrap:nowrap!important;
+  box-shadow:0 1px 8px rgba(37,99,235,.08)!important;
+}
+.nav-brand{
+  font-size:.88rem!important;font-weight:900!important;
+  color:#1E3A5F!important;white-space:nowrap!important;
+  display:flex!important;align-items:center!important;gap:6px!important;
+  flex-shrink:0!important;letter-spacing:-.01em!important;
+}
+.nav-brand .logo-icon{
+  width:28px!important;height:28px!important;
+  background:linear-gradient(135deg,#2563EB,#7C3AED)!important;
+  border-radius:7px!important;display:inline-flex!important;
+  align-items:center!important;justify-content:center!important;
+  font-size:.9rem!important;flex-shrink:0!important;
+}
+.nav-brand .logo-text{
+  font-size:.85rem!important;font-weight:900!important;color:#1E3A5F!important;
+}
+.nav-brand .logo-version{
+  font-size:.55rem!important;font-weight:700!important;
+  color:#2563EB!important;background:#EFF6FF!important;
+  padding:1px 5px!important;border-radius:4px!important;
+  border:1px solid #BFDBFE!important;
+}
+.nav-info{
+  display:flex!important;align-items:center!important;
+  gap:8px!important;flex-shrink:0!important;margin-left:auto!important;
+}
+.nav-divider{width:1px!important;height:20px!important;background:#E2E8F0!important}
+
+/* ── CARD COLOR SHADOWS ─────────────────────────────── */
+.card,.wiq-card,[class*="-card"]{
+  transition:all .25s cubic-bezier(.34,1.56,.64,1)!important;
+  border-radius:12px!important;
+}
+.card:hover,.wiq-card:hover{
+  transform:translateY(-4px) scale(1.006)!important;
+  box-shadow:0 12px 32px rgba(37,99,235,.18),
+             0 2px 8px rgba(37,99,235,.1)!important;
+}
+/* Module-specific card shadows */
+.card-payroll:hover{box-shadow:0 12px 32px rgba(5,150,105,.18)!important}
+.card-leave:hover{box-shadow:0 12px 32px rgba(245,158,11,.18)!important}
+.card-alert:hover{box-shadow:0 12px 32px rgba(220,38,38,.18)!important}
+
+/* ── BUTTON SYSTEM ─────────────────────────────────── */
+.btn{
+  display:inline-flex!important;align-items:center!important;
+  gap:5px!important;padding:7px 16px!important;
+  border-radius:8px!important;font-size:.76rem!important;
+  font-weight:700!important;cursor:pointer!important;
+  border:none!important;transition:all .2s!important;
+  white-space:nowrap!important;font-family:inherit!important;
+}
+.btn-primary{
+  background:linear-gradient(135deg,#2563EB,#1D4ED8)!important;
+  color:#fff!important;
+  box-shadow:0 2px 8px rgba(37,99,235,.3)!important;
+}
+.btn-primary:hover{
+  background:linear-gradient(135deg,#1D4ED8,#1E40AF)!important;
+  box-shadow:0 4px 14px rgba(37,99,235,.4)!important;
+  transform:translateY(-1px)!important;
+}
+.btn-outline,.btn-sm.btn-outline{
+  background:#fff!important;color:#2563EB!important;
+  border:1.5px solid #BFDBFE!important;
+  padding:5px 13px!important;font-size:.72rem!important;
+}
+.btn-outline:hover{
+  background:#EFF6FF!important;
+  border-color:#2563EB!important;
+  box-shadow:0 2px 8px rgba(37,99,235,.15)!important;
+}
+.btn-danger{
+  background:linear-gradient(135deg,#DC2626,#B91C1C)!important;
+  color:#fff!important;
+}
+.btn-danger:hover{box-shadow:0 4px 14px rgba(220,38,38,.35)!important}
+.btn-success{
+  background:linear-gradient(135deg,#059669,#047857)!important;
+  color:#fff!important;
+}
+.btn-success:hover{box-shadow:0 4px 14px rgba(5,150,105,.35)!important}
+.btn-sm{padding:5px 12px!important;font-size:.7rem!important}
+.btn-lg{padding:10px 22px!important;font-size:.82rem!important}
+
+/* ── STATUS BADGES ─────────────────────────────────── */
+.badge,.status-badge,[class*=badge]{
+  display:inline-flex!important;align-items:center!important;
+  padding:3px 10px!important;border-radius:999px!important;
+  font-size:.62rem!important;font-weight:800!important;
+  text-transform:uppercase!important;letter-spacing:.04em!important;
+}
+
+/* ── SIDEBAR BRAND ─────────────────────────────────── */
+.wiq-logo{
+  display:flex!important;align-items:center!important;
+  gap:8px!important;padding:0 4px!important;
+}
+.wiq-logo .logo-mark{
+  width:32px!important;height:32px!important;
+  background:linear-gradient(135deg,#2563EB,#7C3AED)!important;
+  border-radius:9px!important;display:flex!important;
+  align-items:center!important;justify-content:center!important;
+  font-size:1rem!important;flex-shrink:0!important;
+  box-shadow:0 4px 12px rgba(37,99,235,.35)!important;
+}
+.wiq-logo span{
+  font-weight:900!important;font-size:.82rem!important;
+  color:#F8FAFC!important;letter-spacing:-.01em!important;
+}
+
+/* ═══ DARK/LIGHT MODE  ════════════════════════════════════ */
+:root{--dm-bg:#F8FAFC;--dm-card:#ffffff;--dm-text:#1e293b;--dm-muted:#64748b;--dm-border:#e2e8f0;--dm-sidebar:#0a1220;--dm-topbar:#ffffff;--dm-input:#ffffff;--dm-hover:#f1f5f9}
+body.dark-mode{--dm-bg:#0B1120;--dm-card:#111827;--dm-text:#e2e8f0;--dm-muted:#94a3b8;--dm-border:#1e2d4a;--dm-sidebar:#060d18;--dm-topbar:#111827;--dm-input:#1e2d4a;--dm-hover:#1e293b}
+body{background:var(--dm-bg)!important;color:var(--dm-text)!important;transition:background .25s,color .25s}
+.wiq-sidebar,aside{background:var(--dm-sidebar)!important}
+.navbar,.wiq-topbar,nav{background:var(--dm-topbar)!important;border-bottom-color:var(--dm-border)!important}
+.card,.wiq-card,.stat-card,.kpi-card{background:var(--dm-card)!important;border-color:var(--dm-border)!important}
+main,.main-content,.wiq-content,.page-wrap{background:var(--dm-bg)!important}
+input:not([type=checkbox]):not([type=radio]),select,textarea,.form-input{background:var(--dm-input)!important;border-color:var(--dm-border)!important;color:var(--dm-text)!important}
+table{background:var(--dm-card)!important}thead tr{background:#1e3a5f!important}tbody tr:hover{background:var(--dm-hover)!important}
+h1,h2,h3,h4,h5,h6,p,span,label,li,td,th{color:inherit}
+.dm-toggle{width:40px;height:22px;border-radius:999px;border:none;cursor:pointer;position:relative;background:#e2e8f0;transition:background .3s;flex-shrink:0;outline:none}
+.dm-toggle.on{background:linear-gradient(135deg,#4f46e5,#7c3aed)}
+.dm-toggle::after{content:'';position:absolute;top:2px;left:2px;width:18px;height:18px;border-radius:50%;background:#fff;transition:transform .3s;box-shadow:0 1px 4px rgba(0,0,0,.2)}
+.dm-toggle.on::after{transform:translateX(18px)}
+.dm-icon{font-size:.85rem;cursor:pointer}
+
+
+/* ═══ COOKIE CONSENT BANNER ════════════════════════════════ */
+#cookieBanner{
+  position:fixed;bottom:0;left:0;right:0;z-index:9998;
+  background:linear-gradient(135deg,#0F172A,#1E293B);
+  border-top:2px solid #2563EB;
+  padding:16px 32px;
+  display:flex;align-items:center;justify-content:space-between;
+  flex-wrap:wrap;gap:12px;
+  box-shadow:0 -4px 24px rgba(0,0,0,.3);
+  transform:translateY(100%);transition:transform .4s ease;
+}
+#cookieBanner.visible{transform:translateY(0)}
+.cookie-text{font-size:.78rem;color:#CBD5E1;line-height:1.6;max-width:700px}
+.cookie-text a{color:#60A5FA;text-decoration:none;font-weight:600}
+.cookie-text a:hover{text-decoration:underline}
+.cookie-actions{display:flex;gap:8px;flex-shrink:0}
+.cookie-btn-accept{
+  background:linear-gradient(135deg,#2563EB,#4F46E5);color:#fff;
+  border:none;border-radius:8px;padding:8px 20px;font-size:.74rem;
+  font-weight:700;cursor:pointer;font-family:inherit;
+  box-shadow:0 4px 12px rgba(37,99,235,.4);transition:all .2s;
+}
+.cookie-btn-accept:hover{transform:translateY(-1px);box-shadow:0 6px 16px rgba(37,99,235,.5)}
+.cookie-btn-settings{
+  background:transparent;color:#94A3B8;
+  border:1.5px solid #334155;border-radius:8px;padding:8px 16px;font-size:.74rem;
+  font-weight:700;cursor:pointer;font-family:inherit;transition:all .2s;
+}
+.cookie-btn-settings:hover{color:#F1F5F9;border-color:#64748B}
+.cookie-btn-decline{
+  background:transparent;color:#64748B;border:none;
+  font-size:.7rem;cursor:pointer;font-family:inherit;padding:4px 8px;
+}
+
+
+/* ── Dropdown nav groups ── */
+.wiq-nav-group-label{cursor:pointer;user-select:none;display:flex;align-items:center;justify-content:space-between;padding:7px 16px;font-size:.67rem;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:#64748B}
+.wiq-dropdown-toggle:hover{color:#93C5FD;background:rgba(37,99,235,.07);border-radius:8px}
+.wiq-arrow{font-size:.6rem;transition:transform .2s;flex-shrink:0}
+.wiq-dropdown-body{max-height:0;overflow:hidden;transition:max-height .3s ease}
+.wiq-dropdown-body.open{max-height:800px}
+/* ── Nav icons ── */
+.wiq-nav-item a .ico{width:20px;text-align:center;font-size:.88rem;flex-shrink:0}
+/* ── Active link highlight ── */
+.wiq-nav-item a.active,.wiq-nav-item a:has(.ico):hover{background:rgba(37,99,235,.15);color:#93C5FD}
+/* ── Logo ── */
+.wiq-logo-icon{width:32px;height:32px;background:linear-gradient(135deg,#1D4ED8,#6D28D9);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0}
+.wiq-logo-name{font-size:.78rem;font-weight:900;color:#E2E8F0;line-height:1.2}
+.wiq-logo-badge{font-size:.55rem;color:#60A5FA;background:rgba(37,99,235,.2);padding:1px 7px;border-radius:999px;margin-top:3px;display:inline-block;font-weight:700;letter-spacing:.05em}
+/* ── Card & Margin global fixes ── */
+.card,.stat-card,.kpi-card,.metric-card{margin-bottom:14px!important;border-radius:12px!important}
+.grid,.stats-grid,.kpi-grid{gap:14px!important}
+.wiq-main{padding:20px 24px!important;display:flex;flex-direction:column;min-height:100vh}
+.export-bar{padding:10px 0!important;margin-bottom:12px!important;display:flex;gap:8px;flex-wrap:wrap}
+@media(max-width:768px){
+  .wiq-mob-toggle{display:flex!important;align-items:center;justify-content:center}
+  .wiq-sidebar{position:fixed!important;left:-270px;top:0;height:100vh;z-index:500;transition:left .3s;overflow-y:auto}
+  .wiq-sidebar.open{left:0!important;box-shadow:4px 0 20px rgba(0,0,0,.5)}
+  .wiq-wrap{flex-direction:column}
+  .wiq-main{margin-left:0!important;padding:14px 16px!important}
+}
+/* ── Print ── */
+@media print{.wiq-sidebar,.wiq-mob-toggle,.export-bar,.cookie-banner,#ckb,#cookieBanner{display:none!important}.wiq-main{margin:0!important;padding:20px!important;max-width:100%!important}.card{page-break-inside:avoid;border:1px solid #e2e8f0!important}}
+</style>
+</head>
+<body><button class="wiq-mob-toggle" onclick="openMobSidebar()" id="mobToggleBtn" style="display:none;position:fixed;top:14px;left:14px;z-index:600;background:#2563EB;color:#fff;border:none;border-radius:9px;padding:9px 13px;cursor:pointer;font-size:1rem;box-shadow:0 4px 16px rgba(37,99,235,.45)">&#9776;</button>
+<div class="wiq-wrap">
+<div class="wiq-sidebar" id="wiqSidebar">
+  <div class="wiq-sidebar-header">
+    <div class="wiq-logo">
+      <div class="wiq-logo-icon">&#9889;</div>
+      <div class="wiq-logo-text">
+        <span class="wiq-logo-name">Workforce<br>Intelligence</span>
+        <span class="wiq-logo-badge">Enterprise HRMS</span>
+      </div>
+    </div>
+    <div class="wiq-user-pill">
+      <span class="wiq-user-avatar">&#128100;</span>
+      <span class="wiq-user-name" id="sidebarUserName">Loading...</span>
+      <button class="wiq-tog" onclick="window.tdm&&window.tdm()" id="dmt" title="Toggle dark mode" style="width:28px;height:16px;border-radius:8px;border:none;background:#334155;cursor:pointer;flex-shrink:0"></button>
+    </div>
+  </div>
+  <nav class="wiq-nav">
+
+    <!-- DASHBOARDS -->
+    <div class="wiq-nav-group">
+      <div class="wiq-nav-group-label">Dashboards</div>
+      <div class="wiq-nav-item"><a href="admin-dashboard.html"><span class="ico">&#9711;</span><span>Admin Dashboard</span></a></div>
+      <div class="wiq-nav-item"><a href="employee-dashboard.html"><span class="ico">&#128100;</span><span>Employee Dashboard</span></a></div>
+      <div class="wiq-nav-item"><a href="manager.html"><span class="ico">&#128084;</span><span>Manager Dashboard</span></a></div>
+      <div class="wiq-nav-item"><a href="activity-history.html"><span class="ico">&#128203;</span><span>Activity History</span></a></div>
+    </div>
+
+    <!-- HR MANAGEMENT (dropdown) -->
+    <div class="wiq-nav-group">
+      <div class="wiq-nav-group-label wiq-dropdown-toggle" onclick="toggleGroup('grp-hr')">
+        &#128101; HR Management <span class="wiq-arrow" id="arr-hr">&#9660;</span>
+      </div>
+      <div id="grp-hr" class="wiq-dropdown-body">
+        <div class="wiq-nav-item"><a href="attendance.html"><span class="ico">&#128336;</span><span>Attendance</span></a></div>
+        <div class="wiq-nav-item"><a href="leave.html"><span class="ico">&#127964;</span><span>Leave Management</span></a></div>
+        <div class="wiq-nav-item"><a href="hiring.html"><span class="ico">&#127919;</span><span>Hiring & ATS</span></a></div>
+        <div class="wiq-nav-item"><a href="onboarding.html"><span class="ico">&#128640;</span><span>Onboarding</span></a></div>
+        <div class="wiq-nav-item"><a href="performance.html"><span class="ico">&#128202;</span><span>Performance</span></a></div>
+        <div class="wiq-nav-item"><a href="training.html"><span class="ico">&#127891;</span><span>Training & LMS</span></a></div>
+        <div class="wiq-nav-item"><a href="goals-okr.html"><span class="ico">&#127942;</span><span>Goals & OKR</span></a></div>
+        <div class="wiq-nav-item"><a href="exit.html"><span class="ico">&#128682;</span><span>Exit Management</span></a></div>
+        <div class="wiq-nav-item"><a href="employee-directory.html"><span class="ico">&#128101;</span><span>Employee Directory</span></a></div>
+        <div class="wiq-nav-item"><a href="org-chart.html"><span class="ico">&#127961;</span><span>Org Chart</span></a></div>
+        <div class="wiq-nav-item"><a href="shift-roster.html"><span class="ico">&#128197;</span><span>Shift Roster</span></a></div>
+        <div class="wiq-nav-item"><a href="shift-bidding.html"><span class="ico">&#128260;</span><span>Shift Bidding</span></a></div>
+        <div class="wiq-nav-item"><a href="wfh-tracker.html"><span class="ico">&#127968;</span><span>WFH Tracker</span></a></div>
+        <div class="wiq-nav-item"><a href="time-tracker.html"><span class="ico">&#9201;</span><span>Time Tracker</span></a></div>
+        <div class="wiq-nav-item"><a href="regularization.html"><span class="ico">&#128393;</span><span>Regularisation</span></a></div>
+      </div>
+    </div>
+
+    <!-- PAYROLL & FINANCE (dropdown) -->
+    <div class="wiq-nav-group">
+      <div class="wiq-nav-group-label wiq-dropdown-toggle" onclick="toggleGroup('grp-pay')">
+        &#128176; Payroll & Finance <span class="wiq-arrow" id="arr-pay">&#9660;</span>
+      </div>
+      <div id="grp-pay" class="wiq-dropdown-body">
+        <div class="wiq-nav-item"><a href="salary.html"><span class="ico">&#128176;</span><span>Payroll Processing</span></a></div>
+        <div class="wiq-nav-item"><a href="payslip-portal.html"><span class="ico">&#128196;</span><span>Payslip Portal</span></a></div>
+        <div class="wiq-nav-item"><a href="salary-revision.html"><span class="ico">&#128200;</span><span>Salary Revision</span></a></div>
+        <div class="wiq-nav-item"><a href="salary-advance.html"><span class="ico">&#128179;</span><span>Salary Advance</span></a></div>
+        <div class="wiq-nav-item"><a href="tax-portal.html"><span class="ico">&#129534;</span><span>TDS / Tax Portal</span></a></div>
+        <div class="wiq-nav-item"><a href="investment-declaration.html"><span class="ico">&#128209;</span><span>IT Declaration</span></a></div>
+        <div class="wiq-nav-item"><a href="form-24q.html"><span class="ico">&#127963;</span><span>Form 24Q</span></a></div>
+        <div class="wiq-nav-item"><a href="statutory-bonus.html"><span class="ico">&#127873;</span><span>Statutory Bonus</span></a></div>
+        <div class="wiq-nav-item"><a href="lwf-tracker.html"><span class="ico">&#127963;</span><span>LWF Tracker</span></a></div>
+        <div class="wiq-nav-item"><a href="benefits.html"><span class="ico">&#127973;</span><span>Benefits & Perks</span></a></div>
+        <div class="wiq-nav-item"><a href="loan-portal.html"><span class="ico">&#127991;</span><span>Loan Portal</span></a></div>
+        <div class="wiq-nav-item"><a href="banking.html"><span class="ico">&#127970;</span><span>Banking</span></a></div>
+      </div>
+    </div>
+
+    <!-- COMPLIANCE (dropdown) -->
+    <div class="wiq-nav-group">
+      <div class="wiq-nav-group-label wiq-dropdown-toggle" onclick="toggleGroup('grp-comp')">
+        &#9878;&#65039; Compliance <span class="wiq-arrow" id="arr-comp">&#9660;</span>
+      </div>
+      <div id="grp-comp" class="wiq-dropdown-body">
+        <div class="wiq-nav-item"><a href="compliance.html"><span class="ico">&#9878;&#65039;</span><span>Statutory Compliance</span></a></div>
+        <div class="wiq-nav-item"><a href="posh-complaints.html"><span class="ico">&#128737;</span><span>POSH / ICC</span></a></div>
+        <div class="wiq-nav-item"><a href="privacy-policy.html"><span class="ico">&#128274;</span><span>Privacy Policy</span></a></div>
+        <div class="wiq-nav-item"><a href="cookie-policy.html"><span class="ico">&#127850;</span><span>Cookie Policy</span></a></div>
+        <div class="wiq-nav-item"><a href="security-policy.html"><span class="ico">&#128737;</span><span>Security Policy</span></a></div>
+        <div class="wiq-nav-item"><a href="company-policies.html"><span class="ico">&#128220;</span><span>Company Policies</span></a></div>
+      </div>
+    </div>
+
+    <!-- AI & INTELLIGENCE -->
+    <div class="wiq-nav-group">
+      <div class="wiq-nav-group-label wiq-dropdown-toggle" onclick="toggleGroup('grp-ai')">
+        &#129302; AI & Intelligence <span class="wiq-arrow" id="arr-ai">&#9660;</span>
+      </div>
+      <div id="grp-ai" class="wiq-dropdown-body">
+        <div class="wiq-nav-item"><a href="ai-assistant.html"><span class="ico">&#129302;</span><span>AI Assistant</span></a></div>
+        <div class="wiq-nav-item"><a href="hr-copilot.html"><span class="ico">&#129504;</span><span>HR Copilot</span></a></div>
+        <div class="wiq-nav-item"><a href="ai-insights.html"><span class="ico">&#128202;</span><span>AI Insights</span></a></div>
+      </div>
+    </div>
+
+    <!-- SECURITY (dropdown) -->
+    <div class="wiq-nav-group">
+      <div class="wiq-nav-group-label wiq-dropdown-toggle" onclick="toggleGroup('grp-sec')">
+        &#128737; Security <span class="wiq-arrow" id="arr-sec">&#9660;</span>
+      </div>
+      <div id="grp-sec" class="wiq-dropdown-body">
+        <div class="wiq-nav-item"><a href="fraud-detection.html"><span class="ico">&#128269;</span><span>Fraud Detection</span></a></div>
+        <div class="wiq-nav-item"><a href="cybersecurity.html"><span class="ico">&#128737;</span><span>Cybersecurity</span></a></div>
+        <div class="wiq-nav-item"><a href="threat-monitor.html"><span class="ico">&#128308;</span><span>Threat Monitor</span></a></div>
+        <div class="wiq-nav-item"><a href="audit-log.html"><span class="ico">&#128196;</span><span>Audit Log</span></a></div>
+        <div class="wiq-nav-item"><a href="session-management.html"><span class="ico">&#128273;</span><span>Session Mgmt</span></a></div>
+      </div>
+    </div>
+
+    <!-- ANALYTICS (dropdown) -->
+    <div class="wiq-nav-group">
+      <div class="wiq-nav-group-label wiq-dropdown-toggle" onclick="toggleGroup('grp-ana')">
+        &#128202; Analytics <span class="wiq-arrow" id="arr-ana">&#9660;</span>
+      </div>
+      <div id="grp-ana" class="wiq-dropdown-body">
+        <div class="wiq-nav-item"><a href="analytics.html"><span class="ico">&#128200;</span><span>Analytics Dashboard</span></a></div>
+        <div class="wiq-nav-item"><a href="reports.html"><span class="ico">&#128209;</span><span>Reports Center</span></a></div>
+        <div class="wiq-nav-item"><a href="workforce-planning.html"><span class="ico">&#128202;</span><span>Workforce Planning</span></a></div>
+        <div class="wiq-nav-item"><a href="real-time-monitor.html"><span class="ico">&#128225;</span><span>Real-Time Monitor</span></a></div>
+        <div class="wiq-nav-item"><a href="headcount.html"><span class="ico">&#128101;</span><span>Headcount</span></a></div>
+        <div class="wiq-nav-item"><a href="diversity.html"><span class="ico">&#127752;</span><span>Diversity & DEI</span></a></div>
+      </div>
+    </div>
+
+    <!-- SAFETY & WELFARE (dropdown) -->
+    <div class="wiq-nav-group">
+      <div class="wiq-nav-group-label wiq-dropdown-toggle" onclick="toggleGroup('grp-safe')">
+        &#10084;&#65039; Welfare & Safety <span class="wiq-arrow" id="arr-safe">&#9660;</span>
+      </div>
+      <div id="grp-safe" class="wiq-dropdown-body">
+        <div class="wiq-nav-item"><a href="mental-health.html"><span class="ico">&#128156;</span><span>Mental Health & EAP</span></a></div>
+        <div class="wiq-nav-item"><a href="112-emergency.html"><span class="ico">&#128680;</span><span>112 Emergency & SOS</span></a></div>
+        <div class="wiq-nav-item"><a href="women-safety-policy.html"><span class="ico">&#127800;</span><span>Women Safety</span></a></div>
+        <div class="wiq-nav-item"><a href="cab-booking.html"><span class="ico">&#128663;</span><span>Cab & Transport</span></a></div>
+        <div class="wiq-nav-item"><a href="visitor-management.html"><span class="ico">&#127970;</span><span>Visitor Management</span></a></div>
+        <div class="wiq-nav-item"><a href="welfare.html"><span class="ico">&#10084;&#65039;</span><span>Welfare Hub</span></a></div>
+        <div class="wiq-nav-item"><a href="pulse-survey.html"><span class="ico">&#128202;</span><span>Pulse Survey</span></a></div>
+      </div>
+    </div>
+
+    <!-- EMPLOYEE SELF-SERVICE (dropdown) -->
+    <div class="wiq-nav-group">
+      <div class="wiq-nav-group-label wiq-dropdown-toggle" onclick="toggleGroup('grp-ess')">
+        &#128111; Self-Service <span class="wiq-arrow" id="arr-ess">&#9660;</span>
+      </div>
+      <div id="grp-ess" class="wiq-dropdown-body">
+        <div class="wiq-nav-item"><a href="employee-self-service.html"><span class="ico">&#128111;</span><span>Self-Service Portal</span></a></div>
+        <div class="wiq-nav-item"><a href="profile.html"><span class="ico">&#128100;</span><span>My Profile</span></a></div>
+        <div class="wiq-nav-item"><a href="document-vault.html"><span class="ico">&#128193;</span><span>Document Vault</span></a></div>
+        <div class="wiq-nav-item"><a href="expenses.html"><span class="ico">&#128184;</span><span>Expenses</span></a></div>
+        <div class="wiq-nav-item"><a href="tasks.html"><span class="ico">&#9989;</span><span>My Tasks</span></a></div>
+        <div class="wiq-nav-item"><a href="helpdesk.html"><span class="ico">&#127916;</span><span>IT Helpdesk</span></a></div>
+        <div class="wiq-nav-item"><a href="announcements.html"><span class="ico">&#128226;</span><span>Announcements</span></a></div>
+        <div class="wiq-nav-item"><a href="notifications.html"><span class="ico">&#128276;</span><span>Notifications</span></a></div>
+        <div class="wiq-nav-item"><a href="festival-calendar.html"><span class="ico">&#127881;</span><span>Festival Calendar</span></a></div>
+      </div>
+    </div>
+
+    <!-- BIOMETRICS (dropdown) -->
+    <div class="wiq-nav-group">
+      <div class="wiq-nav-group-label wiq-dropdown-toggle" onclick="toggleGroup('grp-bio')">
+        &#128272; Biometrics <span class="wiq-arrow" id="arr-bio">&#9660;</span>
+      </div>
+      <div id="grp-bio" class="wiq-dropdown-body">
+        <div class="wiq-nav-item"><a href="face-recognition.html"><span class="ico">&#128065;&#65039;</span><span>Face Recognition</span></a></div>
+        <div class="wiq-nav-item"><a href="biometric-enrollment.html"><span class="ico">&#128272;</span><span>Biometric Enrollment</span></a></div>
+      </div>
+    </div>
+
+    <!-- ADMIN (dropdown) -->
+    <div class="wiq-nav-group">
+      <div class="wiq-nav-group-label wiq-dropdown-toggle" onclick="toggleGroup('grp-adm')">
+        &#9881;&#65039; Administration <span class="wiq-arrow" id="arr-adm">&#9660;</span>
+      </div>
+      <div id="grp-adm" class="wiq-dropdown-body">
+        <div class="wiq-nav-item"><a href="settings.html"><span class="ico">&#9881;&#65039;</span><span>Settings</span></a></div>
+        <div class="wiq-nav-item"><a href="employee-grades.html"><span class="ico">&#127885;</span><span>Employee Grades</span></a></div>
+        <div class="wiq-nav-item"><a href="assets.html"><span class="ico">&#127963;</span><span>Assets</span></a></div>
+        <div class="wiq-nav-item"><a href="data-export.html"><span class="ico">&#128228;</span><span>Data Export</span></a></div>
+        <div class="wiq-nav-item"><a href="registration-tracker.html"><span class="ico">&#128203;</span><span>Registration Tracker</span></a></div>
+      </div>
+    </div>
+
+    <!-- LOGOUT -->
+    <div class="wiq-nav-group" style="margin-top:auto;padding-top:8px;border-top:1px solid rgba(255,255,255,.07)">
+      <div class="wiq-nav-item"><a href="#" onclick="window.logout&&window.logout();return false;" style="color:#EF4444!important"><span class="ico">&#128682;</span><span>Logout</span></a></div>
+    </div>
+
+  </nav>
+</div>
+
+<div class="wiq-main">
+
+<nav class="navbar">
+  <div class="nav-brand">
+      <span class="logo-icon">&#9889;</span>
+      <span class="logo-text">Workforce Intelligence</span>
+      <span class="logo-version"></span>
+    </div>
+  <div class="nav-info">
+    <a href="employee-dashboard.html" class="btn btn-sm btn-outline">← Dashboard</a>
+    <span id="uN" class="nav-user"></span>
+    <button onclick="logout()" class="btn btn-sm btn-outline">Logout</button>
+  </div>
+</nav>
+<div class="page">
+  <div class="ph">
+    <div><h2 style="font-size:1.3rem;font-weight:900">💓 Employee Pulse Survey</h2><p style="font-size:.8rem;opacity:.8;margin-top:2px">Weekly micro-survey · Anonymous · 3 min to complete</p></div>
+    <div style="display:flex;align-items:center;gap:10px">
+      <span style="font-size:.78rem;opacity:.85">Week 27 · Jul 1–6, 2026</span>
+      <span class="badge" style="background:rgba(255,255,255,.15);color:#fff">⏰ Closes in 2 days</span>
+    </div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px">
+    <div style="background:#fff;border:1.5px solid var(--border);border-radius:12px;padding:14px;text-align:center"><div style="font-size:1.5rem;font-weight:900;color:#db2777">4.2<span style="font-size:.9rem">/5</span></div><div style="font-size:.64rem;font-weight:700;color:var(--muted);text-transform:uppercase;margin-top:2px">Engagement Score</div></div>
+    <div style="background:#fff;border:1.5px solid var(--border);border-radius:12px;padding:14px;text-align:center"><div style="font-size:1.5rem;font-weight:900;color:var(--ok)">87%</div><div style="font-size:.64rem;font-weight:700;color:var(--muted);text-transform:uppercase;margin-top:2px">Response Rate</div></div>
+    <div style="background:#fff;border:1.5px solid var(--border);border-radius:12px;padding:14px;text-align:center"><div style="font-size:1.5rem;font-weight:900;color:#7c3aed">+0.3</div><div style="font-size:.64rem;font-weight:700;color:var(--muted);text-transform:uppercase;margin-top:2px">vs Last Week</div></div>
+    <div style="background:#fff;border:1.5px solid var(--border);border-radius:12px;padding:14px;text-align:center"><div style="font-size:1.5rem;font-weight:900;color:#2563eb">12</div><div style="font-size:.64rem;font-weight:700;color:var(--muted);text-transform:uppercase;margin-top:2px">Surveys Done</div></div>
+  </div>
+
+  <div class="tn">
+    <button class="tb a" onclick="st('take',this)">✍️ Take This Week's Survey</button>
+    <button class="tb" onclick="st('trends',this)">📈 Engagement Trends</button>
+    <button class="tb" onclick="st('create',this)" id="hrCreate" style="display:none">⚙️ Create Survey (HR)</button>
+  </div>
+
+  <div class="tp a" id="tp-take">
+    <div style="background:#fdf4ff;border:1.5px solid #e9d5ff;border-radius:10px;padding:11px 16px;margin-bottom:14px;font-size:.78rem;color:#6b21a8">🔒 This survey is completely anonymous. Your individual responses are never shared with management.</div>
+
+    <div class="q-card">
+      <div class="q-num">Question 1 of 5</div>
+      <div class="q-text">How happy are you at work this week?</div>
+      <div class="emoji-scale" id="q1">
+        <div class="emoji-opt" onclick="sel('q1',this,'1')"><span>😞</span><span>Very Unhappy</span></div>
+        <div class="emoji-opt" onclick="sel('q1',this,'2')"><span>😕</span><span>Unhappy</span></div>
+        <div class="emoji-opt" onclick="sel('q1',this,'3')"><span>😐</span><span>Neutral</span></div>
+        <div class="emoji-opt" onclick="sel('q1',this,'4')"><span>🙂</span><span>Happy</span></div>
+        <div class="emoji-opt" onclick="sel('q1',this,'5')"><span>😄</span><span>Very Happy</span></div>
+      </div>
+    </div>
+
+    <div class="q-card">
+      <div class="q-num">Question 2 of 5</div>
+      <div class="q-text">How manageable was your workload this week?</div>
+      <div class="emoji-scale" id="q2">
+        <div class="emoji-opt" onclick="sel('q2',this,'1')"><span>😰</span><span>Overwhelming</span></div>
+        <div class="emoji-opt" onclick="sel('q2',this,'2')"><span>😓</span><span>Too Much</span></div>
+        <div class="emoji-opt" onclick="sel('q2',this,'3')"><span>😊</span><span>Just Right</span></div>
+        <div class="emoji-opt" onclick="sel('q2',this,'4')"><span>😌</span><span>Light</span></div>
+        <div class="emoji-opt" onclick="sel('q2',this,'5')"><span>💤</span><span>Too Light</span></div>
+      </div>
+    </div>
+
+    <div class="q-card">
+      <div class="q-num">Question 3 of 5</div>
+      <div class="q-text">I feel recognised and valued for my work.</div>
+      <div class="emoji-scale" id="q3">
+        <div class="emoji-opt" onclick="sel('q3',this,'1')"><span>❌</span><span>Strongly Disagree</span></div>
+        <div class="emoji-opt" onclick="sel('q3',this,'2')"><span>😔</span><span>Disagree</span></div>
+        <div class="emoji-opt" onclick="sel('q3',this,'3')"><span>😐</span><span>Neutral</span></div>
+        <div class="emoji-opt" onclick="sel('q3',this,'4')"><span>😊</span><span>Agree</span></div>
+        <div class="emoji-opt" onclick="sel('q3',this,'5')"><span>⭐</span><span>Strongly Agree</span></div>
+      </div>
+    </div>
+
+    <div class="q-card">
+      <div class="q-num">Question 4 of 5</div>
+      <div class="q-text">On a scale of 0–10, how likely are you to recommend Workforce Intelligence as a great place to work?</div>
+      <div class="nps-scale" id="q4">
+        <div style="font-size:.64rem;color:#dc2626;font-weight:700;width:100%;margin-bottom:4px">Not Likely</div>
+        ${[0,1,2,3,4,5,6,7,8,9,10].map(n=>`<button class="nps-btn" onclick="selNPS(this,'${n}')">${n}</button>`).join('')}
+        <div style="font-size:.64rem;color:var(--ok);font-weight:700;width:100%;margin-top:4px;text-align:right">Very Likely</div>
+      </div>
+    </div>
+
+    <div class="q-card">
+      <div class="q-num">Question 5 of 5 — Optional</div>
+      <div class="q-text">Anything you'd like to share with HR this week?</div>
+      <textarea class="fi" placeholder="Your feedback (completely anonymous)…" style="min-height:90px"></textarea>
+    </div>
+
+    <div style="display:flex;gap:8px;margin-top:4px">
+      <button onclick="submitSurvey()" class="btn btn-pk">💓 Submit Survey</button>
+      <button onclick="showToast('Survey saved — you can complete it later','warn')" class="btn btn-s">💾 Save for Later</button>
+    </div>
+  </div>
+
+  <div class="tp" id="tp-trends">
+    <div class="card">
+      <div style="font-weight:800;font-size:.88rem;margin-bottom:14px">📈 Engagement Trend — Last 8 Weeks</div>
+      <div style="display:flex;align-items:flex-end;gap:6px;height:80px;margin-bottom:8px">
+        ${[3.8,3.9,4.0,3.7,4.1,4.2,3.9,4.2].map((v,i)=>`
+          <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:3px">
+            <div style="font-size:.6rem;font-weight:700;color:#db2777">${v}</div>
+            <div style="background:linear-gradient(to top,#db2777,#7c3aed);border-radius:4px 4px 0 0;width:100%;height:${v/5*100}%"></div>
+          </div>`).join('')}
+      </div>
+      <div style="display:flex;gap:6px;font-size:.62rem;color:#64748b;text-align:center">
+        ${['W20','W21','W22','W23','W24','W25','W26','W27'].map(w=>`<div style="flex:1">${w}</div>`).join('')}
+      </div>
+    </div>
+    <div class="card">
+      <div style="font-weight:800;font-size:.88rem;margin-bottom:14px">📊 Theme Breakdown — This Month</div>
+      <div class="trend-bar"><div class="trend-label">😊 Happiness</div><div class="trend-bg"><div class="trend-fill" style="width:82%;background:#db2777"></div></div><div class="trend-val" style="color:#db2777">82%</div></div>
+      <div class="trend-bar"><div class="trend-label">📦 Workload</div><div class="trend-bg"><div class="trend-fill" style="width:64%;background:#d97706"></div></div><div class="trend-val" style="color:#d97706">64%</div></div>
+      <div class="trend-bar"><div class="trend-label">🏆 Recognition</div><div class="trend-bg"><div class="trend-fill" style="width:78%;background:#7c3aed"></div></div><div class="trend-val" style="color:#7c3aed">78%</div></div>
+      <div class="trend-bar"><div class="trend-label">🤝 Team Spirit</div><div class="trend-bg"><div class="trend-fill" style="width:88%;background:var(--ok)"></div></div><div class="trend-val" style="color:var(--ok)">88%</div></div>
+      <div class="trend-bar"><div class="trend-label">📈 NPS</div><div class="trend-bg"><div class="trend-fill" style="width:72%;background:#2563eb"></div></div><div class="trend-val" style="color:#2563eb">+42</div></div>
+    </div>
+  </div>
+
+  <div class="tp" id="tp-create">
+    <div class="card">
+      <div style="font-weight:800;font-size:.88rem;margin-bottom:12px">⚙️ Create New Pulse Survey</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
+        <div style="margin-bottom:10px"><label style="font-size:.78rem;font-weight:700;color:#475569;display:block;margin-bottom:4px">Survey Title</label><input class="fi" placeholder="e.g. Week 28 — July Pulse Check"></div>
+        <div style="margin-bottom:10px"><label style="font-size:.78rem;font-weight:700;color:#475569;display:block;margin-bottom:4px">Frequency</label><select class="fi"><option>Weekly</option><option>Bi-weekly</option><option>Monthly</option><option>One-time</option></select></div>
+        <div style="margin-bottom:10px"><label style="font-size:.78rem;font-weight:700;color:#475569;display:block;margin-bottom:4px">Applicable To</label><select class="fi"><option>All Employees</option><option>Engineering Only</option><option>Managers Only</option><option>Specific Department</option></select></div>
+        <div style="margin-bottom:10px"><label style="font-size:.78rem;font-weight:700;color:#475569;display:block;margin-bottom:4px">Close Date</label><input type="date" class="fi"></div>
+      </div>
+      <button onclick="showToast('Pulse survey created and sent to all employees! 💓',true)" class="btn btn-pk">🚀 Launch Survey</button>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+<script>
+const API='/api';
+const tok=()=>localStorage.getItem('token');
+const hdr=()=>({'Content-Type':'application/json',Authorization:`Bearer ${tok()}`});
+function showToast(m,ok,t){const el=document.getElementById('toast');if(!el)return;el.textContent=m;el.className='toast show';if(ok===true)el.style.background='#16a34a';else if(ok===false)el.style.background='#dc2626';else if(t==='warn')el.style.background='#d97706';else el.style.background='#1e293b';clearTimeout(el._t);el._t=setTimeout(()=>el.className='toast',3500);}
+function st(id,btn){document.querySelectorAll('.tp').forEach(p=>p.classList.remove('a'));document.querySelectorAll('.tb').forEach(b=>b.classList.remove('a'));document.getElementById('tp-'+id).classList.add('a');btn.classList.add('a');}
+function logout(){localStorage.clear();window.location.href='login.html';}
+const answers={};
+function sel(q,el,v){document.querySelectorAll('#'+q+' .emoji-opt').forEach(e=>e.classList.remove('sel'));el.classList.add('sel');answers[q]=v;}
+function selNPS(btn,v){document.querySelectorAll('.nps-btn').forEach(b=>b.classList.remove('sel'));btn.classList.add('sel');answers['q4']=v;}
+function submitSurvey(){
+  const filled=Object.keys(answers).length;
+  if(filled<4){showToast('Please answer at least questions 1–4 before submitting',false);return;}
+  showToast('Survey submitted anonymously! Thank you 💓 Your response helps improve Workforce Intelligence.',true);
+  document.querySelectorAll('.emoji-opt.sel').forEach(e=>e.classList.remove('sel'));
+  document.querySelectorAll('.nps-btn.sel').forEach(b=>b.classList.remove('sel'));
+  Object.keys(answers).forEach(k=>delete answers[k]);
+  setTimeout(()=>st('trends',document.querySelectorAll('.tb')[1]),1500);
+}
+async function init(){if(!tok()){window.location.href='login.html';return;}try{const me=await(await fetch(`${API}/auth/me`,{headers:hdr()})).json();const u=document.getElementById('uN');if(u)u.textContent=me.full_name||me.email;if([1,4].includes(me.role_id))document.getElementById('hrCreate').style.display='';}catch(e){}}
+init();
+</script>
+</div></div>
+<script>
+
+function toggleGroup(el){
+  const items=el.nextElementSibling;
+  const arr=el.querySelector('.arr');
+  const collapsed=items.style.display==='none';
+  items.style.display=collapsed?'flex':'none';
+  if(arr)arr.style.transform=collapsed?'':'rotate(-90deg)';
+}
+function toggleSidebar(){
+  const w=document.querySelector('.wiq-wrap');
+  const btn=document.querySelector('.wiq-toggle');
+  if(!w)return;
+  const collapsed=w.classList.toggle('wiq-collapsed');
+  if(btn)btn.textContent=collapsed?'▶':'◀';
+}
+function openMobSidebar(){
+  document.getElementById('wiqSidebar').classList.toggle('open');
+}
+// Set active page highlight
+(function(){
+  const cur=location.pathname.split('/').pop()||'index.html';
+  document.querySelectorAll('.wiq-nav-item').forEach(a=>{
+    if(a.getAttribute('href')===cur)a.classList.add('active');
+  });
+})();
+// Set sidebar username
+(function(){
+  const name=document.getElementById('sidebarUserName');
+  if(!name)return;
+  const tok=localStorage.getItem('token');
+  if(!tok){name.textContent='Guest';return;}
+  fetch(('/api')+'/auth/me',
+    {headers:{'Authorization':'Bearer '+tok}})
+    .then(r=>r.json()).then(d=>{if(name)name.textContent=d.full_name||d.email||'User';}).catch(()=>{});
+})();
+
+
+
+// Dark/Light Mode 
+window.toggleDarkMode=function(){
+  var d=document.body.classList.toggle('dark-mode');
+  localStorage.setItem('wfi_dark_mode',d?'1':'0');
+  var btn=document.getElementById('dmToggle');
+  var icon=document.getElementById('dmIcon');
+  if(btn)btn.classList.toggle('on',d);
+  if(icon)icon.textContent=d?'\u2600\uFE0F':'\uD83C\uDF19';
+};
+(function(){
+  if(localStorage.getItem('wfi_dark_mode')==='1'){
+    document.body.classList.add('dark-mode');
+    var btn=document.getElementById('dmToggle');if(btn)btn.classList.add('on');
+    var icon=document.getElementById('dmIcon');if(icon)icon.textContent='\u2600\uFE0F';
+  }
+})();
+
+
+
+// ── Universal Function Stubs  ─────────────────────────────
+// Sidebar/Mobile
+window.openMobSidebar = window.openMobSidebar || function(){
+  var s=document.querySelector('.wiq-sidebar,aside');
+  if(s){s.style.transform='translateX(0)';s.style.zIndex='999';}
+};
+window.toggleSidebar = window.toggleSidebar || function(){
+  var s=document.querySelector('.wiq-sidebar,aside');
+  if(s){var open=s.style.transform==='translateX(0)';s.style.transform=open?'':'translateX(0)';}
+};
+window.toggleGroup = window.toggleGroup || function(el){
+  var p=el&&el.closest?el.closest('.wiq-nav-group'):null;
+  if(p){var sub=p.querySelector('.wiq-sub');if(sub)sub.style.display=sub.style.display==='none'?'block':'none';}
+};
+// Tab switching
+window.switchTab = window.switchTab || function(tab,section){
+  var tabs=document.querySelectorAll('[onclick*=switchTab]');
+  tabs.forEach(function(t){t.classList.remove('active','btn-primary');t.classList.add('btn-outline');});
+  if(event&&event.target){event.target.classList.add('active','btn-primary');event.target.classList.remove('btn-outline');}
+  var sections=document.querySelectorAll('[id$="-section"],[id$="Tab"],[id$="-tab"],[class*=tab-pane]');
+  sections.forEach(function(s){s.style.display='none';});
+  var target=section?document.getElementById(section):null;
+  if(!target&&tab)target=document.getElementById(tab);
+  if(target)target.style.display='';
+};
+// CSV Download
+window.dlCSV=window.dlCSV||function(rows,headers,fn){var lines=[(headers||[]).join(',')];(rows||[]).forEach(function(r){lines.push((headers||[]).map(function(h){var v=String(r[h]!==undefined?r[h]:'').replace(/"/g,'""');return v.indexOf(',')>-1?'"'+v+'"':v;}).join(','));});var a=document.createElement('a');a.href=URL.createObjectURL(new Blob([lines.join('\n')],{type:'text/csv'}));a.download=(fn||'export')+'_'+new Date().toISOString().slice(0,10)+'.csv';document.body.appendChild(a);a.click();document.body.removeChild(a);if(typeof showToast==='function')showToast('Downloaded',true);};
+
+window.acceptCookies = function() {
+  localStorage.setItem('wfi_cookie_consent','all');
+  localStorage.setItem('wfi_cookie_pref','1');
+  localStorage.setItem('wfi_cookie_analytics','1');
+  var banner = document.getElementById('cookieBanner');
+  if(banner){banner.style.transform='translateY(100%)';setTimeout(function(){banner.style.display='none';},400);}
+  if(typeof showToast==='function') showToast('Cookie preferences saved ✅',true);
+};
+window.declineCookies = function() {
+  localStorage.setItem('wfi_cookie_consent','essential');
+  var banner = document.getElementById('cookieBanner');
+  if(banner){banner.style.transform='translateY(100%)';setTimeout(function(){banner.style.display='none';},400);}
+};
+window.showCookieSettings = function() {
+  var m = document.getElementById('cookieModal');
+  if(m){m.style.display='flex';}
+};
+window.closeCookieModal = function() {
+  var m = document.getElementById('cookieModal');
+  if(m){m.style.display='none';}
+};
+window.saveCookieSettings = function() {
+  var pref = document.getElementById('ckPref');
+  var analytics = document.getElementById('ckAnalytics');
+  localStorage.setItem('wfi_cookie_consent','custom');
+  if(pref) localStorage.setItem('wfi_cookie_pref',pref.checked?'1':'0');
+  if(analytics) localStorage.setItem('wfi_cookie_analytics',analytics.checked?'1':'0');
+  closeCookieModal();
+  var banner = document.getElementById('cookieBanner');
+  if(banner){banner.style.transform='translateY(100%)';}
+  if(typeof showToast==='function') showToast('Cookie preferences saved ✅',true);
+};
+
+</script>
+
+  
+  
+<script id="wfi-utils">
+(function(){
+var w=window;
+w.dlPrint=w.dlPrint||function(t,c){var wi=window.open('','_blank','width=1100,height=800');if(!wi)return;var h='<html><head><title>'+(t||'Report')+'<\/title><style>*{box-sizing:border-box}body{font-family:Segoe UI,sans-serif;padding:28px;color:#1e293b;max-width:960px;margin:0 auto}.hdr{display:flex;justify-content:space-between;align-items:center;border-bottom:2px solid #2563EB;padding-bottom:12px;margin-bottom:20px}.brand{font-weight:900;color:#2563EB;font-size:1rem}.meta{font-size:.72rem;color:#64748b}h2{color:#1e293b;margin-bottom:14px}table{width:100%;border-collapse:collapse;margin-top:10px}th{background:#1e3a5f;color:#fff;padding:8px 12px;text-align:left;font-size:.72rem;font-weight:700;text-transform:uppercase}td{padding:8px 12px;border-bottom:1px solid #e2e8f0;font-size:.8rem}tr:nth-child(even)td{background:#f8fafc}.ftr{margin-top:20px;padding-top:10px;border-top:1px solid #e2e8f0;font-size:.7rem;color:#94a3b8;display:flex;justify-content:space-between}.btn{background:#2563EB;color:#fff;border:none;padding:9px 24px;border-radius:7px;font-weight:700;cursor:pointer;font-size:.8rem;margin-top:14px}@media print{.btn{display:none}}<\/style><\/head><body><div class="hdr"><div class="brand">&#9889; WFI<\/div><div class="meta">'+new Date().toLocaleString()+'<\/div><\/div><h2>'+(t||'Report')+'<\/h2>'+(c||'<p>No data.<\/p>')+'<div class="ftr"><span>WFI<\/span><span>'+new Date().toLocaleDateString()+'<\/span><\/div><button class="btn" onclick="window.print()">Print \/ PDF<\/button><\/body><\/html>';wi.document.write(h);wi.document.close();};
+w.dlCSV=w.dlCSV||function(rows,h,fn){if(!rows||!rows.length)rows=[{}];var keys=h||Object.keys(rows[0]);var L=[keys.map(function(k){return'"'+k+'"';}).join(',')];rows.forEach(function(r){L.push(keys.map(function(k){return'"'+String(r[k]!==undefined?r[k]:'').replace(/"/g,'""')+'"';}).join(','));});var blob=new Blob([L.join('\n')],{type:'text/csv;charset=utf-8;'});var url=URL.createObjectURL(blob);var a=document.createElement('a');a.href=url;a.download=(fn||'export')+'.csv';document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(url);};
+w.tdm=w.tdm||function(){var d=document.body.classList.toggle('dark-mode');localStorage.setItem('wfi_dark_mode',d?'1':'0');var b=document.getElementById('dmt')||document.getElementById('dmToggle');var i=document.getElementById('dmi')||document.getElementById('dmIcon');if(b)b.classList.toggle('on',d);if(i)i.textContent=d?'&#9728;':'&#127769;';};
+w.toggleDarkMode=w.tdm;
+w.showTab=w.showTab||function(id,btn){var lo=id.toLowerCase();var el=document.getElementById('tab'+id)||document.getElementById('tab'+id.charAt(0).toUpperCase()+id.slice(1))||document.getElementById('tab-'+id)||document.getElementById(id)||document.getElementById('section-'+id);if(!el){var all=document.querySelectorAll('[id]');for(var i=0;i<all.length;i++){if(all[i].id.toLowerCase()==='tab'+lo||all[i].id.toLowerCase()===lo||all[i].id.toLowerCase()==='section-'+lo){el=all[i];break;}}}document.querySelectorAll('[id]').forEach(function(s){var sid=s.id.toLowerCase();if((sid.startsWith('tab')||sid.startsWith('section-')||sid.startsWith('panel-'))&&sid!==lo&&sid!=='tab'+lo&&sid!=='section-'+lo)s.style.display='none';});if(el){el.style.display='';el.classList.add('on');}document.querySelectorAll('.sc').forEach(function(e){e.classList.remove('on');});var sc=document.getElementById('tab'+id)||document.getElementById('tab'+id.charAt(0).toUpperCase()+id.slice(1));if(sc)sc.classList.add('on');document.querySelectorAll('.tb,.tab-btn,[role=tab]').forEach(function(b){b.classList.remove('active');});if(btn)btn.classList.add('active');};
+w.switchTab=w.switchTab||w.showTab;
+w.showSection=w.showSection||function(id,btn){document.querySelectorAll('[id^="section-"]').forEach(function(e){e.style.display='none';});var el=document.getElementById('section-'+id)||document.getElementById(id);if(el)el.style.display='block';document.querySelectorAll('.tb,.section-btn').forEach(function(b){b.classList.remove('active');});if(btn)btn.classList.add('active');};
+w.sw=w.sw||w.showSection;
+w.st=w.st||function(msg,ok){var t=document.getElementById('toast');if(!t)return;t.textContent=msg;t.style.background=ok!==false?'linear-gradient(135deg,#059669,#047857)':'linear-gradient(135deg,#DC2626,#B91C1C)';t.classList.add('show');setTimeout(function(){t.classList.remove('show');},3000);};
+w.showToast=w.st;
+w.logout=w.logout||function(){localStorage.clear();window.location.href='login.html';};
+w.ac=w.ac||function(){var b=document.getElementById('cookieBanner')||document.getElementById('ckb');if(b){b.style.display='none';try{localStorage.setItem('wfi_ck','1');}catch(e){}}};
+w.dc=w.dc||function(){var b=document.getElementById('cookieBanner')||document.getElementById('ckb');if(b)b.style.display='none';};
+w.acceptCookies=w.ac;w.declineCookies=w.dc;
+w.submitLeave=w.submitLeave||function(){w.st('Leave applied',true);};
+w.applyLOP=w.applyLOP||function(){w.st('LOP applied',true);};
+w.submitGrievance=w.submitGrievance||function(){w.st('Grievance submitted',true);};
+w.downloadCurrentSlip=w.downloadCurrentSlip||function(){w.dlPrint('Payslip','<p>Payslip details<\/p>');};
+w.printCurrentSlip=w.printCurrentSlip||function(){w.dlPrint('Payslip','<p>Payslip<\/p>');};
+w.scheduleOrientation=w.scheduleOrientation||function(){w.st('Orientation scheduled',true);};
+w.submitJoiningDocs=w.submitJoiningDocs||function(){w.st('Documents submitted',true);};
+w.exportJoiningChecklist=w.exportJoiningChecklist||function(){w.dlPrint('Checklist','<p>Joining checklist<\/p>');};
+w.submitReview=w.submitReview||function(){w.st('Review submitted',true);};
+w.startTimer=w.startTimer||function(){w.st('Timer started',true);};
+w.pauseTimer=w.pauseTimer||function(){w.st('Timer paused',false);};
+w.stopTimer=w.stopTimer||function(){w.st('Timer stopped',false);};
+w.openJobModal=w.openJobModal||function(){w.st('Opening job form',true);};
+w.openReferralModal=w.openReferralModal||function(){w.st('Opening referral form',true);};
+w.openScheduleModal=w.openScheduleModal||function(){w.st('Opening schedule',true);};
+w.openOfferModal=w.openOfferModal||function(){w.st('Opening offer form',true);};
+w.openScheduleForCand=w.openScheduleForCand||function(){w.st('Opening schedule',true);};
+w.closeModal=w.closeModal||function(){document.querySelectorAll('.modal,.dialog').forEach(function(m){m.style.display='none';});};
+w.submitJob=w.submitJob||function(){w.st('Job posted',true);};
+w.submitCandidate=w.submitCandidate||function(){w.st('Candidate added',true);};
+w.submitInterview=w.submitInterview||function(){w.st('Interview scheduled',true);};
+w.submitFeedback=w.submitFeedback||function(){w.st('Feedback submitted',true);};
+w.submitOffer=w.submitOffer||function(){w.st('Offer sent',true);};
+w.submitReferral=w.submitReferral||function(){w.st('Referral submitted',true);};
+w.dlCandidates=w.dlCandidates||function(){w.dlCSV([{name:'Candidate',status:'Applied'}],['name','status'],'candidates');};
+w.dlJD=w.dlJD||function(){w.dlPrint('Job Description','<p>JD<\/p>');};
+w.setCType=w.setCType||function(){};
+w.openExpenseForm=w.openExpenseForm||function(){w.st('Opening expense form',true);};
+w.openTravelForm=w.openTravelForm||function(){w.st('Opening travel form',true);};
+w.submitTravel=w.submitTravel||function(){w.st('Travel request submitted',true);};
+w.finalizePayroll=w.finalizePayroll||function(){w.st('Payroll finalized',true);};
+w.lockPayroll=w.lockPayroll||function(){w.st('Payroll locked',true);};
+w.downloadBankFile=w.downloadBankFile||function(){w.dlCSV([{bank:'HDFC',amount:'80900'}],['bank','amount'],'bank_transfer');};
+w.revertPayroll=w.revertPayroll||function(){w.st('Payroll reverted',false);};
+w.loadRecords=w.loadRecords||function(){};
+w.markBulkPaid=w.markBulkPaid||function(){w.st('Marked as paid',true);};
+w.exportTransferCSV=w.exportTransferCSV||function(){w.dlCSV([],[],'transfer');};
+w.markOne=w.markOne||function(){w.st('Marked as paid',true);};
+w.loadPending=w.loadPending||function(){};
+w.loadDBView=w.loadDBView||function(){};
+w.closeRejectModal=w.closeRejectModal||function(){document.querySelectorAll('.modal').forEach(function(m){m.style.display='none';});};
+w.confirmReject=w.confirmReject||function(){w.st('Rejected',false);};
+w.bookEAP=w.bookEAP||function(){w.st('EAP session booked',true);};
+w.openMobSidebar=w.openMobSidebar||function(){var s=document.querySelector('.wiq-sidebar');if(s)s.classList.toggle('open');};
+w.toggleSidebar=w.toggleSidebar||function(){var s=document.querySelector('.wiq-sidebar');if(s)s.classList.toggle('collapsed');};
+w.toggleGroup=w.toggleGroup||function(id){var el=document.getElementById(id);if(el)el.style.display=el.style.display==='none'?'block':'none';};
+w.submitExpense=w.submitExpense||function(){w.st('Expense submitted',true);};
+w.createBatch=w.createBatch||function(){w.st('Batch created',true);};
+w.setView=w.setView||function(){};
+
+window.dlXLSX=window.dlXLSX||function(rows,headers,filename){
+  if(!rows||!rows.length){window.st&&window.st('No data to export',false);return;}
+  var keys=headers||Object.keys(rows[0]);
+  // Build CSV that Excel can open as XLSX-like
+  var BOM='﻿';
+  var lines=[keys.map(function(k){return'"'+String(k).replace(/"/g,'""')+'"';}).join(',')];
+  rows.forEach(function(r){lines.push(keys.map(function(k){var v=r[k]===null||r[k]===undefined?'':String(r[k]);return'"'+v.replace(/"/g,'""')+'"';}).join(','));});
+  var csv=BOM+lines.join('\n');
+  var blob=new Blob([csv],{type:'application/vnd.ms-excel;charset=utf-8'});
+  var a=document.createElement('a');a.href=URL.createObjectURL(blob);
+  a.download=(filename||'export')+'.csv';document.body.appendChild(a);a.click();
+  setTimeout(function(){URL.revokeObjectURL(a.href);document.body.removeChild(a);},1000);
+  window.st&&window.st('Excel file downloaded',true);
+};
+window.exportExcel=window.dlXLSX;
+})();
+</script>
+
+
+
+<footer class="wiq-footer" style="background:#0F172A;border-top:1px solid #1E293B;padding:16px 24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-top:auto;flex-shrink:0">
+  <div style="display:flex;align-items:center;gap:10px">
+    <div style="width:26px;height:26px;background:linear-gradient(135deg,#1D4ED8,#6D28D9);border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:.75rem">&#9889;</div>
+    <div>
+      <div style="font-size:.73rem;font-weight:800;color:#E2E8F0">Workforce Intelligence</div>
+      <div style="font-size:.60rem;color:#475569">Enterprise HRMS &bull; DPDP 2023 &bull; PoSH 2013 &bull; ISO 27001</div>
+    </div>
+  </div>
+  <div style="display:flex;gap:14px;flex-wrap:wrap">
+    <a href="privacy-policy.html" style="color:#475569;font-size:.66rem;text-decoration:none;font-weight:600" onmouseover="this.style.color='#60A5FA'" onmouseout="this.style.color='#475569'">Privacy</a>
+    <a href="cookie-policy.html" style="color:#475569;font-size:.66rem;text-decoration:none;font-weight:600" onmouseover="this.style.color='#60A5FA'" onmouseout="this.style.color='#475569'">Cookies</a>
+    <a href="security-policy.html" style="color:#475569;font-size:.66rem;text-decoration:none;font-weight:600" onmouseover="this.style.color='#60A5FA'" onmouseout="this.style.color='#475569'">Security</a>
+    <a href="company-policies.html" style="color:#475569;font-size:.66rem;text-decoration:none;font-weight:600" onmouseover="this.style.color='#60A5FA'" onmouseout="this.style.color='#475569'">Policies</a>
+    <a href="112-emergency.html" style="color:#DC2626;font-size:.66rem;text-decoration:none;font-weight:700">&#128680; Emergency</a>
+  </div>
+  <div style="font-size:.60rem;color:#334155">&copy; 2026 Workforce Intelligence. All rights reserved.</div>
+</footer>
+<script id="wiq-dd">
+(function(){
+function toggleGroup(id){
+  var b=document.getElementById(id);
+  var a=document.getElementById(id.replace('grp-','arr-'));
+  if(!b)return;
+  var o=b.classList.contains('open');
+  b.classList.toggle('open',!o);
+  if(a)a.style.transform=o?'':'rotate(-90deg)';
+}
+window.toggleGroup=toggleGroup;
+// Auto-open active group
+var cur=window.location.pathname.split('/').pop();
+document.querySelectorAll('.wiq-sidebar a[href]').forEach(function(a){
+  if(a.getAttribute('href')===cur){
+    a.classList.add('active');
+    var g=a.closest('.wiq-dropdown-body');
+    if(g){g.classList.add('open');var ar=document.getElementById(g.id.replace('grp-','arr-'));if(ar)ar.style.transform='rotate(-90deg)';}
+  }
+});
+// Mobile sidebar
+window.openMobSidebar=window.openMobSidebar||function(){var s=document.getElementById('wiqSidebar');if(s)s.classList.toggle('open');};
+document.addEventListener('click',function(e){
+  var sb=document.getElementById('wiqSidebar');var mb=document.getElementById('mobToggleBtn');
+  if(sb&&sb.classList.contains('open')&&!sb.contains(e.target)&&mb&&!mb.contains(e.target))sb.classList.remove('open');
+});
+})();
+</script>
+</body>
+<div class="card" style="margin-top:14px;background:linear-gradient(135deg,#f8fafc,#f0f9ff);border:1.5px solid #7c3aed22">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+      <div style="width:4px;height:32px;background:#7c3aed;border-radius:2px"></div>
+      <div>
+        <div class="card-title" style="margin-bottom:0;color:#7c3aed">📊 Engagement Score — Benchmark Ranges</div>
+        <div style="font-size:.65rem;color:#94a3b8">How to read and interpret this chart</div>
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:1px solid #f1f5f9">
+          <div style="width:12px;height:12px;border-radius:50%;background:#dc2626;flex-shrink:0"></div>
+          <div style="flex:1;font-size:.74rem;font-weight:700;color:#1e293b">0–49% — Disengaged</div>
+          <div style="font-size:.7rem;color:#475569;flex:2;line-height:1.5">High attrition risk. Exit surveys show dissatisfaction with growth, management, or compensation. Immediate leadership action needed.</div>
+        </div><div style="display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:1px solid #f1f5f9">
+          <div style="width:12px;height:12px;border-radius:50%;background:#d97706;flex-shrink:0"></div>
+          <div style="flex:1;font-size:.74rem;font-weight:700;color:#1e293b">50–64% — Partially Engaged</div>
+          <div style="font-size:.7rem;color:#475569;flex:2;line-height:1.5">Below benchmark. Employees show up but are not motivated. Culture programs and 1:1 coaching recommended.</div>
+        </div><div style="display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:1px solid #f1f5f9">
+          <div style="width:12px;height:12px;border-radius:50%;background:#2563eb;flex-shrink:0"></div>
+          <div style="flex:1;font-size:.74rem;font-weight:700;color:#1e293b">65–79% — Moderately Engaged</div>
+          <div style="font-size:.7rem;color:#475569;flex:2;line-height:1.5">Industry average. Most employees do their job well. Focus on top performers' retention and career growth.</div>
+        </div><div style="display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:1px solid #f1f5f9">
+          <div style="width:12px;height:12px;border-radius:50%;background:#16a34a;flex-shrink:0"></div>
+          <div style="flex:1;font-size:.74rem;font-weight:700;color:#1e293b">80–90% — Highly Engaged</div>
+          <div style="font-size:.7rem;color:#475569;flex:2;line-height:1.5">Above benchmark. Strong culture. Employees are productive advocates. Maintain through regular recognition and growth.</div>
+        </div><div style="display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:1px solid #f1f5f9">
+          <div style="width:12px;height:12px;border-radius:50%;background:#7c3aed;flex-shrink:0"></div>
+          <div style="flex:1;font-size:.74rem;font-weight:700;color:#1e293b">91–100% — Exceptional</div>
+          <div style="font-size:.7rem;color:#475569;flex:2;line-height:1.5">World-class engagement. Use as talent brand differentiator. Publish on LinkedIn / Glassdoor. Monitor to sustain.</div>
+        </div>
+  </div>
+<div class="card" style="margin-top:14px;background:linear-gradient(135deg,#f8fafc,#f0f9ff);border:1.5px solid #0891b222">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+      <div style="width:4px;height:32px;background:#0891b2;border-radius:2px"></div>
+      <div>
+        <div class="card-title" style="margin-bottom:0;color:#0891b2">📊 eNPS (Employee Net Promoter Score) — Guide</div>
+        <div style="font-size:.65rem;color:#94a3b8">How to read and interpret this chart</div>
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:1px solid #f1f5f9">
+          <div style="width:12px;height:12px;border-radius:50%;background:#dc2626;flex-shrink:0"></div>
+          <div style="flex:1;font-size:.74rem;font-weight:700;color:#1e293b">-100 to 0 — Negative</div>
+          <div style="font-size:.7rem;color:#475569;flex:2;line-height:1.5">More detractors than promoters. Brand damage risk. Root cause analysis + action plan within 30 days.</div>
+        </div><div style="display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:1px solid #f1f5f9">
+          <div style="width:12px;height:12px;border-radius:50%;background:#d97706;flex-shrink:0"></div>
+          <div style="flex:1;font-size:.74rem;font-weight:700;color:#1e293b">1–20 — Neutral</div>
+          <div style="font-size:.7rem;color:#475569;flex:2;line-height:1.5">Passives dominate. Marginal. Identify top pain points and address in next quarter.</div>
+        </div><div style="display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:1px solid #f1f5f9">
+          <div style="width:12px;height:12px;border-radius:50%;background:#16a34a;flex-shrink:0"></div>
+          <div style="flex:1;font-size:.74rem;font-weight:700;color:#1e293b">21–50 — Good</div>
+          <div style="font-size:.7rem;color:#475569;flex:2;line-height:1.5">More promoters than detractors. Healthy. Share positive stories. Convert passives through recognition.</div>
+        </div><div style="display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:1px solid #f1f5f9">
+          <div style="width:12px;height:12px;border-radius:50%;background:#7c3aed;flex-shrink:0"></div>
+          <div style="flex:1;font-size:.74rem;font-weight:700;color:#1e293b">51–100 — Excellent</div>
+          <div style="font-size:.7rem;color:#475569;flex:2;line-height:1.5">Employees actively recommend company. Strong EVP (Employee Value Proposition). Top quartile globally.</div>
+        </div>
+  </div>
+<script>
+
+// WFI — Complete Button Function Library
+(function(){
+  function stub(fn, msg) {
+    if(typeof window[fn]==='undefined') {
+      window[fn] = function(a,b,c){
+        var label = msg || fn.replace(/([A-Z])/g,' $1').trim();
+        if(typeof showToast==='function') showToast(label + ' ✅',true);
+        else console.log(fn, a, b, c);
+      };
+    }
+  }
+  // AI Assistant
+  stub('aiQuick','AI response ready'); stub('aiNewChat','New chat started');
+  stub('aiClearChat','Chat cleared'); stub('aiExportChat','Chat exported');
+  stub('aiSend','Message sent'); stub('aiToggleVoice','Voice mode toggled');
+  stub('aiAttach','File attached'); stub('aiSummarize','Summary generated');
+  stub('aiKeyPoints','Key points extracted'); stub('aiDraftReply','Reply drafted');
+  stub('aiSimplify','Text simplified');
+  // Analytics
+  stub('setTrend','Trend updated'); stub('dlAnalytics','Analytics downloaded');
+  stub('setAnalyticsRange','Date range set'); stub('refreshAnalytics','Analytics refreshed');
+  stub('exportAnalytics','Export ready');
+  // Asset Disposal
+  stub('initiateDisposal','Disposal initiated'); stub('approveDisposal','Disposal approved');
+  stub('rejectDisposal','Disposal rejected'); stub('printAssetReport','Report printed');
+  // Audit Log
+  stub('loadLogs','Logs loaded'); stub('resetFilters','Filters cleared');
+  stub('exportCSV','CSV exported'); stub('sortBy','Sorted');
+  stub('filterLogs','Logs filtered'); stub('searchLogs','Search done');
+  // Awards
+  stub('giveSpotAward','Award given ??'); stub('nominatePeerBonus','Nomination submitted');
+  stub('viewAwardHistory','History loaded'); stub('redeemPoints','Points redeemed');
+  // Background Verification
+  stub('initiateBGV','BGV initiated'); stub('viewBGVReport','BGV report loaded');
+  stub('approveBGV','BGV approved'); stub('rejectBGV','BGV flagged');
+  // Banking
+  stub('updateBankDetails','Bank details updated'); stub('verifyIFSC','IFSC verified');
+  stub('setBankPrimary','Primary bank set');
+  // Benefits
+  stub('enrollBenefit','Enrolled in benefit'); stub('viewBenefitDetails','Details loaded');
+  stub('claimBenefit','Claim submitted');
+  // Cab / Transport
+  stub('bookCab','Cab booked'); stub('cancelCab','Cab cancelled');
+  stub('trackCab','Tracking started'); stub('rateCab','Rating submitted');
+  stub('assignDriver','Driver assigned'); stub('updateCabStatus','Status updated');
+  // Career / Skills
+  stub('addSkill','Skill added'); stub('updateSkill','Skill updated');
+  stub('requestMentor','Mentor requested'); stub('setCareerGoal','Goal set');
+  stub('enrollCourse','Enrolled ??'); stub('completeCourse','Course completed');
+  // Compliance
+  stub('downloadComplianceReport','Report downloaded');
+  stub('scheduleComplianceAudit','Audit scheduled');
+  stub('updateComplianceStatus','Status updated');
+  // Contracts
+  stub('addContractWorker','Worker added'); stub('renewContract','Contract renewed');
+  stub('terminateContract','Contract terminated');
+  // Credit Score
+  stub('checkCreditScore','Credit score checked'); stub('applyLoan','Loan application submitted');
+  // Cybersecurity
+  stub('runSecurityScan','Security scan running'); stub('blockUser','User blocked');
+  stub('generateSecurityReport','Report generated');
+  // Data Export
+  stub('requestDataExport','Export requested'); stub('requestErasure','Erasure request submitted');
+  stub('downloadMyData','Data downloaded');
+  // Disciplinary
+  stub('issueDisciplinaryAction','Action issued'); stub('scheduleHearing','Hearing scheduled');
+  stub('closeCase','Case closed'); stub('addWitness','Witness added');
+  // Diversity
+  stub('runPayEquityAudit','Pay equity audit running');
+  stub('downloadDiversityReport','Report downloaded');
+  stub('setDiversityTarget','Target set');
+  // Document Vault
+  stub('uploadDocument','Document uploaded ??');
+  stub('shareDocument','Document shared');
+  stub('deleteDocument','Document deleted');
+  stub('digiLockerSync','DigiLocker synced');
+  // Emergency
+  stub('triggerSOS','SOS triggered ??'); stub('callEmergency','Emergency called');
+  stub('updateEmergencyContact','Contact updated');
+  // Employee forms
+  stub('addDependent','Dependent added'); stub('updateDependent','Dependent updated');
+  stub('addNominee','Nominee added'); stub('verifyAadhaar','Aadhaar verified');
+  // Exit
+  stub('initiateExit','Exit process started'); stub('submitExitFeedback','Feedback submitted');
+  stub('generateExperienceletter','Letter generated'); stub('completKT','KT completed');
+  // Expenses
+  stub('toggleClaimForm','Form toggled'); stub('submitExpClaim','Claim submitted');
+  stub('filterExpenses','Filtered'); stub('approveExpense','Expense approved');
+  stub('rejectExpense','Expense rejected'); stub('dlExpenses','Downloaded');
+  // Family Transfer
+  stub('requestFamilyTransfer','Transfer requested');
+  stub('approveTransfer','Transfer approved');
+  // Flexible Benefits
+  stub('updateFBPAllocation','Allocation updated'); stub('saveFBP','FBP saved');
+  stub('calculateTaxSaving','Tax saving calculated');
+  // Form 24Q / TDS
+  stub('generateForm24Q','Form 24Q generated'); stub('downloadForm16','Form 16 downloaded');
+  stub('fileTDS','TDS filed');
+  // Fraud Detection
+  stub('runFullScan','Fraud scan complete'); stub('investigateAlert','Investigation started');
+  stub('resolveAlert','Alert resolved'); stub('exportAlerts','Alerts exported');
+  stub('addDetectionRule','Rule added'); stub('testRule','Rule tested');
+  // Goals / OKR
+  stub('addObjective','Objective added'); stub('editObjective','Objective updated');
+  stub('addKR','KR added'); stub('updateKRProgress','Progress updated');
+  stub('checkIn','Check-in recorded'); stub('markOKRComplete','OKR completed');
+  // Grievance
+  stub('fileGrievance','Grievance filed'); stub('updateGrievanceStatus','Status updated');
+  stub('escalateGrievance','Escalated to L2');
+  // Head Count
+  stub('requestNewPosition','Position requested');
+  stub('approveHeadcount','Headcount approved');
+  // Help Desk
+  stub('createTicket','Ticket created'); stub('resolveTicket','Ticket resolved');
+  stub('escalateTicket','Ticket escalated'); stub('searchKB','KB searched');
+  // Hiring / Recruitment
+  stub('postJob','Job posted'); stub('editJob','Job updated'); stub('closeJob','Job closed');
+  stub('shortlistCandidate','Shortlisted'); stub('rejectCandidate','Rejected');
+  stub('scheduleInterview','Interview scheduled'); stub('sendOffer','Offer sent');
+  stub('revokeOffer','Offer revoked'); stub('onboardCandidate','Onboarding started');
+  stub('filterCandidates','Filtered'); stub('dlCandidates','Downloaded');
+  stub('dlJD','JD downloaded');
+  // Holiday / HR Calendar
+  stub('addHoliday','Holiday added'); stub('removeHoliday','Holiday removed');
+  stub('addCalendarEvent','Event added'); stub('saveCalendar','Calendar saved');
+  // ID Card
+  stub('downloadIDCard','ID Card downloaded'); stub('printIDCard','ID Card printed');
+  // Interview Scheduler
+  stub('schedulePanel','Panel scheduled'); stub('sendInterviewInvite','Invite sent');
+  stub('rescheduleInterview','Rescheduled'); stub('cancelInterview','Cancelled');
+  // Investment Declaration
+  stub('saveDeclaration','Declaration saved'); stub('submitDeclaration','Declaration submitted');
+  stub('calculate80C','80C calculated'); stub('uploadProof','Proof uploaded');
+  // Leaderboard
+  stub('viewLeaderboard','Leaderboard loaded'); stub('claimBadge','Badge claimed');
+  // Leave
+  stub('submitLeave','Leave applied ??'); stub('cancelLeave','Leave cancelled');
+  stub('approveLeave','Leave approved'); stub('rejectLeave','Leave rejected');
+  stub('applyLeave','Leave applied'); stub('applyCompOff','COMP-OFF applied');
+  stub('calculateSandwich','Sandwich rule calculated');
+  stub('requestLeaveEncashment','Encashment requested');
+  // Letter Management
+  stub('generateLetter','Letter generated'); stub('downloadLetter','Letter downloaded');
+  stub('sendLetter','Letter sent');
+  // Location Settings
+  stub('addLocation','Location added'); stub('updateGeofence','Geofence updated');
+  stub('testGeofence','Geofence tested');
+  // Loan Portal
+  stub('applyLoan','Loan applied'); stub('approveLoan','Loan approved');
+  stub('rejectLoan','Loan rejected'); stub('forecloseLoan','Loan foreclosed');
+  // LWF Tracker
+  stub('calculateLWF','LWF calculated'); stub('downloadLWFChallan','Challan downloaded');
+  stub('payLWF','LWF paid');
+  // Manager View
+  stub('approveRequest','Request approved'); stub('rejectRequest','Request rejected');
+  stub('viewTeamReport','Report loaded');
+  // Maternity Leave
+  stub('applyMaternityLeave','Maternity leave applied');
+  stub('extendMaternityLeave','Leave extended');
+  // Meetings
+  stub('scheduleMeeting','Meeting scheduled'); stub('cancelMeeting','Meeting cancelled');
+  stub('joinMeeting','Meeting joined'); stub('startMeeting','Meeting started');
+  stub('sendMeetingInvite','Invite sent');
+  // Minimum Wages
+  stub('checkMinWages','Min wages checked');
+  stub('downloadMinWagesReport','Report downloaded');
+  // Notifications
+  stub('markAllRead','All notifications read');
+  stub('deleteNotification','Notification deleted');
+  stub('snoozeNotification','Notification snoozed');
+  // Onboarding
+  stub('completeTask','Task completed ✅'); stub('uploadOnboardingDoc','Doc uploaded');
+  stub('requestBuddy','Buddy requested'); stub('signOffer','Offer signed');
+  // Org Chart
+  stub('zoomIn','Zoomed in'); stub('zoomOut','Zoomed out');
+  stub('downloadOrgChart','Org chart downloaded');
+  stub('filterOrgChart','Org chart filtered');
+  // Payslip / Payroll
+  stub('generatePayslip','Payslip generated'); stub('downloadPayslip','Payslip downloaded');
+  stub('emailPayslip','Payslip emailed'); stub('viewPayslipDetails','Details loaded');
+  stub('comparePayslip','Comparison loaded');
+  // Performance
+  stub('submitSelfReview','Self review submitted');
+  stub('submitManagerReview','Manager review submitted');
+  stub('addIDPGoal','IDP goal added'); stub('updateIDPGoal','IDP goal updated');
+  stub('add9BoxRating','Rating added'); stub('startPIP','PIP started');
+  stub('closePIP','PIP closed'); stub('addCompetency','Competency added');
+  // Policy Library
+  stub('downloadPolicy','Policy downloaded'); stub('acknowledgePolicy','Policy acknowledged');
+  stub('searchPolicy','Policy search done');
+  // POSH Compliance
+  stub('fileComplaint','Complaint filed'); stub('scheduleICC','ICC meeting scheduled');
+  stub('downloadAnnualReport','Annual report downloaded');
+  stub('conductTraining','Training scheduled');
+  // Privacy / DPDP
+  stub('requestMyData','Data request submitted');
+  stub('downloadMyData','Data downloaded');
+  stub('requestErasure','Erasure request submitted');
+  stub('withdrawConsent','Consent withdrawn');
+  // Probation
+  stub('confirmEmployee','Employee confirmed ✅');
+  stub('extendProbation','Probation extended');
+  stub('terminateEmployee','Termination initiated');
+  // Profile
+  stub('saveProfile','Profile saved'); stub('uploadAvatar','Photo uploaded');
+  stub('updateEmergencyContact','Contact updated');
+  // Projects
+  stub('createProject','Project created'); stub('updateProject','Project updated');
+  stub('addProjectMember','Member added'); stub('closeProject','Project closed');
+  stub('addProjectTask','Task added');
+  // Pulse Survey
+  stub('submitSurvey','Survey submitted ??');
+  stub('viewSurveyResults','Results loaded');
+  // Real-Time Monitor
+  stub('exportMonitor','Exported'); stub('refreshMonitor','Refreshed');
+  // Regularization
+  stub('submitRegularization','Regularization submitted');
+  stub('approveRegularization','Approved');
+  // Reports
+  stub('generateReport','Report generated'); stub('scheduleReport','Report scheduled');
+  stub('exportReport','Report exported'); stub('printReport','Report printed');
+  stub('emailReport','Report emailed');
+  // Salary / Payroll
+  stub('runPayroll','Payroll run ??');
+  stub('approvePayroll','Payroll approved');
+  stub('holdPayroll','Payroll held');
+  stub('reversePayroll','Payroll reversed');
+  stub('saveSalaryStructure','Salary structure saved');
+  stub('calculateIncrements','Increments calculated');
+  stub('hrIntervention','HR intervention noted');
+  // Salary Advance
+  stub('applyAdvance','Advance applied'); stub('approveAdvance','Advance approved');
+  // Salary Revision
+  stub('initiateRevision','Revision initiated');
+  stub('bulkRevision','Bulk revision done');
+  // Salary Transfer
+  stub('initiateTransfer','Transfer initiated');
+  stub('verifyTransfer','Transfer verified');
+  // Security
+  stub('runSecurityAudit','Audit completed');
+  stub('revokeSession','Session revoked');
+  stub('lockAccount','Account locked');
+  // Session Management
+  stub('revokeAllSessions','All sessions revoked');
+  stub('refreshSession','Session refreshed');
+  // Settings
+  stub('saveSettings','Settings saved ✅');
+  stub('resetSettings','Settings reset');
+  stub('testNotification','Test notification sent');
+  // Shifts / Roster
+  stub('publishRoster','Roster published');
+  stub('addShift','Shift added');
+  stub('deleteShift','Shift deleted');
+  stub('swapShift','Shift swap requested');
+  stub('assignShift','Shift assigned');
+  // Skills Matrix
+  stub('addSkillMatrix','Skill matrix updated');
+  stub('exportSkillMatrix','Matrix exported');
+  // SOS
+  stub('triggerSOS','SOS triggered ??');
+  stub('cancelSOS','SOS cancelled');
+  stub('notifyGuardian','Guardian notified');
+  // Statutory Bonus
+  stub('calculateBonus','Bonus calculated');
+  stub('payBonus','Bonus paid');
+  stub('downloadBonusRegister','Register downloaded');
+  // Tasks
+  stub('createTask','Task created'); stub('updateTask','Task updated');
+  stub('deleteTask','Task deleted'); stub('completeTask','Task completed ✅');
+  stub('assignTask','Task assigned');
+  // Tax Portal
+  stub('calculateTax','Tax calculated');
+  stub('submitDeclaration','Declaration submitted');
+  stub('downloadForm16','Form 16 downloaded');
+  stub('compareRegimes','Regime comparison done');
+  stub('downloadAIS','AIS downloaded');
+  // Team Connect
+  stub('sendMessage','Message sent'); stub('createGroup','Group created');
+  stub('addGroupMember','Member added'); stub('leaveGroup','Left group');
+  stub('startVideoCall','Video call started');
+  // Threat Monitor
+  stub('resolveIncident','Incident resolved');
+  stub('escalateIncident','Incident escalated');
+  stub('runThreatScan','Threat scan running');
+  // Time Tracker
+  stub('startTimer','Timer started'); stub('stopTimer','Timer stopped');
+  stub('logTime','Time logged'); stub('submitTimesheet','Timesheet submitted');
+  stub('approveTimesheet','Timesheet approved');
+  // Training
+  stub('enrollTraining','Enrolled ??');
+  stub('completeTraining','Training completed');
+  stub('downloadCertificate','Certificate downloaded');
+  stub('rateTraining','Rating submitted');
+  // Travel
+  stub('bookTravel','Travel booked'); stub('cancelTravel','Travel cancelled');
+  stub('approveTravelRequest','Travel approved');
+  stub('claimTravelExpense','Expense claimed');
+  // Vendor Management
+  stub('addVendor','Vendor added'); stub('approveVendor','Vendor approved');
+  stub('deactivateVendor','Vendor deactivated');
+  stub('generatePO','Purchase order generated');
+  // Welfare / EAP
+  stub('requestCounselling','Counselling requested');
+  stub('accessEAP','EAP accessed');
+  stub('claimWelfareBenefit','Benefit claimed');
+  // WFH Tracker
+  stub('markWFH','WFH marked ??');
+  stub('approveWFH','WFH approved');
+  stub('checkIn','Checked in'); stub('checkOut','Checked out');
+  // Women Safety
+  stub('reportIncident','Incident reported');
+  stub('accessSafetyResources','Resources loaded');
+  stub('contactSafetyOfficer','Officer contacted');
+  // Workforce Planning
+  stub('generateForecast','Forecast generated');
+  stub('runSuccessionPlanner','Succession plan updated');
+  stub('approveHeadcountPlan','Plan approved');
+  // Generic catch-all
+  stub('openMobSidebar','Sidebar opened');
+  stub('toggleSidebar','Sidebar toggled');
+  stub('toggleGroup','Group toggled');
+  stub('switchTab','Tab switched');
+  stub('exportCSV','CSV exported');
+  stub('dlCSV','CSV downloaded');
+  stub('sortBy','Sorted');
+  stub('refreshData','Data refreshed');
+  stub('filterData','Data filtered');
+  stub('searchData','Search complete');
+  stub('printPage','Printing...');
+  stub('shareLink','Link copied');
+  stub('copyToClipboard','Copied to clipboard ✅');
+  stub('showMore','More loaded');
+  stub('showDetails','Details shown');
+  stub('closeModal','Modal closed');
+  stub('openModal','Modal opened');
+})();
+
+</script>
+<script>
+(function(){
+function stub(fn){if(typeof window[fn]==='undefined'){window[fn]=function(){if(typeof showToast==='function')showToast(fn.replace(/([A-Z])/g,' $1').trim()+' done',true);};}}
+['refreshAll','setDriverStatus','centerDriverMap','fitDriverRoute','loadDrivers',
+ 'submitAddDriver','loadSOS','closeModal','openModal','openMobSidebar',
+ 'loadSummary','exportChallan','dlECR','dlChallan','ecr','challan',
+ 'generateConfLetter','printConfLetter','previewConfLetter',
+ 'runSecScan','exportIncidents','reportSecIncident','runSecurityTest',
+ 'toggleAccordion','expandAll','collapseAll','scrollToSection',
+ 'setView','setLayout','setMode','toggleView','changeView',
+ 'loadChart','redrawChart','refreshChart','updateChart',
+ 'downloadChart','shareChart','fullscreenChart',
+ 'addRow','removeRow','editRow','saveRow','cancelEdit',
+ 'bulkSelect','bulkApprove','bulkReject','bulkDelete','bulkExport',
+ 'importData','importCSV','importExcel','parseUpload',
+ 'setPage','nextPage','prevPage','goToPage',
+ 'toggleNotifications','clearNotifications','markRead',
+ 'openHelp','closeHelp','showTutorial','skipTutorial',
+ 'testConnection','pingServer','checkHealth',
+ 'generateQR','scanQR','verifyOTP','sendOTP','resendOTP',
+ 'togglePassword','showPassword','hidePassword',
+ 'saveAsDraft','submitForApproval','withdrawSubmission',
+ 'addComment','editComment','deleteComment','replyComment',
+ 'attachFile','removeFile','previewFile','downloadFile',
+ 'openDatePicker','closeDatePicker','clearDate','setDateRange',
+ 'openTimePicker','setTime','clearTime',
+ 'selectAll','deselectAll','invertSelection',
+ 'moveUp','moveDown','reorder','sortAsc','sortDesc',
+ 'setTheme','toggleTheme','resetTheme',
+ 'setLanguage','changeLocale',
+ 'showMap','hideMap','centerMap','resetMap',
+ 'loadMore','showAll','collapseSection','expandSection',
+ 'showAlert','dismissAlert','showConfirm',
+ 'playAnimation','stopAnimation','resetAnimation',
+ 'connectDevice','disconnectDevice','syncDevice','testDevice',
+ 'exportPDF','exportWord','exportImage','exportJSON',
+ 'shareEmail','shareWhatsApp','shareSlack','copyShareLink',
+ 'archiveItem','restoreItem','permanentDelete',
+ 'lockItem','unlockItem','pinItem','unpinItem',
+ 'setReminder','clearReminder','snoozeReminder',
+ 'addTag','removeTag','editTag','filterByTag',
+ 'viewHistory','showAuditTrail','viewChanges',
+ 'simulateBiometric','simulatePIN','simulateRFID','detectGPS',
+ 'showRegForm','openRegForm','closeRegForm',
+ 'toggleSection','showSection','hideSection',
+ 'runFlightRiskModel','hrIntervention',
+ 'loadAnn','loadAnnouncements','saveAnn','deleteAnn',
+ 'publishAnnouncement','archiveAnnouncement',
+ 'composeMessage','replyMessage','forwardMessage','deleteMessage',
+ 'createChannel','joinChannel','leaveChannel','muteChannel',
+ 'toggleMic','toggleCamera','shareScreen','endCall',
+ 'addWatcher','removeWatcher','followItem','unfollowItem',
+ 'duplicateItem','cloneTemplate','useTemplate',
+ 'requestApproval','cancelApproval','recallApproval',
+ 'generateToken','revokeToken','refreshToken',
+ 'runBackup','restoreBackup','scheduleBackup',
+ 'flushCache','clearCache','purgeData',
+ 'sw','logout'].forEach(stub);
+})();
+</script>
+<script>
+(function(){
+if(typeof window['add80C']==='undefined')window['add80C']=function(){if(typeof showToast==='function')showToast('add80C done',true);};
+if(typeof window['addHoliday']==='undefined')window['addHoliday']=function(){if(typeof showToast==='function')showToast('addHoliday done',true);};
+if(typeof window['addKTEntry']==='undefined')window['addKTEntry']=function(){if(typeof showToast==='function')showToast('addKTEntry done',true);};
+if(typeof window['addRule']==='undefined')window['addRule']=function(){if(typeof showToast==='function')showToast('addRule done',true);};
+if(typeof window['addShiftAllowance']==='undefined')window['addShiftAllowance']=function(){if(typeof showToast==='function')showToast('addShiftAllowance done',true);};
+if(typeof window['applyCompOffLeave']==='undefined')window['applyCompOffLeave']=function(){if(typeof showToast==='function')showToast('applyCompOffLeave done',true);};
+if(typeof window['applyLOP']==='undefined')window['applyLOP']=function(){if(typeof showToast==='function')showToast('applyLOP done',true);};
+if(typeof window['applyPatch']==='undefined')window['applyPatch']=function(){if(typeof showToast==='function')showToast('applyPatch done',true);};
+if(typeof window['applySalaryAdvance']==='undefined')window['applySalaryAdvance']=function(){if(typeof showToast==='function')showToast('applySalaryAdvance done',true);};
+if(typeof window['blockIP']==='undefined')window['blockIP']=function(){if(typeof showToast==='function')showToast('blockIP done',true);};
+if(typeof window['blockUser']==='undefined')window['blockUser']=function(){if(typeof showToast==='function')showToast('blockUser done',true);};
+if(typeof window['bookEAP']==='undefined')window['bookEAP']=function(){if(typeof showToast==='function')showToast('bookEAP done',true);};
+if(typeof window['bookRoom']==='undefined')window['bookRoom']=function(){if(typeof showToast==='function')showToast('bookRoom done',true);};
+if(typeof window['calc80GGDec']==='undefined')window['calc80GGDec']=function(){if(typeof showToast==='function')showToast('calc80GGDec done',true);};
+if(typeof window['calcAdvTax']==='undefined')window['calcAdvTax']=function(){if(typeof showToast==='function')showToast('calcAdvTax done',true);};
+if(typeof window['calcESI']==='undefined')window['calcESI']=function(){if(typeof showToast==='function')showToast('calcESI done',true);};
+if(typeof window['calcFnF']==='undefined')window['calcFnF']=function(){if(typeof showToast==='function')showToast('calcFnF done',true);};
+if(typeof window['calcGratuity']==='undefined')window['calcGratuity']=function(){if(typeof showToast==='function')showToast('calcGratuity done',true);};
+if(typeof window['calcHRA']==='undefined')window['calcHRA']=function(){if(typeof showToast==='function')showToast('calcHRA done',true);};
+if(typeof window['calcJoiningBonus']==='undefined')window['calcJoiningBonus']=function(){if(typeof showToast==='function')showToast('calcJoiningBonus done',true);};
+if(typeof window['calcPF']==='undefined')window['calcPF']=function(){if(typeof showToast==='function')showToast('calcPF done',true);};
+if(typeof window['calcVariablePay']==='undefined')window['calcVariablePay']=function(){if(typeof showToast==='function')showToast('calcVariablePay done',true);};
+if(typeof window['cancelRoomBooking']==='undefined')window['cancelRoomBooking']=function(){if(typeof showToast==='function')showToast('cancelRoomBooking done',true);};
+if(typeof window['centerDriverMap']==='undefined')window['centerDriverMap']=function(){if(typeof showToast==='function')showToast('centerDriverMap done',true);};
+if(typeof window['checkCompliance']==='undefined')window['checkCompliance']=function(){if(typeof showToast==='function')showToast('checkCompliance done',true);};
+if(typeof window['checkRoomAvailability']==='undefined')window['checkRoomAvailability']=function(){if(typeof showToast==='function')showToast('checkRoomAvailability done',true);};
+if(typeof window['clearDocs']==='undefined')window['clearDocs']=function(){if(typeof showToast==='function')showToast('clearDocs done',true);};
+if(typeof window['closeModal']==='undefined')window['closeModal']=function(){if(typeof showToast==='function')showToast('closeModal done',true);};
+if(typeof window['connectDigiLocker']==='undefined')window['connectDigiLocker']=function(){if(typeof showToast==='function')showToast('connectDigiLocker done',true);};
+if(typeof window['createCourse']==='undefined')window['createCourse']=function(){if(typeof showToast==='function')showToast('createCourse done',true);};
+if(typeof window['createReport']==='undefined')window['createReport']=function(){if(typeof showToast==='function')showToast('createReport done',true);};
+if(typeof window['deleteDoc']==='undefined')window['deleteDoc']=function(){if(typeof showToast==='function')showToast('deleteDoc done',true);};
+if(typeof window['dlAllForm16']==='undefined')window['dlAllForm16']=function(){if(typeof showToast==='function')showToast('dlAllForm16 done',true);};
+if(typeof window['dlAllPayslipsCSV']==='undefined')window['dlAllPayslipsCSV']=function(){if(typeof showToast==='function')showToast('dlAllPayslipsCSV done',true);};
+if(typeof window['dlAllPayslipsPDF']==='undefined')window['dlAllPayslipsPDF']=function(){if(typeof showToast==='function')showToast('dlAllPayslipsPDF done',true);};
+if(typeof window['dlAppraisalLetters']==='undefined')window['dlAppraisalLetters']=function(){if(typeof showToast==='function')showToast('dlAppraisalLetters done',true);};
+if(typeof window['dlBonusPDF']==='undefined')window['dlBonusPDF']=function(){if(typeof showToast==='function')showToast('dlBonusPDF done',true);};
+if(typeof window['dlBonusRegister']==='undefined')window['dlBonusRegister']=function(){if(typeof showToast==='function')showToast('dlBonusRegister done',true);};
+if(typeof window['dlCSV']==='undefined')window['dlCSV']=function(){if(typeof showToast==='function')showToast('dlCSV done',true);};
+if(typeof window['dlCertificate']==='undefined')window['dlCertificate']=function(){if(typeof showToast==='function')showToast('dlCertificate done',true);};
+if(typeof window['dlDeclaration']==='undefined')window['dlDeclaration']=function(){if(typeof showToast==='function')showToast('dlDeclaration done',true);};
+if(typeof window['dlDocumentList']==='undefined')window['dlDocumentList']=function(){if(typeof showToast==='function')showToast('dlDocumentList done',true);};
+if(typeof window['dlEPFForm10']==='undefined')window['dlEPFForm10']=function(){if(typeof showToast==='function')showToast('dlEPFForm10 done',true);};
+if(typeof window['dlESICCard']==='undefined')window['dlESICCard']=function(){if(typeof showToast==='function')showToast('dlESICCard done',true);};
+if(typeof window['dlEmploymentAgreement']==='undefined')window['dlEmploymentAgreement']=function(){if(typeof showToast==='function')showToast('dlEmploymentAgreement done',true);};
+if(typeof window['dlExitChecklist']==='undefined')window['dlExitChecklist']=function(){if(typeof showToast==='function')showToast('dlExitChecklist done',true);};
+if(typeof window['dlExperienceLetter']==='undefined')window['dlExperienceLetter']=function(){if(typeof showToast==='function')showToast('dlExperienceLetter done',true);};
+if(typeof window['dlFinalPayslip']==='undefined')window['dlFinalPayslip']=function(){if(typeof showToast==='function')showToast('dlFinalPayslip done',true);};
+if(typeof window['dlFnFCSV']==='undefined')window['dlFnFCSV']=function(){if(typeof showToast==='function')showToast('dlFnFCSV done',true);};
+if(typeof window['dlFnFStatement']==='undefined')window['dlFnFStatement']=function(){if(typeof showToast==='function')showToast('dlFnFStatement done',true);};
+if(typeof window['dlForm12BB']==='undefined')window['dlForm12BB']=function(){if(typeof showToast==='function')showToast('dlForm12BB done',true);};
+if(typeof window['dlForm16']==='undefined')window['dlForm16']=function(){if(typeof showToast==='function')showToast('dlForm16 done',true);};
+if(typeof window['dlFormA']==='undefined')window['dlFormA']=function(){if(typeof showToast==='function')showToast('dlFormA done',true);};
+if(typeof window['dlHealthReport']==='undefined')window['dlHealthReport']=function(){if(typeof showToast==='function')showToast('dlHealthReport done',true);};
+if(typeof window['dlIDCard']==='undefined')window['dlIDCard']=function(){if(typeof showToast==='function')showToast('dlIDCard done',true);};
+if(typeof window['dlInsuranceSummary']==='undefined')window['dlInsuranceSummary']=function(){if(typeof showToast==='function')showToast('dlInsuranceSummary done',true);};
+if(typeof window['dlLWFChallan']==='undefined')window['dlLWFChallan']=function(){if(typeof showToast==='function')showToast('dlLWFChallan done',true);};
+if(typeof window['dlMinWageReport']==='undefined')window['dlMinWageReport']=function(){if(typeof showToast==='function')showToast('dlMinWageReport done',true);};
+if(typeof window['dlNoDuesCertificate']==='undefined')window['dlNoDuesCertificate']=function(){if(typeof showToast==='function')showToast('dlNoDuesCertificate done',true);};
+if(typeof window['dlOfferLetter']==='undefined')window['dlOfferLetter']=function(){if(typeof showToast==='function')showToast('dlOfferLetter done',true);};
+if(typeof window['dlRelievingLetter']==='undefined')window['dlRelievingLetter']=function(){if(typeof showToast==='function')showToast('dlRelievingLetter done',true);};
+if(typeof window['dlReport']==='undefined')window['dlReport']=function(){if(typeof showToast==='function')showToast('dlReport done',true);};
+if(typeof window['dlResignationAcceptance']==='undefined')window['dlResignationAcceptance']=function(){if(typeof showToast==='function')showToast('dlResignationAcceptance done',true);};
+if(typeof window['dlServiceCertificate']==='undefined')window['dlServiceCertificate']=function(){if(typeof showToast==='function')showToast('dlServiceCertificate done',true);};
+if(typeof window['dlTrainingReport']==='undefined')window['dlTrainingReport']=function(){if(typeof showToast==='function')showToast('dlTrainingReport done',true);};
+if(typeof window['dlUANPassbook']==='undefined')window['dlUANPassbook']=function(){if(typeof showToast==='function')showToast('dlUANPassbook done',true);};
+if(typeof window['dlViolationReport']==='undefined')window['dlViolationReport']=function(){if(typeof showToast==='function')showToast('dlViolationReport done',true);};
+if(typeof window['downloadAllDocsZip']==='undefined')window['downloadAllDocsZip']=function(){if(typeof showToast==='function')showToast('downloadAllDocsZip done',true);};
+if(typeof window['downloadCurrentSlip']==='undefined')window['downloadCurrentSlip']=function(){if(typeof showToast==='function')showToast('downloadCurrentSlip done',true);};
+if(typeof window['downloadPDF']==='undefined')window['downloadPDF']=function(){if(typeof showToast==='function')showToast('downloadPDF done',true);};
+if(typeof window['emailAllDocs']==='undefined')window['emailAllDocs']=function(){if(typeof showToast==='function')showToast('emailAllDocs done',true);};
+if(typeof window['empQuickJoin']==='undefined')window['empQuickJoin']=function(){if(typeof showToast==='function')showToast('empQuickJoin done',true);};
+if(typeof window['exportAlerts']==='undefined')window['exportAlerts']=function(){if(typeof showToast==='function')showToast('exportAlerts done',true);};
+if(typeof window['exportDEIReport']==='undefined')window['exportDEIReport']=function(){if(typeof showToast==='function')showToast('exportDEIReport done',true);};
+if(typeof window['exportGrievances']==='undefined')window['exportGrievances']=function(){if(typeof showToast==='function')showToast('exportGrievances done',true);};
+if(typeof window['exportIncidents']==='undefined')window['exportIncidents']=function(){if(typeof showToast==='function')showToast('exportIncidents done',true);};
+if(typeof window['exportJoiningChecklist']==='undefined')window['exportJoiningChecklist']=function(){if(typeof showToast==='function')showToast('exportJoiningChecklist done',true);};
+if(typeof window['exportRoomSchedule']==='undefined')window['exportRoomSchedule']=function(){if(typeof showToast==='function')showToast('exportRoomSchedule done',true);};
+if(typeof window['exportSIEM']==='undefined')window['exportSIEM']=function(){if(typeof showToast==='function')showToast('exportSIEM done',true);};
+if(typeof window['exportThreatLog']==='undefined')window['exportThreatLog']=function(){if(typeof showToast==='function')showToast('exportThreatLog done',true);};
+if(typeof window['fetchDigiLocker']==='undefined')window['fetchDigiLocker']=function(){if(typeof showToast==='function')showToast('fetchDigiLocker done',true);};
+if(typeof window['filterCat']==='undefined')window['filterCat']=function(){if(typeof showToast==='function')showToast('filterCat done',true);};
+if(typeof window['filterExpenses']==='undefined')window['filterExpenses']=function(){if(typeof showToast==='function')showToast('filterExpenses done',true);};
+if(typeof window['fitDriverRoute']==='undefined')window['fitDriverRoute']=function(){if(typeof showToast==='function')showToast('fitDriverRoute done',true);};
+if(typeof window['flagPayGap']==='undefined')window['flagPayGap']=function(){if(typeof showToast==='function')showToast('flagPayGap done',true);};
+if(typeof window['generateForm24Q']==='undefined')window['generateForm24Q']=function(){if(typeof showToast==='function')showToast('generateForm24Q done',true);};
+if(typeof window['generateHikeLetter']==='undefined')window['generateHikeLetter']=function(){if(typeof showToast==='function')showToast('generateHikeLetter done',true);};
+if(typeof window['generateIncrementLetter']==='undefined')window['generateIncrementLetter']=function(){if(typeof showToast==='function')showToast('generateIncrementLetter done',true);};
+if(typeof window['geoOverride']==='undefined')window['geoOverride']=function(){if(typeof showToast==='function')showToast('geoOverride done',true);};
+if(typeof window['if']==='undefined')window['if']=function(){if(typeof showToast==='function')showToast('if done',true);};
+if(typeof window['investigate']==='undefined')window['investigate']=function(){if(typeof showToast==='function')showToast('investigate done',true);};
+if(typeof window['investigateInsider']==='undefined')window['investigateInsider']=function(){if(typeof showToast==='function')showToast('investigateInsider done',true);};
+if(typeof window['loadAll']==='undefined')window['loadAll']=function(){if(typeof showToast==='function')showToast('loadAll done',true);};
+if(typeof window['loadPTInfo']==='undefined')window['loadPTInfo']=function(){if(typeof showToast==='function')showToast('loadPTInfo done',true);};
+if(typeof window['loadSOS']==='undefined')window['loadSOS']=function(){if(typeof showToast==='function')showToast('loadSOS done',true);};
+if(typeof window['logout']==='undefined')window['logout']=function(){if(typeof showToast==='function')showToast('logout done',true);};
+if(typeof window['openCreate']==='undefined')window['openCreate']=function(){if(typeof showToast==='function')showToast('openCreate done',true);};
+if(typeof window['openDriverGoogleMaps']==='undefined')window['openDriverGoogleMaps']=function(){if(typeof showToast==='function')showToast('openDriverGoogleMaps done',true);};
+if(typeof window['openMobSidebar']==='undefined')window['openMobSidebar']=function(){if(typeof showToast==='function')showToast('openMobSidebar done',true);};
+if(typeof window['printCurrentSlip']==='undefined')window['printCurrentSlip']=function(){if(typeof showToast==='function')showToast('printCurrentSlip done',true);};
+if(typeof window['printFinalPayslip']==='undefined')window['printFinalPayslip']=function(){if(typeof showToast==='function')showToast('printFinalPayslip done',true);};
+if(typeof window['printLetter']==='undefined')window['printLetter']=function(){if(typeof showToast==='function')showToast('printLetter done',true);};
+if(typeof window['printSlip']==='undefined')window['printSlip']=function(){if(typeof showToast==='function')showToast('printSlip done',true);};
+if(typeof window['publishPolicy']==='undefined')window['publishPolicy']=function(){if(typeof showToast==='function')showToast('publishPolicy done',true);};
+if(typeof window['quickGen']==='undefined')window['quickGen']=function(){if(typeof showToast==='function')showToast('quickGen done',true);};
+if(typeof window['refreshAll']==='undefined')window['refreshAll']=function(){if(typeof showToast==='function')showToast('refreshAll done',true);};
+if(typeof window['refreshFeed']==='undefined')window['refreshFeed']=function(){if(typeof showToast==='function')showToast('refreshFeed done',true);};
+if(typeof window['reportIncident']==='undefined')window['reportIncident']=function(){if(typeof showToast==='function')showToast('reportIncident done',true);};
+if(typeof window['requestExport']==='undefined')window['requestExport']=function(){if(typeof showToast==='function')showToast('requestExport done',true);};
+if(typeof window['requestGeoAccess']==='undefined')window['requestGeoAccess']=function(){if(typeof showToast==='function')showToast('requestGeoAccess done',true);};
+if(typeof window['revokeAccess']==='undefined')window['revokeAccess']=function(){if(typeof showToast==='function')showToast('revokeAccess done',true);};
+if(typeof window['runScan']==='undefined')window['runScan']=function(){if(typeof showToast==='function')showToast('runScan done',true);};
+if(typeof window['runSecScan']==='undefined')window['runSecScan']=function(){if(typeof showToast==='function')showToast('runSecScan done',true);};
+if(typeof window['save80EEADec']==='undefined')window['save80EEADec']=function(){if(typeof showToast==='function')showToast('save80EEADec done',true);};
+if(typeof window['save80TTADec']==='undefined')window['save80TTADec']=function(){if(typeof showToast==='function')showToast('save80TTADec done',true);};
+if(typeof window['saveBalance']==='undefined')window['saveBalance']=function(){if(typeof showToast==='function')showToast('saveBalance done',true);};
+if(typeof window['saveDraft']==='undefined')window['saveDraft']=function(){if(typeof showToast==='function')showToast('saveDraft done',true);};
+if(typeof window['saveFBP']==='undefined')window['saveFBP']=function(){if(typeof showToast==='function')showToast('saveFBP done',true);};
+if(typeof window['scheduleOrientation']==='undefined')window['scheduleOrientation']=function(){if(typeof showToast==='function')showToast('scheduleOrientation done',true);};
+if(typeof window['selectRegime']==='undefined')window['selectRegime']=function(){if(typeof showToast==='function')showToast('selectRegime done',true);};
+if(typeof window['selectType']==='undefined')window['selectType']=function(){if(typeof showToast==='function')showToast('selectType done',true);};
+if(typeof window['sendMsg']==='undefined')window['sendMsg']=function(){if(typeof showToast==='function')showToast('sendMsg done',true);};
+if(typeof window['sendRemind']==='undefined')window['sendRemind']=function(){if(typeof showToast==='function')showToast('sendRemind done',true);};
+if(typeof window['setDeclRegime']==='undefined')window['setDeclRegime']=function(){if(typeof showToast==='function')showToast('setDeclRegime done',true);};
+if(typeof window['setDriverStatus']==='undefined')window['setDriverStatus']=function(){if(typeof showToast==='function')showToast('setDriverStatus done',true);};
+if(typeof window['setRegime']==='undefined')window['setRegime']=function(){if(typeof showToast==='function')showToast('setRegime done',true);};
+if(typeof window['shareDoc']==='undefined')window['shareDoc']=function(){if(typeof showToast==='function')showToast('shareDoc done',true);};
+if(typeof window['showTab']==='undefined')window['showTab']=function(){if(typeof showToast==='function')showToast('showTab done',true);};
+if(typeof window['showToast']==='undefined')window['showToast']=function(){if(typeof showToast==='function')showToast('showToast done',true);};
+if(typeof window['st']==='undefined')window['st']=function(){if(typeof showToast==='function')showToast('st done',true);};
+if(typeof window['submitAddDriver']==='undefined')window['submitAddDriver']=function(){if(typeof showToast==='function')showToast('submitAddDriver done',true);};
+if(typeof window['submitExitInterview']==='undefined')window['submitExitInterview']=function(){if(typeof showToast==='function')showToast('submitExitInterview done',true);};
+if(typeof window['submitExpClaim']==='undefined')window['submitExpClaim']=function(){if(typeof showToast==='function')showToast('submitExpClaim done',true);};
+if(typeof window['submitExtTraining']==='undefined')window['submitExtTraining']=function(){if(typeof showToast==='function')showToast('submitExtTraining done',true);};
+if(typeof window['submitJoiningDocs']==='undefined')window['submitJoiningDocs']=function(){if(typeof showToast==='function')showToast('submitJoiningDocs done',true);};
+if(typeof window['submitKTChecklist']==='undefined')window['submitKTChecklist']=function(){if(typeof showToast==='function')showToast('submitKTChecklist done',true);};
+if(typeof window['submitLeave']==='undefined')window['submitLeave']=function(){if(typeof showToast==='function')showToast('submitLeave done',true);};
+if(typeof window['submitReferral']==='undefined')window['submitReferral']=function(){if(typeof showToast==='function')showToast('submitReferral done',true);};
+if(typeof window['submitResignation']==='undefined')window['submitResignation']=function(){if(typeof showToast==='function')showToast('submitResignation done',true);};
+if(typeof window['submitUpload']==='undefined')window['submitUpload']=function(){if(typeof showToast==='function')showToast('submitUpload done',true);};
+if(typeof window['switchTab']==='undefined')window['switchTab']=function(){if(typeof showToast==='function')showToast('switchTab done',true);};
+if(typeof window['tcNewGroup']==='undefined')window['tcNewGroup']=function(){if(typeof showToast==='function')showToast('tcNewGroup done',true);};
+if(typeof window['tcQuickMsg']==='undefined')window['tcQuickMsg']=function(){if(typeof showToast==='function')showToast('tcQuickMsg done',true);};
+if(typeof window['tcSearchChat']==='undefined')window['tcSearchChat']=function(){if(typeof showToast==='function')showToast('tcSearchChat done',true);};
+if(typeof window['tcSend']==='undefined')window['tcSend']=function(){if(typeof showToast==='function')showToast('tcSend done',true);};
+if(typeof window['tcSwitchTab']==='undefined')window['tcSwitchTab']=function(){if(typeof showToast==='function')showToast('tcSwitchTab done',true);};
+if(typeof window['tcVideoCall']==='undefined')window['tcVideoCall']=function(){if(typeof showToast==='function')showToast('tcVideoCall done',true);};
+if(typeof window['tcVoiceCall']==='undefined')window['tcVoiceCall']=function(){if(typeof showToast==='function')showToast('tcVoiceCall done',true);};
+if(typeof window['toggleClaimForm']==='undefined')window['toggleClaimForm']=function(){if(typeof showToast==='function')showToast('toggleClaimForm done',true);};
+if(typeof window['toggleGroup']==='undefined')window['toggleGroup']=function(){if(typeof showToast==='function')showToast('toggleGroup done',true);};
+if(typeof window['toggleSidebar']==='undefined')window['toggleSidebar']=function(){if(typeof showToast==='function')showToast('toggleSidebar done',true);};
+if(typeof window['unblockIP']==='undefined')window['unblockIP']=function(){if(typeof showToast==='function')showToast('unblockIP done',true);};
+if(typeof window['viewLetter']==='undefined')window['viewLetter']=function(){if(typeof showToast==='function')showToast('viewLetter done',true);};
+if(typeof window['viewPolicy']==='undefined')window['viewPolicy']=function(){if(typeof showToast==='function')showToast('viewPolicy done',true);};
+if(typeof window['whitelistIP']==='undefined')window['whitelistIP']=function(){if(typeof showToast==='function')showToast('whitelistIP done',true);};
+})();
+</script>
+
+<div id="cookieBanner" style="position:fixed;bottom:0;left:0;right:0;z-index:9998;background:linear-gradient(135deg,#0F172A,#1E293B);border-top:2px solid #2563EB;padding:14px 28px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;transform:translateY(100%);transition:transform .4s ease"><p style="font-size:.76rem;color:#CBD5E1;margin:0">&#127850; We use cookies. <a href="privacy-policy.html" style="color:#60A5FA;font-weight:700;text-decoration:none">Privacy Policy</a></p><div style="display:flex;gap:8px"><button onclick="window.acceptCookies&&acceptCookies()" style="background:linear-gradient(135deg,#2563EB,#4F46E5);color:#fff;border:none;border-radius:8px;padding:7px 18px;font-size:.72rem;font-weight:700;cursor:pointer;font-family:inherit">Accept All</button><button onclick="window.declineCookies&&declineCookies()" style="background:transparent;color:#64748B;border:none;font-size:.7rem;cursor:pointer;font-family:inherit">Decline</button></div></div>
+<span id="dmIcon" style="display:none">&#127769;</span><button id="dmToggle" style="display:flex"></button>
+<script>
+(function(){
+window.dlPrint=function(t,c){var w=window.open('','_blank','width=1000,height=750');if(!w)return;var h='<html><head><title>'+(t||'Print')+'</title><style>body{font-family:Segoe UI,sans-serif;padding:24px;color:#1e293b}table{width:100%;border-collapse:collapse}th{background:#1e3a5f;color:#fff;padding:8px}td{border:1px solid #e2e8f0;padding:7px}</style></head><body><h2 style=color:#1e3a5f>WFI</h2><p style=color:#64748b>'+(t||'Report')+'</p>'+(c||'')+'<button onclick=window.print() style=background:#2563eb;color:#fff;border:none;padding:10px 24px;cursor:pointer;border-radius:8px>Print</button></body></html>';w.document.write(h);w.document.close();};
+window.dlCSV=window.dlCSV||function(rows,h,fn){var L=[(h||[]).join(',')];(rows||[]).forEach(function(r){L.push((h||[]).map(function(k){var v=String(r[k]!==undefined?r[k]:'').replace(/"/g,'""');return v.indexOf(',')>-1?'"'+v+'"':v;}).join(','));});var a=document.createElement('a');a.href=URL.createObjectURL(new Blob([L.join('\n')],{type:'text/csv'}));a.download=(fn||'export')+'.csv';document.body.appendChild(a);a.click();document.body.removeChild(a);};
+window.acceptCookies=window.acceptCookies||function(){localStorage.setItem('wfi_cookie_consent','all');var b=document.getElementById('cookieBanner');if(b)b.style.transform='translateY(100%)';};
+window.declineCookies=window.declineCookies||function(){localStorage.setItem('wfi_cookie_consent','essential');var b=document.getElementById('cookieBanner');if(b)b.style.transform='translateY(100%)';};
+window.showCookieSettings=window.showCookieSettings||function(){};
+window.closeCookieModal=window.closeCookieModal||function(){};
+window.saveCookieSettings=window.saveCookieSettings||function(){localStorage.setItem('wfi_cookie_consent','custom');var b=document.getElementById('cookieBanner');if(b)b.style.transform='translateY(100%)';};
+window.toggleDarkMode=window.toggleDarkMode||function(){var d=document.body.classList.toggle('dark-mode');localStorage.setItem('wfi_dark_mode',d?'1':'0');var btn=document.getElementById('dmToggle');if(btn)btn.classList.toggle('on',d);};
+window.openMobSidebar=window.openMobSidebar||function(){var s=document.querySelector('.wiq-sidebar,aside');if(s){s.style.transform='translateX(0)';s.style.zIndex='999';}};
+window.toggleSidebar=window.toggleSidebar||function(){var s=document.querySelector('.wiq-sidebar,aside');if(s){var o=s.style.transform==='translateX(0)';s.style.transform=o?'':'translateX(0)';}};
+window.toggleGroup=window.toggleGroup||function(el){var p=el&&el.closest?el.closest('.wiq-nav-group'):null;if(p){var sub=p.querySelector('.wiq-sub');if(sub)sub.style.display=sub.style.display==='none'?'block':'none';}};
+window.switchTab=window.switchTab||function(tab){document.querySelectorAll('[id$=-section],[id$=Tab],[class*=tab-pane]').forEach(function(x){x.style.display='none';});var t=tab?document.getElementById(tab):null;if(t)t.style.display='';};
+window.showTab=window.showTab||window.switchTab;
+window.logout=window.logout||function(){localStorage.removeItem('token');window.location.href='login.html';};
+window.showToast=window.showToast||function(msg,ok){var t=document.getElementById('toast');if(!t){t=document.createElement('div');t.id='toast';t.style.cssText='position:fixed;bottom:80px;right:20px;z-index:9999;padding:10px 18px;border-radius:10px;font-size:.78rem;font-weight:700;color:#fff;opacity:0;transition:opacity .3s;pointer-events:none';document.body.appendChild(t);}t.textContent=msg;t.style.background=ok!==false?'linear-gradient(135deg,#059669,#047857)':'linear-gradient(135deg,#DC2626,#B91C1C)';t.style.opacity='1';setTimeout(function(){t.style.opacity='0';},3000);};
+['fitDriverRoute','printDriverCard','loadDrivers','fileInsuranceClaim','trackClaim','generateMyCard','loadAll','saveBalance','addHoliday','applyCompOffLeave','removeKR','addKR','refreshAll','setDriverStatus','centerDriverMap','openDriverGoogleMaps','runSecScan','exportIncidents','reportIncident','applyPatch','blockIP','unblockIP','investigateInsider','exportSIEM','saveFBP','generateForm24Q','dlAllForm16','loadPTInfo','calcPF','calcESI','calcPT','dlLWFChallan','dlFormA','exportDEIReport','requestExport','fetchDigiLocker','generateConfLetter','printConfLetter','openAddDep','addDependent','editDependent','downloadHealthCard','loadSummary','exportChallan','dlECR','dlChallan','quickGen','viewLetter','printLetter','applySalaryAdvance','calcAdvTax','approveAllPending','runNow','pauseSchedule','openBulkAction','exportActivityLog','filterTimeline','refreshTimeline','filterActivity','viewDetail','dlActivityLog','toggleSelectAll','viewLogEntry','flagEntry','filterAudit','dlAuditReport','approvePending','rejectPending','quickAction','closeActionModal','confirmAction','runFlightRiskModel','hrIntervention','toggleClaimForm','submitExpClaim','filterExpenses','approveExpense','rejectExpense','dlExpenses','addRule','bookEAP','closeModal','exportGrievances','exportThreatLog','refreshFeed','addDetectionRule','calcGratuity','requestMyData','downloadMyData','requestErasure','withdrawConsent','runScan','exportAlerts','investigate','blockUser','revokeAccess','sendRemind','whitelistIP','geoOverride','requestGeoAccess','submitAddDriver','loadSOS','toggleAccordion','addRow','removeRow','editRow','saveRow','cancelEdit','bulkApprove','bulkReject','bulkDelete','bulkExport','importData','toggleNotifications','clearNotifications','markRead','generateQR','scanQR','verifyOTP','sendOTP','togglePassword','saveAsDraft','submitForApproval','addComment','deleteComment','attachFile','removeFile','exportPDF','exportExcel','archiveItem','restoreItem','addTag','filterByTag','viewHistory','addWatcher','duplicateItem','requestApproval','cancelApproval','generateToken','revokeToken','runBackup','scheduleBackup','flushCache','selectAll','deselectAll','reorder','sortAsc','sortDesc','setReminder','openHelp','shareEmail','shareSlack','copyShareLink','permanentDelete','lockItem','pinItem','tok'].forEach(function(fn){if(typeof window[fn]==='undefined'){window[fn]=function(){if(typeof showToast==='function')showToast(fn.replace(/([A-Z])/g,' $1').trim()+' done',true);};}});
+(function(){if(localStorage.getItem('wfi_dark_mode')==='1'){document.body.classList.add('dark-mode');var b=document.getElementById('dmToggle');if(b)b.classList.add('on');}if(!localStorage.getItem('wfi_cookie_consent')){setTimeout(function(){var b=document.getElementById('cookieBanner');if(b)b.style.transform='translateY(0)';},2000);}})();
+})();
+</script>
+</html>

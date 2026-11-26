@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>SOS Alerts – WorkforceIQ v7</title>
+<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<style>
+body{background:#fef2f2;font-family:'Segoe UI',Arial,sans-serif;margin:0;color:#1e293b}
+.page-wrap{max-width:1200px;margin:0 auto;padding:24px 16px 60px}
+.page-title{font-size:1.3rem;font-weight:900;color:#dc2626;margin:0 0 20px;display:flex;align-items:center;gap:10px}
+.stats{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:12px;margin-bottom:20px}
+.stat{background:#fff;border-radius:12px;padding:14px 18px;box-shadow:0 2px 10px rgba(0,0,0,.07);border-left:4px solid #dc2626;text-align:center}
+.stat-num{font-size:1.6rem;font-weight:900;color:#dc2626}
+.stat-lbl{font-size:.68rem;color:#64748b;font-weight:700;text-transform:uppercase;letter-spacing:.05em}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:700px){.grid2{grid-template-columns:1fr}}
+.card{background:#fff;border-radius:14px;padding:22px;box-shadow:0 2px 12px rgba(0,0,0,.08);margin-bottom:16px}
+.card-title{font-size:.9rem;font-weight:800;color:#dc2626;margin:0 0 14px;text-transform:uppercase;letter-spacing:.05em}
+.sos-item{border:1.5px solid #fca5a5;border-radius:12px;padding:14px 16px;margin-bottom:10px;background:#fff;position:relative}
+.sos-item.resolved{border-color:#d1fae5;opacity:.7}
+.sos-header{display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:6px;margin-bottom:8px}
+.sos-driver{font-weight:800;font-size:.95rem;color:#1e293b}
+.sos-time{font-size:.72rem;color:#64748b;white-space:nowrap}
+.sos-msg{font-size:.82rem;color:#475569;margin-bottom:8px;line-height:1.5}
+.sos-meta{font-size:.72rem;color:#94a3b8;display:flex;gap:12px;flex-wrap:wrap;margin-bottom:8px}
+.sos-actions{display:flex;gap:8px;flex-wrap:wrap}
+.btn-resolve{background:#15803d;color:#fff;border:none;border-radius:7px;padding:6px 16px;font-size:.78rem;font-weight:700;cursor:pointer}
+.btn-call{background:#1B4F8A;color:#fff;border:none;border-radius:7px;padding:6px 16px;font-size:.78rem;font-weight:700;cursor:pointer;text-decoration:none}
+.badge-open{background:#fee2e2;color:#b91c1c;border-radius:20px;padding:2px 10px;font-size:.7rem;font-weight:700}
+.badge-res{background:#d1fae5;color:#065f46;border-radius:20px;padding:2px 10px;font-size:.7rem;font-weight:700}
+#sosMap{height:380px;border-radius:14px;border:1.5px solid #fca5a5;overflow:hidden}
+.empty{text-align:center;padding:40px;color:#94a3b8;font-size:.9rem}
+.pulse{animation:pulse 1.5s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+</style>
+</head>
+<body>
+<nav class="navbar">
+  <div class="nav-brand" style="color:#dc2626">🚨 WorkforceIQ — SOS Alerts</div>
+  <div class="nav-links">
+    <a href="admin-dashboard.html" style="color:#fff">← Dashboard</a>
+    <a href="cab-drivers.html" style="color:#fff;margin-left:16px">🚗 Drivers</a>
+    <a href="login.html" onclick="localStorage.clear()" style="color:#fff;margin-left:16px">Logout</a>
+  </div>
+</nav>
+
+<div class="page-wrap">
+  <div class="page-title">🚨 SOS Alert Management <span id="pulseIcon" class="pulse" style="color:#dc2626;font-size:1.1rem">●</span></div>
+
+  <div class="stats">
+    <div class="stat"><div class="stat-num" id="stOpen">—</div><div class="stat-lbl">Open SOS</div></div>
+    <div class="stat" style="border-color:#15803d"><div class="stat-num" style="color:#15803d" id="stResolved">—</div><div class="stat-lbl">Resolved</div></div>
+    <div class="stat" style="border-color:#d97706"><div class="stat-num" style="color:#d97706" id="stToday">—</div><div class="stat-lbl">Today</div></div>
+    <div class="stat" style="border-color:#7c3aed"><div class="stat-num" style="color:#7c3aed" id="stTotal">—</div><div class="stat-lbl">All Time</div></div>
+  </div>
+
+  <div class="grid2">
+    <!-- SOS List -->
+    <div>
+      <div class="card">
+        <div class="card-title" style="display:flex;justify-content:space-between;align-items:center">
+          <span>Active SOS Alerts</span>
+          <button onclick="loadSOS()" style="background:#fef2f2;border:1px solid #fca5a5;border-radius:7px;color:#dc2626;padding:4px 12px;font-size:.72rem;font-weight:700;cursor:pointer">🔄 Refresh</button>
+        </div>
+        <div id="sosList"><div class="empty pulse">Loading…</div></div>
+      </div>
+    </div>
+
+    <!-- Map -->
+    <div>
+      <div class="card">
+        <div class="card-title">🗺️ SOS Location Map</div>
+        <div id="sosMap"></div>
+        <div style="font-size:.72rem;color:#64748b;margin-top:8px">🔴 Open SOS &nbsp; 🟢 Resolved &nbsp; 🔵 Office</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- All alerts log -->
+  <div class="card">
+    <div class="card-title">📋 Full SOS History</div>
+    <div style="overflow-x:auto">
+      <table style="width:100%;border-collapse:collapse;font-size:.8rem">
+        <thead><tr style="background:#fef2f2">
+          <th style="padding:9px 12px;text-align:left;font-weight:700;color:#dc2626">Time</th>
+          <th style="padding:9px 12px;text-align:left;font-weight:700;color:#dc2626">Driver</th>
+          <th style="padding:9px 12px;text-align:left;font-weight:700;color:#dc2626">Message</th>
+          <th style="padding:9px 12px;text-align:left;font-weight:700;color:#dc2626">Location</th>
+          <th style="padding:9px 12px;text-align:left;font-weight:700;color:#dc2626">Status</th>
+          <th style="padding:9px 12px;text-align:left;font-weight:700;color:#dc2626">Action</th>
+        </tr></thead>
+        <tbody id="sosTable"><tr><td colspan="6" style="text-align:center;padding:24px;color:#94a3b8">Loading…</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+var API   = 'http://localhost:5000/api';
+var token = localStorage.getItem('token');
+var user  = JSON.parse(localStorage.getItem('user')||'{}');
+if (!token || ![1,3].includes(user.role_id)) { alert('Admin/Manager only'); location.href='login.html'; }
+function hdrs(){ return {'Authorization':'Bearer '+token,'Content-Type':'application/json'}; }
+function escHtml(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+var _map, _allSOS = [];
+var OFFICE = {lat:25.6093, lng:85.1376};
+
+function initMap(){
+  _map = L.map('sosMap').setView([OFFICE.lat, OFFICE.lng], 13);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'© OSM'}).addTo(_map);
+  L.marker([OFFICE.lat, OFFICE.lng],{icon:L.divIcon({className:'',html:'<div style="background:#1a56db;color:#fff;padding:3px 8px;border-radius:6px;font-size:.62rem;font-weight:700;white-space:nowrap">🏢 Office</div>',iconAnchor:[36,14]})}).addTo(_map);
+}
+
+var _sosMarkers = [];
+function renderMap(alerts){
+  _sosMarkers.forEach(function(m){ _map.removeLayer(m); });
+  _sosMarkers = [];
+  var pts = [[OFFICE.lat, OFFICE.lng]];
+  alerts.forEach(function(a){
+    if (!a.latitude || !a.longitude) return;
+    var isOpen = a.status === 'open' || !a.status;
+    var m = L.marker([a.latitude, a.longitude], {
+      icon: L.divIcon({className:'',
+        html:'<div style="background:'+(isOpen?'#dc2626':'#15803d')+';color:#fff;padding:4px 10px;border-radius:8px;font-size:.65rem;font-weight:700;white-space:nowrap;box-shadow:0 2px 8px rgba(0,0,0,.3)">'+(isOpen?'🚨':'✅')+' '+escHtml(a.driver_name||'Driver')+'</div>',
+        iconAnchor:[50,16]})
+    }).bindPopup('<b>'+(isOpen?'🚨 OPEN SOS':'✅ Resolved')+'</b><br>'+escHtml(a.driver_name||'Driver')+'<br><small>'+new Date(a.created_at).toLocaleString('en-IN')+'</small>').addTo(_map);
+    _sosMarkers.push(m);
+    pts.push([a.latitude, a.longitude]);
+  });
+  if(pts.length > 1) _map.fitBounds(L.latLngBounds(pts), {padding:[30,30]});
+}
+
+async function loadSOS(){
+  try {
+    const alerts = await fetch(API+'/cab/sos-alerts', {headers:hdrs()}).then(r=>r.json());
+    _allSOS = Array.isArray(alerts) ? alerts : [];
+    const open     = _allSOS.filter(a => a.status==='open'||!a.status);
+    const resolved = _allSOS.filter(a => a.status==='resolved');
+    const today    = new Date().toDateString();
+    const todayN   = _allSOS.filter(a => new Date(a.created_at).toDateString()===today);
+    document.getElementById('stOpen').textContent     = open.length;
+    document.getElementById('stResolved').textContent = resolved.length;
+    document.getElementById('stToday').textContent    = todayN.length;
+    document.getElementById('stTotal').textContent    = _allSOS.length;
+    // List of open alerts
+    const list = document.getElementById('sosList');
+    if (!open.length) {
+      list.innerHTML = '<div class="empty">✅ No active SOS alerts right now.</div>';
+    } else {
+      list.innerHTML = open.map(function(a){
+        return '<div class="sos-item">'+
+          '<div class="sos-header">'+
+            '<div class="sos-driver">🚨 '+escHtml(a.driver_name||'Unknown Driver')+'</div>'+
+            '<span class="badge-open">OPEN</span>'+
+          '</div>'+
+          '<div class="sos-time">⏰ '+new Date(a.created_at).toLocaleString('en-IN')+'</div>'+
+          '<div class="sos-msg" style="margin-top:6px">'+escHtml(a.message||'Driver triggered SOS alert')+'</div>'+
+          '<div class="sos-meta">'+
+            (a.latitude?'📍 '+parseFloat(a.latitude).toFixed(4)+', '+parseFloat(a.longitude).toFixed(4):'📍 Location unavailable')+
+            (a.driver_mobile?'<span>📞 '+escHtml(a.driver_mobile)+'</span>':'')+
+            (a.route_name?'<span>🚌 '+escHtml(a.route_name)+'</span>':'')+
+          '</div>'+
+          '<div class="sos-actions">'+
+            (a.driver_mobile?'<a href="tel:'+escHtml(a.driver_mobile)+'" class="btn-call">📞 Call Driver</a>':'')+
+            '<button onclick="resolveSOS('+a.sos_id+')" class="btn-resolve">✅ Resolve</button>'+
+            (a.latitude?'<a href="https://www.google.com/maps?q='+a.latitude+','+a.longitude+'" target="_blank" style="background:#f59e0b;color:#fff;border:none;border-radius:7px;padding:6px 14px;font-size:.78rem;font-weight:700;cursor:pointer;text-decoration:none">🗺️ Maps</a>':'')+
+          '</div>'+
+        '</div>';
+      }).join('');
+    }
+    // Full history table
+    document.getElementById('sosTable').innerHTML = _allSOS.length ? _allSOS.map(function(a){
+      var isOpen = a.status==='open'||!a.status;
+      return '<tr style="border-bottom:1px solid #f1f5f9">'+
+        '<td style="padding:8px 12px;white-space:nowrap;font-size:.78rem">'+new Date(a.created_at).toLocaleString('en-IN',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'})+'</td>'+
+        '<td style="padding:8px 12px;font-weight:600">'+escHtml(a.driver_name||'—')+'</td>'+
+        '<td style="padding:8px 12px;color:#475569">'+escHtml(a.message||'—')+'</td>'+
+        '<td style="padding:8px 12px;font-size:.75rem;color:#64748b">'+(a.latitude?parseFloat(a.latitude).toFixed(4)+', '+parseFloat(a.longitude).toFixed(4):'—')+'</td>'+
+        '<td style="padding:8px 12px"><span class="'+(isOpen?'badge-open':'badge-res')+'">'+escHtml(a.status||'open').toUpperCase()+'</span></td>'+
+        '<td style="padding:8px 12px">'+(isOpen?'<button onclick="resolveSOS('+a.sos_id+')" class="btn-resolve" style="padding:4px 12px;font-size:.72rem">Resolve</button>':'<span style="color:#94a3b8;font-size:.75rem">Done</span>')+'</td>'+
+      '</tr>';
+    }).join('') : '<tr><td colspan="6" style="text-align:center;padding:24px;color:#94a3b8">No SOS records yet.</td></tr>';
+    renderMap(_allSOS);
+  } catch(e) {
+    document.getElementById('sosList').innerHTML = '<div class="empty" style="color:#dc2626">Failed to load SOS alerts. Check backend.</div>';
+  }
+}
+
+async function resolveSOS(id){
+  if (!confirm('Mark this SOS as resolved?')) return;
+  try {
+    await fetch(API+'/cab/sos-alerts/'+id+'/resolve', {method:'PATCH', headers:hdrs()});
+    loadSOS();
+  } catch(e) { alert('Failed to resolve SOS.'); }
+}
+
+initMap();
+loadSOS();
+setInterval(loadSOS, 30000); // auto-refresh every 30s
+</script>
+</body>
+</html>

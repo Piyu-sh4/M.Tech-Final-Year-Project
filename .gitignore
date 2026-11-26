@@ -1,0 +1,33 @@
+# Dependencies
+node_modules/
+*/node_modules/
+
+# Environment variables — NEVER commit these
+.env
+.env.*
+!.env.example
+!.env.compose.example
+
+# Logs
+*.log
+npm-debug.log*
+logs/
+
+# Build outputs
+dist/
+build/
+
+# File uploads (contain PII)
+uploads/
+backend/uploads/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+backend/state/
+database/.snapshot.*/

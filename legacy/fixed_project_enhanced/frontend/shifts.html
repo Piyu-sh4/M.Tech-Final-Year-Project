@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Shifts & Attendance – Workforce Intelligence v6.0</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+  .page-wrap{max-width:1100px;margin:0 auto;padding:24px}
+  .card{background:#fff;border-radius:12px;padding:24px;margin-bottom:20px;box-shadow:0 2px 12px rgba(0,0,0,.08)}
+  .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .form-group{margin-bottom:14px}
+  .form-group label{display:block;font-weight:600;color:#1B4F8A;margin-bottom:5px;font-size:13px}
+  .form-group input,.form-group select{width:100%;padding:9px 12px;border:1px solid #BDC3C7;border-radius:7px;font-size:14px;box-sizing:border-box}
+  .btn{padding:9px 20px;border:none;border-radius:7px;font-weight:600;cursor:pointer;font-size:14px}
+  .btn-primary{background:#1B4F8A;color:#fff}.btn-sm{padding:5px 12px;font-size:12px}
+  .btn-danger{background:#C0392B;color:#fff;border:none}
+  table{width:100%;border-collapse:collapse;font-size:13px}
+  th{background:#1B4F8A;color:#fff;padding:10px 12px;text-align:left}
+  td{padding:9px 12px;border-bottom:1px solid #EEF2F7}
+  tr:hover td{background:#f8fafc}
+  .shift-card{border:1.5px solid #e2e8f0;border-radius:10px;padding:16px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center}
+  .tabs{display:flex;gap:8px;margin-bottom:20px}
+  .tab{padding:9px 22px;border-radius:8px;border:2px solid #BDC3C7;background:#fff;color:#5D6D7E;font-weight:600;cursor:pointer}
+  .tab.active{background:#1B4F8A;color:#fff;border-color:#1B4F8A}
+  .msg{padding:10px;border-radius:8px;margin-bottom:12px;display:none}
+  .msg.success{background:#D5F5E3;color:#1E8449;display:block}
+  .msg.error{background:#FADBD8;color:#C0392B;display:block}
+  .filter-row{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px}
+  .filter-row input,.filter-row select{padding:8px 12px;border:1px solid #BDC3C7;border-radius:7px;font-size:13px}
+</style>
+</head>
+<body>
+<nav class="navbar">
+  <div class="nav-brand">⚡ Workforce Intelligence</div>
+  <div class="nav-links">
+    <a href="admin-dashboard.html" style="color:#fff">← Dashboard</a>
+    <a href="login.html" onclick="localStorage.clear()" style="color:#fff;margin-left:16px">Logout</a>
+  </div>
+</nav>
+<div class="page-wrap">
+  <h2>🕐 Shifts & Attendance Management</h2>
+
+  <div class="tabs">
+    <button class="tab active" onclick="showTab('shifts',this)">⏰ Shifts</button>
+    <button class="tab" onclick="showTab('attendance',this)">📅 Attendance</button>
+    <button class="tab" onclick="showTab('summary',this)">📊 Monthly Summary</button>
+  </div>
+
+  <!-- SHIFTS -->
+  <div id="tab-shifts">
+    <div class="card">
+      <h3 style="margin-top:0;color:#1B4F8A">Create Shift</h3>
+      <div id="shiftMsg" class="msg"></div>
+      <div class="form-grid">
+        <div class="form-group"><label>Shift Name *</label><input type="text" id="shiftName" placeholder="e.g. Morning Shift"></div>
+        <div class="form-group"><label>Grace Period (minutes)</label><input type="number" id="shiftGrace" value="15"></div>
+      </div>
+      <div class="form-grid">
+        <div class="form-group"><label>Start Time *</label><input type="time" id="shiftStart"></div>
+        <div class="form-group"><label>End Time *</label><input type="time" id="shiftEnd"></div>
+      </div>
+      <button class="btn btn-primary" onclick="createShift()">+ Create Shift</button>
+    </div>
+    <div class="card">
+      <h3 style="margin-top:0;color:#1B4F8A">All Shifts</h3>
+      <div id="shiftList">Loading…</div>
+    </div>
+  </div>
+
+  <!-- ATTENDANCE -->
+  <div id="tab-attendance" style="display:none">
+    <div class="card">
+      <h3 style="margin-top:0;color:#1B4F8A">Mark / Override Attendance</h3>
+      <div id="attMsg" class="msg"></div>
+      <div class="form-grid">
+        <div class="form-group"><label>Employee ID *</label><input type="number" id="attUser" placeholder="User ID"></div>
+        <div class="form-group"><label>Date *</label><input type="date" id="attDate"></div>
+      </div>
+      <div class="form-grid">
+        <div class="form-group"><label>Clock In</label><input type="time" id="attIn"></div>
+        <div class="form-group"><label>Clock Out</label><input type="time" id="attOut"></div>
+      </div>
+      <div class="form-grid">
+        <div class="form-group"><label>Status</label>
+          <select id="attStatus"><option>present</option><option>absent</option><option>late</option><option>half_day</option><option>leave</option></select>
+        </div>
+        <div class="form-group"><label>Remarks</label><input type="text" id="attRemarks" placeholder="Optional"></div>
+      </div>
+      <button class="btn btn-primary" onclick="markAttendance()">💾 Save</button>
+    </div>
+    <div class="card">
+      <h3 style="margin-top:0;color:#1B4F8A">Attendance Log</h3>
+      <div class="filter-row">
+        <input type="number" id="fUser" placeholder="User ID">
+        <input type="date" id="fFrom">
+        <input type="date" id="fTo">
+        <button class="btn btn-primary btn-sm" onclick="loadAttendance()">Filter</button>
+        <button class="btn btn-sm" style="background:#27AE60;color:#fff" onclick="exportAtt()">📥 Export CSV</button>
+      </div>
+      <table><thead><tr><th>Employee</th><th>Date</th><th>Clock In</th><th>Clock Out</th><th>Hours</th><th>OT</th><th>Status</th><th>Remarks</th></tr></thead>
+      <tbody id="attBody"><tr><td colspan="8" style="text-align:center;color:#999">Apply filter to view records</td></tr></tbody></table>
+    </div>
+  </div>
+
+  <!-- MONTHLY SUMMARY -->
+  <div id="tab-summary" style="display:none">
+    <div class="card">
+      <div class="filter-row">
+        <select id="sumMonth"></select>
+        <select id="sumYear"></select>
+        <button class="btn btn-primary btn-sm" onclick="loadSummary()">View Summary</button>
+      </div>
+      <table>
+        <thead><tr><th>Employee</th><th>Designation</th><th>Dept</th><th>Present</th><th>Absent</th><th>Late</th><th>Half Day</th><th>Leave</th><th>Total Hrs</th><th>OT Hrs</th></tr></thead>
+        <tbody id="sumBody"><tr><td colspan="10" style="text-align:center;color:#999">Select month and year</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script>
+const API=  'http://localhost:5000/api';
+const token=localStorage.getItem('token');
+const user= JSON.parse(localStorage.getItem('user')||'{}');
+if(!token||![1,3,4].includes(user.role_id)){ alert('Access restricted'); location.href='login.html'; }
+
+function ap(url,opts={}){ return fetch(API+url,{headers:{'Authorization':'Bearer '+token,'Content-Type':'application/json'},...opts}).then(r=>r.json()); }
+function msg(id,t,type){ const m=document.getElementById(id); m.textContent=t; m.className='msg '+type; setTimeout(()=>{m.className='msg';},4000); }
+function showTab(id,btn){ ['shifts','attendance','summary'].forEach(t=>document.getElementById('tab-'+t).style.display=t===id?'':'none'); document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); }
+
+// Init dropdowns
+(function(){
+  const MONTHS=['January','February','March','April','May','June','July','August','September','October','November','December'];
+  const ms=document.getElementById('sumMonth'), ys=document.getElementById('sumYear');
+  const now=new Date();
+  MONTHS.forEach((m,i)=>{ const o=document.createElement('option'); o.value=i+1; o.textContent=m; if(i===now.getMonth()) o.selected=true; ms.appendChild(o); });
+  for(let y=now.getFullYear();y>=now.getFullYear()-3;y--){ const o=document.createElement('option'); o.value=y; o.textContent=y; if(y===now.getFullYear()) o.selected=true; ys.appendChild(o); }
+  document.getElementById('attDate').value=now.toISOString().slice(0,10);
+})();
+
+async function loadShifts(){
+  const data=await ap('/admin/shifts');
+  const el=document.getElementById('shiftList');
+  if(!data.length){ el.innerHTML='<p style="color:#94a3b8">No shifts defined yet.</p>'; return; }
+  el.innerHTML=data.map(s=>`
+    <div class="shift-card">
+      <div>
+        <strong>${s.shift_name}</strong>
+        <span style="color:#64748b;font-size:13px;margin-left:12px">${s.start_time} – ${s.end_time}</span>
+        <span style="color:#94a3b8;font-size:12px;margin-left:8px">(${s.working_hours||'?'}h · grace ${s.grace_minutes}min)</span>
+      </div>
+      <button class="btn btn-danger btn-sm" onclick="deleteShift(${s.shift_id})">🗑️</button>
+    </div>`).join('');
+}
+
+async function createShift(){
+  const body={shift_name:document.getElementById('shiftName').value,start_time:document.getElementById('shiftStart').value,end_time:document.getElementById('shiftEnd').value,grace_minutes:document.getElementById('shiftGrace').value||15};
+  if(!body.shift_name||!body.start_time||!body.end_time){ msg('shiftMsg','All fields required','error'); return; }
+  const r=await ap('/admin/shifts',{method:'POST',body:JSON.stringify(body)});
+  msg('shiftMsg',r.message,'success'); loadShifts();
+}
+
+async function deleteShift(id){
+  if(!confirm('Delete this shift?')) return;
+  await ap('/admin/shifts/'+id,{method:'DELETE'}); loadShifts();
+}
+
+async function loadAttendance(){
+  const u=document.getElementById('fUser').value, f=document.getElementById('fFrom').value, t=document.getElementById('fTo').value;
+  let url='/admin/attendance?';
+  if(u) url+=`user_id=${u}&`; if(f) url+=`date_from=${f}&`; if(t) url+=`date_to=${t}&`;
+  const data=await ap(url);
+  const tb=document.getElementById('attBody');
+  if(!data.length){ tb.innerHTML='<tr><td colspan="8" style="text-align:center;color:#999">No records found</td></tr>'; return; }
+  tb.innerHTML=data.map(r=>`<tr>
+    <td><strong>${r.full_name}</strong></td>
+    <td>${new Date(r.work_date).toLocaleDateString('en-IN')}</td>
+    <td>${r.clock_in?r.clock_in.slice(11,16):'—'}</td>
+    <td>${r.clock_out?r.clock_out.slice(11,16):'—'}</td>
+    <td>${r.total_hours!=null?r.total_hours+'h':'—'}</td>
+    <td>${r.ot_hours>0?`<span style="color:#D4AC0D;font-weight:700">${r.ot_hours}h</span>`:'—'}</td>
+    <td><span style="padding:2px 8px;border-radius:20px;font-size:11px;font-weight:700;background:${r.status==='present'?'#D5F5E3':r.status==='absent'?'#FADBD8':'#FEF9E7'};color:${r.status==='present'?'#1E8449':r.status==='absent'?'#C0392B':'#D4AC0D'}">${r.status}</span></td>
+    <td>${r.remarks||'—'}</td>
+  </tr>`).join('');
+}
+
+async function markAttendance(){
+  const body={user_id:document.getElementById('attUser').value,work_date:document.getElementById('attDate').value,clock_in:document.getElementById('attIn').value||null,clock_out:document.getElementById('attOut').value||null,status:document.getElementById('attStatus').value,remarks:document.getElementById('attRemarks').value};
+  if(!body.user_id||!body.work_date){ msg('attMsg','User ID and date required','error'); return; }
+  const r=await ap('/admin/attendance',{method:'POST',body:JSON.stringify(body)});
+  msg('attMsg',r.message+(r.total_hours!=null?` · ${r.total_hours}h worked, OT: ${r.ot_hours}h`:''),'success');
+}
+
+async function loadSummary(){
+  const m=document.getElementById('sumMonth').value, y=document.getElementById('sumYear').value;
+  const data=await ap(`/admin/attendance/summary?month=${m}&year=${y}`);
+  const tb=document.getElementById('sumBody');
+  const rows=data.summary||data;
+  if(!rows.length){ tb.innerHTML='<tr><td colspan="10" style="text-align:center;color:#999">No data</td></tr>'; return; }
+  tb.innerHTML=rows.map(r=>`<tr>
+    <td><strong>${r.full_name}</strong></td>
+    <td>${r.designation||'—'}</td>
+    <td>${r.dept_name||'—'}</td>
+    <td style="color:#1E8449;font-weight:700">${r.days_present||0}</td>
+    <td style="color:#C0392B">${r.days_absent||0}</td>
+    <td style="color:#D4AC0D">${r.days_late||0}</td>
+    <td>${r.days_half||0}</td>
+    <td>${r.days_leave||0}</td>
+    <td>${parseFloat(r.total_hours||0).toFixed(1)}h</td>
+    <td style="${parseFloat(r.total_ot_hours||0)>0?'color:#D4AC0D;font-weight:700':''}">${parseFloat(r.total_ot_hours||0).toFixed(1)}h</td>
+  </tr>`).join('');
+}
+
+async function exportAtt(){
+  const u=document.getElementById('fUser').value, f=document.getElementById('fFrom').value, t=document.getElementById('fTo').value;
+  let url=`${API}/admin/attendance/export?_t=${token}`;
+  if(u) url+=`&user_id=${u}`; if(f) url+=`&date_from=${f}`; if(t) url+=`&date_to=${t}`;
+  window.open(url,'_blank');
+}
+
+loadShifts();
+</script>
+</body></html>

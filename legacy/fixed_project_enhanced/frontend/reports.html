@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Reports – Workforce Intelligence v6.0</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+  body{background:#F0F4F8}
+  .pw{max-width:1080px;margin:0 auto;padding:24px}
+  .card{background:#fff;border-radius:12px;padding:22px;box-shadow:0 2px 12px rgba(0,0,0,.08);border:1px solid #e2e8f0;margin-bottom:20px}
+  .ct{font-weight:700;font-size:14px;margin-bottom:14px;color:#0f172a}
+  .rep-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:14px;margin-bottom:24px}
+  .rep-card{background:#fff;border-radius:12px;padding:18px;border:1.5px solid #e2e8f0;cursor:pointer;transition:all .2s;box-shadow:0 2px 8px rgba(0,0,0,.05)}
+  .rep-card:hover{border-color:#2563eb;transform:translateY(-2px);box-shadow:0 6px 20px rgba(37,99,235,.1)}
+  .rep-icon{font-size:26px;margin-bottom:9px}
+  .rep-title{font-weight:700;font-size:13px;margin-bottom:4px;color:#0f172a}
+  .rep-desc{font-size:11px;color:#64748b;line-height:1.5}
+  .rep-btn{margin-top:12px;padding:6px 14px;background:#2563eb;color:#fff;border:none;border-radius:7px;font-size:11px;font-weight:700;cursor:pointer;width:100%}
+  table{width:100%;border-collapse:collapse;font-size:13px}
+  th{padding:9px 11px;text-align:left;color:#64748b;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;border-bottom:2px solid #e2e8f0}
+  td{padding:9px 11px;border-bottom:1px solid #f1f5f9}
+  tr:hover td{background:#f8fafc}
+  .pill{display:inline-block;padding:2px 8px;border-radius:999px;font-size:10px;font-weight:700}
+  .pb{background:#dbeafe;color:#2563eb}.pg{background:#dcfce7;color:#16a34a}.pa{background:#fef3c7;color:#d97706}
+  .btn-row{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:18px}
+  .btn{padding:8px 18px;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer}
+  .btn-p{background:#2563eb;color:#fff}.btn-g{background:#f1f5f9;color:#64748b}
+  .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:999;align-items:center;justify-content:center}
+  .modal-overlay.open{display:flex}
+  .modal-box{background:#fff;border-radius:16px;padding:28px;width:min(540px,95vw);max-height:90vh;overflow-y:auto}
+  .modal-title{font-size:1rem;font-weight:700;margin-bottom:16px}
+  .form-group{margin-bottom:12px}
+  .form-group label{display:block;font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.04em;margin-bottom:5px}
+  .form-group input,.form-group select,.form-group textarea{width:100%;padding:9px 12px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:13px;box-sizing:border-box}
+</style>
+</head>
+<body>
+<nav class="navbar">
+  <div class="nav-brand">⚡ Workforce Intelligence v6.0</div>
+  <div class="nav-links">
+    <a href="analytics.html" style="color:#fff">📊 Analytics</a>
+    <a href="leaderboard.html" style="color:#fff;margin-left:16px">🏆 Leaderboard</a>
+    <a href="javascript:history.back()" style="color:#fff;margin-left:16px">← Back</a>
+    <a href="login.html" onclick="localStorage.clear()" style="color:#fff;margin-left:16px">Logout</a>
+  </div>
+</nav>
+
+<div class="pw">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;flex-wrap:wrap;gap:10px">
+    <h2 style="font-size:1.4rem">📈 Reports</h2>
+    <button class="btn btn-p" onclick="openCreate()">+ New Report</button>
+  </div>
+
+  <!-- Quick generate cards -->
+  <div class="rep-grid">
+    <div class="rep-card">
+      <div class="rep-icon">📊</div>
+      <div class="rep-title">Payroll Summary</div>
+      <div class="rep-desc">Monthly payroll cost by dept and employee. Includes gross, deductions, net.</div>
+      <button class="rep-btn" onclick="quickGen('Payroll Summary','monthly')">📥 Generate</button>
+    </div>
+    <div class="rep-card">
+      <div class="rep-icon">📅</div>
+      <div class="rep-title">Attendance Report</div>
+      <div class="rep-desc">Present/absent/late/OT records by month and department.</div>
+      <button class="rep-btn" onclick="quickGen('Task Summary','monthly')">📥 Generate</button>
+    </div>
+    <div class="rep-card">
+      <div class="rep-icon">🏖️</div>
+      <div class="rep-title">Leave Utilization</div>
+      <div class="rep-desc">Leave taken vs entitled by type, department, and employee.</div>
+      <button class="rep-btn" onclick="quickGen('Employee Performance','monthly')">📥 Generate</button>
+    </div>
+    <div class="rep-card">
+      <div class="rep-icon">📋</div>
+      <div class="rep-title">Task Performance</div>
+      <div class="rep-desc">Completion rate, overdue analysis, and productivity trends.</div>
+      <button class="rep-btn" onclick="quickGen('Productivity','monthly')">📥 Generate</button>
+    </div>
+    <div class="rep-card">
+      <div class="rep-icon">⚠️</div>
+      <div class="rep-title">Overdue Alert</div>
+      <div class="rep-desc">All tasks past deadline with affected employees and days overdue.</div>
+      <button class="rep-btn" onclick="quickGen('Overdue Alert','all')">📥 Generate</button>
+    </div>
+    <div class="rep-card">
+      <div class="rep-icon">🔍</div>
+      <div class="rep-title">Audit Trail</div>
+      <div class="rep-desc">Full compliance report of all admin actions with timestamps.</div>
+      <button class="rep-btn" onclick="quickGen('Employee Performance','all')">📥 Generate</button>
+    </div>
+  </div>
+
+  <!-- Saved reports -->
+  <div class="card">
+    <div class="ct">📁 Saved Reports</div>
+    <div id="reportsList"><div style="text-align:center;color:#94a3b8;padding:24px">Loading reports…</div></div>
+  </div>
+</div>
+
+<!-- Create modal -->
+<div class="modal-overlay" id="viewReportModal" onclick="if(event.target===this)this.classList.remove('open')">
+  <div class="modal-box" style="max-width:800px;width:95vw">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+      <div class="modal-title" style="margin:0">Report Data</div>
+      <button onclick="document.getElementById('viewReportModal').classList.remove('open')" style="background:none;border:none;font-size:1.2rem;cursor:pointer;color:#64748b">✕</button>
+    </div>
+    <div id="viewReportBody" style="font-size:.82rem;color:#1e293b"></div>
+  </div>
+</div>
+
+<!-- Create modal -->
+<div class="modal-overlay" id="createModal">
+  <div class="modal-box">
+    <div class="modal-title">📈 New Report</div>
+    <div class="form-group"><label>Report Title</label><input type="text" id="rTitle" placeholder="e.g. Payroll Summary May 2025"></div>
+    <div class="form-group"><label>Report Type</label>
+      <select id="rType"><option>Productivity</option><option>Task Summary</option><option>Employee Performance</option><option>Overdue Alert</option><option>Custom</option></select>
+    </div>
+    <div class="form-group"><label>Period</label>
+      <select id="rPeriod"><option value="daily">Daily</option><option value="weekly">Weekly</option><option value="monthly" selected>Monthly</option><option value="annual">Annual</option><option value="all">All Time</option></select>
+    </div>
+    <div class="form-group"><label>Summary (optional)</label><textarea id="rSummary" rows="3" placeholder="Auto-generated if left blank"></textarea></div>
+    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:16px">
+      <button class="btn btn-g" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-p" onclick="createReport()">Generate</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const API   = 'http://localhost:5000/api';
+const token = localStorage.getItem('token');
+if (!token) location.href = 'login.html';
+
+function ap(url, opts={}) {
+  return fetch(API+url,{headers:{'Authorization':'Bearer '+token,'Content-Type':'application/json'},...opts}).then(r=>r.json());
+}
+
+async function loadReports() {
+  try {
+    const data = await ap('/reports');
+    const el   = document.getElementById('reportsList');
+    if (!data.length) { el.innerHTML='<div style="text-align:center;color:#94a3b8;padding:24px">No reports yet. Generate one above.</div>'; return; }
+    el.innerHTML=`<table><thead><tr><th>Title</th><th>Type</th><th>Period</th><th>Generated</th><th>By</th><th>Actions</th></tr></thead><tbody>
+      ${data.map(r=>`<tr>
+        <td><strong>${r.report_title}</strong>${r.summary?`<br><small style="color:#94a3b8">${r.summary.slice(0,80)}…</small>`:''}</td>
+        <td><span class="pill pb">${r.report_type}</span></td>
+        <td style="color:#64748b;font-size:11px">${r.period||'—'}</td>
+        <td style="font-size:11px;color:#64748b">${new Date(r.report_date).toLocaleDateString('en-IN')}</td>
+        <td style="font-size:11px">${r.author_name||'—'}</td>
+        <td><div style="display:flex;gap:4px">
+          <a href="${API}/reports/${r.report_id}/export?format=json" target="_blank"><button class="btn btn-g" style="padding:4px 9px;font-size:10px">👁️</button></a>
+          <a href="${API}/reports/${r.report_id}/export?format=csv" target="_blank"><button class="btn btn-g" style="padding:4px 9px;font-size:10px">📥 CSV</button></a>
+          <button onclick="viewReport(${r.report_id},'${escHtml(r.report_title)}')" class="btn btn-g" style="padding:4px 9px;font-size:10px;background:#eff6ff;color:#1B4F8A">👁 View</button>
+          <button onclick="printReport(${r.report_id},'${escHtml(r.report_title)}')" class="btn btn-g" style="padding:4px 9px;font-size:10px;background:#f0fdf4;color:#15803d">🖨️ Print</button>
+          <button onclick="deleteReport(${r.report_id})" class="btn btn-g" style="padding:4px 9px;font-size:10px;color:#dc2626">🗑️</button>
+        </div></td>
+      </tr>`).join('')}
+    </tbody></table>`;
+  } catch(e) { console.error(e); }
+}
+
+async function quickGen(type, period) {
+  try {
+    const title = `${type} — ${new Date().toLocaleDateString('en-IN',{month:'long',year:'numeric'})}`;
+    const r = await ap('/reports',{method:'POST',body:JSON.stringify({report_title:title,report_type:type,period,auto_generate:true})});
+    alert(r.message || 'Report generated!');
+    loadReports();
+  } catch(e) { alert('Error: '+e.message); }
+}
+
+function openCreate(){ document.getElementById('createModal').classList.add('open'); }
+function closeModal(){ document.getElementById('createModal').classList.remove('open'); }
+
+async function createReport(){
+  const body={report_title:document.getElementById('rTitle').value,report_type:document.getElementById('rType').value,period:document.getElementById('rPeriod').value,summary:document.getElementById('rSummary').value||undefined,auto_generate:true};
+  if(!body.report_title){ alert('Title required'); return; }
+  const r=await ap('/reports',{method:'POST',body:JSON.stringify(body)});
+  alert(r.message||'Created'); closeModal(); loadReports();
+}
+
+async function deleteReport(id){
+  if(!confirm('Delete this report?')) return;
+  await ap('/reports/'+id,{method:'DELETE'});
+  loadReports();
+}
+
+async function viewReport(id, title){
+  try {
+    const data = await ap('/reports/'+id);
+    const rows = data.report_data;
+    let html = '<div style="font-size:1rem;font-weight:800;color:#1B4F8A;margin-bottom:12px">📊 '+escHtml(title)+'</div>';
+    if (Array.isArray(rows) && rows.length) {
+      const keys = Object.keys(rows[0]);
+      html += '<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:.8rem">';
+      html += '<tr style="background:#f1f5f9">'+keys.map(k=>'<th style="padding:8px 10px;text-align:left;font-weight:700;color:#64748b;white-space:nowrap">'+escHtml(k)+'</th>').join('')+'</tr>';
+      html += rows.map(r=>'<tr style="border-bottom:1px solid #f1f5f9">'+keys.map(k=>'<td style="padding:8px 10px">'+escHtml(String(r[k]!=null?r[k]:'—'))+'</td>').join('')+'</tr>').join('');
+      html += '</table></div>';
+    } else {
+      html += '<pre style="background:#f8fafc;border-radius:8px;padding:14px;font-size:.75rem;overflow:auto;max-height:340px">'+JSON.stringify(rows,null,2)+'</pre>';
+    }
+    document.getElementById('viewReportBody').innerHTML = html;
+    document.getElementById('viewReportModal').classList.add('open');
+  } catch(e){ alert('Failed to load report data.'); }
+}
+
+function printReport(id, title){
+  window.open(API+'/reports/'+id+'/export?format=csv', '_blank');
+}
+
+function escHtml(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+loadReports();
+</script>
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <a href="index.html" class="footer-brand">⚡ Workforce Intelligence Platform v6.0</a>
+    <p class="footer-copy">&copy; 2025 Workforce Intelligence Platform v6.0</p>
+  </div>
+</footer>
+</body>
+</html>

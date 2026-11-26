@@ -1,0 +1,85 @@
+{
+  "date": "2026-11-14",
+  "baseline_commit": "fb39b8e53b39ee9a2675cebef157f40a2b291481",
+  "api_tests": 122,
+  "api_suites": 8,
+  "page_checks": {
+    "chromium": {
+      "checks": 375,
+      "failures": 0,
+      "widths": [
+        320,
+        768,
+        1440
+      ]
+    },
+    "webkit": {
+      "checks": 375,
+      "failures": 0,
+      "widths": [
+        320,
+        768,
+        1440
+      ]
+    }
+  },
+  "workflow_checks": 84,
+  "finance_engines": [
+    "chromium",
+    "webkit"
+  ],
+  "public_settings_engines": [
+    "chromium",
+    "webkit"
+  ],
+  "navigation_engines": [
+    "chromium",
+    "webkit"
+  ],
+  "passkey": "Chromium virtual authenticator, not physical hardware",
+  "production_dependency_audit_known_vulnerabilities": 0,
+  "snapshot": {
+    "base_tables": 161,
+    "restored_rows": 24802,
+    "migrations": 10,
+    "business_row_count_mismatches": {}
+  },
+  "public_url": "https://workforce.bharatmedha.com/",
+  "external_provider_tests": "contract mocks and official links; no paid calls or financial transfers",
+  "theme_release": {
+    "baseline_commit": "a389df3",
+    "api_tests": 127,
+    "api_suites": 9,
+    "templates": 31,
+    "urls": 125,
+    "page_viewports": [
+      320,
+      768,
+      1440
+    ],
+    "engines": [
+      "chromium",
+      "webkit"
+    ],
+    "checks_per_engine": 375,
+    "theme_presets": [
+      "system",
+      "light",
+      "day",
+      "night",
+      "dark"
+    ],
+    "public_theme_persistence": "passed in Chromium and WebKit",
+    "finance": "passed mobile and desktop in Chromium",
+    "stylesheet": "frontend/theme.css",
+    "assertions": [
+      "one central theme stylesheet",
+      "computed font consistency",
+      "compact mobile menu labels",
+      "page load and script errors",
+      "horizontal overflow",
+      "header branding",
+      "menu and Escape behavior"
+    ]
+  }
+}

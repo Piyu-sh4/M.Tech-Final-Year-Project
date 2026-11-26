@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Import employees · Workforce Intelligence</title>
+  <link rel="stylesheet" href="/workspace.css">
+  <link rel="stylesheet" href="/modules.css">
+  <link rel="stylesheet" href="/navigation.css">
+  <link rel="stylesheet" href="/preferences.css">
+  <link rel="stylesheet" href="/theme.css">
+  <script src="/navigation.js" defer></script>
+  <script src="/appearance.js" defer></script>
+  <script src="/vendor/xlsx.js" defer></script>
+  <script src="/employee-import.js" defer></script>
+</head>
+<body class="wfi-module-page">
+  <a class="wfi-skip" href="#main-content">Skip to content</a>
+  <main id="main-content" tabindex="-1">
+    <div class="page-heading wfi-page-lead">
+      <div>
+        <p class="eyebrow">Administration</p>
+        <h1>Import employees</h1>
+        <p>Check a spreadsheet before sending employees to registration review.</p>
+      </div>
+      <a class="action-link" id="registration-review" href="/registration-tracker.html">Registration tracker</a>
+    </div>
+    <p id="message" role="status" aria-live="polite">Checking access…</p>
+    <section class="records-surface" aria-labelledby="choose-spreadsheet" id="import-section" hidden>
+      <h2 id="choose-spreadsheet">Choose a spreadsheet</h2>
+      <p>Use the first sheet of a CSV or XLSX file with up to 50 employees. A full name and work email are required. Job title, department, and company are optional. Use the names already configured in Workforce Intelligence.</p>
+      <a id="download-import-template" class="action-link"
+         href="/employee-import-template.csv" download>Download CSV template</a>
+      <form id="import-form">
+        <label class="filter" for="employee-spreadsheet">Employee spreadsheet
+          <input type="file" id="employee-spreadsheet" accept=".csv,.xlsx" required>
+        </label>
+        <div class="form-buttons">
+          <button type="submit" class="primary" id="preview-button">Preview spreadsheet</button>
+          <button type="button" id="discard-spreadsheet" hidden>Discard spreadsheet</button>
+        </div>
+      </form>
+    </section>
+    <section class="records-surface" aria-labelledby="import-preview-heading" id="import-preview" hidden>
+      <h2 id="import-preview-heading">Employee preview</h2>
+      <p id="import-preview-summary"></p>
+      <div class="table-wrap">
+        <table class="wfi-record-table" role="table" aria-label="Employee validation results">
+          <thead role="rowgroup"><tr role="row">
+            <th scope="col" role="columnheader">Data row</th>
+            <th scope="col" role="columnheader">Full name</th>
+            <th scope="col" role="columnheader">Email</th>
+            <th scope="col" role="columnheader">Job title</th>
+            <th scope="col" role="columnheader">Department</th>
+            <th scope="col" role="columnheader">Company</th>
+            <th scope="col" role="columnheader">Validation</th>
+          </tr></thead>
+          <tbody id="import-preview-rows" role="rowgroup"></tbody>
+        </table>
+      </div>
+      <div class="form-buttons">
+        <button type="button" class="primary" id="submit-import" hidden>Send to registration review</button>
+      </div>
+    </section>
+  </main>
+</body>
+</html>

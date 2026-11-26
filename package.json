@@ -1,0 +1,81 @@
+{
+  "name": "workforce-intelligence-platform",
+  "version": "1.0.0",
+  "description": "AI-Powered Enterprise HRMS — HR, Payroll, Attendance, Compliance, AI Copilot",
+  "main": "backend/server.js",
+  "scripts": {
+    "start": "node backend/server.js",
+    "dev": "nodemon backend/server.js",
+    "db:setup": "mysql -u root -p -e \"CREATE DATABASE IF NOT EXISTS workforce_intelligence CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci; CREATE USER IF NOT EXISTS 'wfi_user'@'localhost' IDENTIFIED WITH mysql_native_password BY 'P123/'; GRANT ALL PRIVILEGES ON workforce_intelligence.* TO 'wfi_user'@'localhost'; FLUSH PRIVILEGES;\"",
+    "db:init": "npm run db:create && npm run db:import",
+    "db:reset": "mysql -u root -p -e \"DROP DATABASE IF EXISTS workforce_intelligence;\" && npm run db:init",
+    "test": "jest --config=tests/jest.config.js",
+    "test:watch": "jest --config=tests/jest.config.js --watch",
+    "test:cov": "jest --config=tests/jest.config.js --coverage",
+    "attrition": "python attrition_model.py",
+    "docker:up": "docker compose up -d",
+    "docker:down": "docker compose down",
+    "db:user": "mysql -u root -p -e \"CREATE USER IF NOT EXISTS 'wfi_user'@'localhost' IDENTIFIED WITH mysql_native_password BY 'P123/'; GRANT ALL PRIVILEGES ON workforce_intelligence.* TO 'wfi_user'@'localhost'; FLUSH PRIVILEGES; SELECT 'wfi_user created with P123/' AS result;\"",
+    "db:create": "mysql -u root -p -e \"CREATE DATABASE IF NOT EXISTS workforce_intelligence CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci; CREATE USER IF NOT EXISTS 'wfi_user'@'localhost' IDENTIFIED WITH mysql_native_password BY 'P123/'; GRANT ALL PRIVILEGES ON workforce_intelligence.* TO 'wfi_user'@'localhost'; FLUSH PRIVILEGES; SELECT 'Database ready' AS Status;\"",
+    "db:import": "mysql --default-character-set=utf8mb4 -u wfi_user -pP123/ workforce_intelligence < database/init/02_master.sql",
+    "db:verify": "mysql -u wfi_user -pP123/ workforce_intelligence -e \"SELECT COUNT(*) AS tables FROM information_schema.tables WHERE table_schema='workforce_intelligence'; SELECT COUNT(*) AS users FROM users;\"",
+    "setup": "node -e \"const fs=require('fs');if(!fs.existsSync('.env'))fs.copyFileSync('.env.example','.env')\" && PUPPETEER_SKIP_DOWNLOAD=true npm install",
+    "setup:win": "node -e \"const fs=require('fs');if(!fs.existsSync('.env'))fs.copyFileSync('.env.example','.env')\" && set PUPPETEER_SKIP_DOWNLOAD=true && npm install",
+    "docker:logs": "docker compose logs -f api",
+    "docker:reset": "docker compose down -v && docker compose up -d",
+    "test:docker": "sh scripts/test-docker.sh",
+    "test:browser": "node tests/browser-finance.cjs && node tests/browser-pages.cjs",
+    "test:browser:workflows": "node tests/browser-workflows.cjs",
+    "test:browser:settings": "node tests/browser-settings.cjs",
+    "test:browser:device": "node tests/browser-device-auth.cjs"
+  },
+  "keywords": [
+    "hrms",
+    "payroll",
+    "attendance",
+    "task-management",
+    "nodejs",
+    "express",
+    "mysql",
+    "claude-ai"
+  ],
+  "author": "Workforce Intelligence Team",
+  "license": "MIT",
+  "dependencies": {
+    "@simplewebauthn/browser": "^14.0.0",
+    "@simplewebauthn/server": "^14.1.0",
+    "bcryptjs": "^2.4.3",
+    "compression": "^1.8.2",
+    "cors": "^2.8.5",
+    "docx": "^9.16.0",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.2",
+    "jsbarcode": "3.11.6",
+    "jsonwebtoken": "^9.0.2",
+    "mammoth": "^1.6.0",
+    "multer": "^2.5.0",
+    "mysql": "^2.18.1",
+    "nodemailer": "^10.6.1",
+    "pdf-parse": "^1.1.1",
+    "puppeteer": "^25.17.0",
+    "redis": "^4.7.0",
+    "socket.io": "^4.7.5",
+    "xlsx": "https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz"
+  },
+  "devDependencies": {
+    "jest": "^30.5.2",
+    "nodemon": "^3.1.0",
+    "socket.io-client": "^4.8.4",
+    "supertest": "^7.3.2"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "overrides": {
+    "express": {
+      "qs": "^6.16.2"
+    },
+    "glob": "^14.0.6",
+    "minimatch": "^11.0.8"
+  }
+}

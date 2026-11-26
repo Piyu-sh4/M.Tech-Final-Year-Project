@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Assets Management — Workforce Intelligence</title>
+<style>
+:root{--bg:#F8FAFC;--card:#fff;--border:#E2E8F0;--text:#1E293B;--muted:#64748B;--accent:#2563EB}
+body.dark-mode{--bg:#07101F;--card:#0D1B2E;--border:#162840;--text:#E4EAF0;--muted:#6B7F96}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:"Segoe UI",system-ui,sans-serif;background:var(--bg);color:var(--text)}
+.navbar{display:flex;align-items:center;padding:0 20px;height:54px;background:#0F172A;border-bottom:1px solid #1E293B;position:sticky;top:0;z-index:200;gap:12px}
+.nb-brand{display:flex;align-items:center;gap:8px;text-decoration:none;color:#E2E8F0;font-weight:800;font-size:.88rem}
+.nb-icon{width:28px;height:28px;background:linear-gradient(135deg,#1D4ED8,#6D28D9);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:.82rem}
+.nb-page{font-size:.72rem;color:#475569;font-weight:600}
+.nb-right{margin-left:auto;display:flex;align-items:center;gap:10px}
+.nb-link{color:#60A5FA;font-size:.72rem;font-weight:700;text-decoration:none}
+.dm-btn{width:30px;height:17px;border-radius:9px;border:none;background:#334155;cursor:pointer;position:relative;transition:background .2s}
+.dm-btn.on{background:#2563EB}
+.main{padding:20px 24px;max-width:1200px;margin:0 auto}
+.ph{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;flex-wrap:wrap;gap:10px}
+.ph h1{font-size:1.2rem;font-weight:900;color:var(--text)}
+.ph p{font-size:.76rem;color:var(--muted);margin-top:3px}
+.export-bar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+.btn{padding:7px 16px;border-radius:8px;font-size:.75rem;font-weight:700;cursor:pointer;font-family:inherit;border:1.5px solid var(--border);background:transparent;color:var(--muted);transition:all .2s}
+.btn:hover{border-color:var(--accent);color:var(--accent)}
+.btn-primary{background:linear-gradient(135deg,#2563EB,#4F46E5);color:#fff;border-color:transparent}
+.btn-primary:hover{opacity:.88}
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:14px;margin-bottom:20px}
+.kpi{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px}
+.kpi-n{font-size:1.8rem;font-weight:900;color:var(--accent)}
+.kpi-l{font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-top:4px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:18px;margin-bottom:14px}
+table{width:100%;border-collapse:collapse;font-size:.8rem}
+thead th{background:#F8FAFC;padding:9px 12px;text-align:left;font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);border-bottom:2px solid var(--border)}
+tbody td{padding:9px 12px;border-bottom:1px solid #F1F5F9;color:var(--text)}
+tbody tr:hover td{background:#F8FAFC}
+.badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:999px;font-size:.67rem;font-weight:700}
+.badge-green{background:#DCFCE7;color:#166534}
+.badge-amber{background:#FEF9C3;color:#92400E}
+.badge-red{background:#FEE2E2;color:#991B1B}
+.toast{position:fixed;bottom:24px;right:24px;padding:11px 18px;border-radius:10px;color:#fff;font-weight:700;font-size:.8rem;z-index:9999;transform:translateY(100px);opacity:0;transition:all .3s;max-width:340px}
+.toast.show{transform:translateY(0);opacity:1}
+</style>
+<style id="wfi-print">@media print{.wiq-sidebar,.wiq-mob-toggle,.navbar,.export-bar,#ckb,#cookieBanner,#toast,footer{display:none!important}body{padding:16px!important}table{width:100%;border-collapse:collapse}th{background:#1e3a5f!important;color:#fff!important;-webkit-print-color-adjust:exact}.card{page-break-inside:avoid;border:1px solid #e2e8f0!important}}</style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar">
+  <a class="nb-brand" href="admin-dashboard.html">
+    <div class="nb-icon">⚡</div>
+    Workforce Intelligence
+  </a>
+  <span class="nb-page">🏭 Assets Management</span>
+  <div class="nb-right">
+    <a class="nb-link" href="admin-dashboard.html">← Dashboard</a>
+    <button id="dmt" class="dm-btn" onclick="window.tdm&&window.tdm()" title="Toggle dark mode"></button>
+  </div>
+</nav>
+
+<!-- COOKIE BANNER -->
+<div id="ckb" style="display:none;position:fixed;bottom:0;left:0;right:0;z-index:9998;background:linear-gradient(135deg,#0F172A,#1E293B);border-top:2px solid #2563EB;padding:14px 24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px">
+  <p style="font-size:.75rem;color:#CBD5E1">🍪 We use cookies. <a href="cookie-policy.html" style="color:#60A5FA;font-weight:700;text-decoration:none">Cookie Policy</a></p>
+  <div style="display:flex;gap:8px">
+    <button onclick="window.ac&&window.ac()" style="padding:6px 16px;background:#2563EB;color:#fff;border:none;border-radius:7px;font-weight:700;cursor:pointer;font-size:.74rem">Accept</button>
+    <button onclick="window.dc&&window.dc()" style="padding:6px 16px;background:transparent;color:#94A3B8;border:1px solid #334155;border-radius:7px;font-weight:700;cursor:pointer;font-size:.74rem">Decline</button>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div id="toast" class="toast"></div>
+
+<!-- MAIN CONTENT -->
+<div class="main">
+
+  <!-- EXPORT BAR -->
+  <div class="export-bar">
+    <button class="btn" onclick="window.dlPrint&&window.dlPrint('Asset Register Report','<h3>Asset Register</h3><table><thead><tr><th>Asset ID</th><th>Name</th><th>Category</th><th>Assigned To</th><th>Status</th><th>Value</th></tr></thead><tbody><tr><td>AST-001</td><td>MacBook Pro 14</td><td>IT Equipment</td><td>Priya Nair</td><td>In Use</td><td>&#8377;1,45,000</td></tr><tr><td>AST-002</td><td>Dell Monitor 27</td><td>IT Equipment</td><td>Ravi Kumar</td><td>In Use</td><td>&#8377;32,000</td></tr></tbody></table>')">🖨️ Print Register</button>
+    <button class="btn" onclick="window.dlCSV&&window.dlCSV([{id:'AST-001',name:'MacBook Pro 14',category:'IT Equipment',assigned:'Priya Nair',status:'In Use',value:'145000'},{id:'AST-002',name:'Dell Monitor 27',category:'IT Equipment',assigned:'Ravi Kumar',status:'In Use',value:'32000'},{id:'AST-003',name:'Office Chair',category:'Furniture',assigned:'Sneha Reddy',status:'In Use',value:'12500'}],['id','name','category','assigned','status','value'],'asset_register')">⬇️ Export CSV</button>
+    <button class="btn" onclick="window.dlPrint&&window.dlPrint('Asset Disposal Report','<h3>Asset Disposal Report</h3><p>Assets pending disposal: 3</p>')">🗑️ Disposal Report</button>
+    <button class="btn btn-primary" onclick="window.st&&window.st('Asset request form opened',true)">+ Add Asset</button>
+  </div>
+
+  <!-- KPIs -->
+  <div class="kpi-grid">
+    <div class="kpi"><div class="kpi-n">247</div><div class="kpi-l">Total Assets</div></div>
+    <div class="kpi"><div class="kpi-n">194</div><div class="kpi-l">In Use</div></div>
+    <div class="kpi"><div class="kpi-n">38</div><div class="kpi-l">In Stock</div></div>
+    <div class="kpi"><div class="kpi-n">15</div><div class="kpi-l">Under Repair</div></div>
+    <div class="kpi" style="border-color:#DC2626"><div class="kpi-n" style="color:#DC2626">3</div><div class="kpi-l">For Disposal</div></div>
+    <div class="kpi"><div class="kpi-n" style="color:#059669">₹1.2Cr</div><div class="kpi-l">Total Asset Value</div></div>
+  </div>
+
+  <!-- ASSET TABLE -->
+  <div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:8px">
+      <div>
+        <div style="font-size:.95rem;font-weight:800;color:var(--text)">🏭 Asset Register</div>
+        <div style="font-size:.72rem;color:var(--muted)">All company assets — IT, Furniture, Vehicles, Equipment</div>
+      </div>
+      <input type="text" placeholder="Search assets..." style="padding:7px 12px;border-radius:8px;border:1.5px solid var(--border);font-size:.76rem;font-family:inherit;background:var(--card);color:var(--text);outline:none;width:200px" oninput="filterTable(this.value)">
+    </div>
+    <div style="overflow-x:auto">
+      <table id="assetTable">
+        <thead>
+          <tr>
+            <th>Asset ID</th><th>Name</th><th>Category</th><th>Assigned To</th>
+            <th>Department</th><th>Location</th><th>Status</th><th>Value (₹)</th><th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>AST-001</td><td>MacBook Pro 14"</td><td>IT Equipment</td><td>Priya Nair</td><td>HR</td><td>3rd Floor</td><td><span class="badge badge-green">In Use</span></td><td>₹1,45,000</td><td><button class="btn" style="padding:3px 10px;font-size:.68rem" onclick="window.st('Viewing AST-001',true)">View</button></td></tr>
+          <tr><td>AST-002</td><td>Dell Monitor 27"</td><td>IT Equipment</td><td>Ravi Kumar</td><td>Engineering</td><td>2nd Floor</td><td><span class="badge badge-green">In Use</span></td><td>₹32,000</td><td><button class="btn" style="padding:3px 10px;font-size:.68rem" onclick="window.st('Viewing AST-002',true)">View</button></td></tr>
+          <tr><td>AST-003</td><td>Ergonomic Chair</td><td>Furniture</td><td>Sneha Reddy</td><td>Finance</td><td>4th Floor</td><td><span class="badge badge-green">In Use</span></td><td>₹12,500</td><td><button class="btn" style="padding:3px 10px;font-size:.68rem" onclick="window.st('Viewing AST-003',true)">View</button></td></tr>
+          <tr><td>AST-004</td><td>iPhone 15 Pro</td><td>Mobile Device</td><td>Arjun Nair</td><td>Sales</td><td>Mobile</td><td><span class="badge badge-green">In Use</span></td><td>₹1,29,000</td><td><button class="btn" style="padding:3px 10px;font-size:.68rem" onclick="window.st('Viewing AST-004',true)">View</button></td></tr>
+          <tr><td>AST-005</td><td>HP LaserJet Printer</td><td>IT Equipment</td><td>Unassigned</td><td>—</td><td>Store Room</td><td><span class="badge badge-amber">In Stock</span></td><td>₹28,000</td><td><button class="btn" style="padding:3px 10px;font-size:.68rem" onclick="window.st('Viewing AST-005',true)">View</button></td></tr>
+          <tr><td>AST-006</td><td>Standing Desk</td><td>Furniture</td><td>Priya Nair</td><td>HR</td><td>3rd Floor</td><td><span class="badge badge-amber">Under Repair</span></td><td>₹45,000</td><td><button class="btn" style="padding:3px 10px;font-size:.68rem" onclick="window.st('Viewing AST-006',true)">View</button></td></tr>
+          <tr><td>AST-007</td><td>Projector Epson</td><td>AV Equipment</td><td>Conference Room</td><td>Shared</td><td>1st Floor</td><td><span class="badge badge-red">For Disposal</span></td><td>₹18,000</td><td><button class="btn" style="padding:3px 10px;font-size:.68rem" onclick="window.st('Viewing AST-007',true)">View</button></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+
+
+<script id="wfi-utils">
+(function(){
+var w=window;
+w.dlPrint=w.dlPrint||function(t,c){var wi=window.open('','_blank','width=1100,height=800');if(!wi)return;var h='<html><head><title>'+(t||'Report')+'<\/title><style>body{font-family:Segoe UI,sans-serif;padding:28px;color:#1e293b}table{width:100%;border-collapse:collapse}th{background:#1e3a5f;color:#fff;padding:8px 12px;text-align:left;font-size:.75rem}td{padding:8px 12px;border-bottom:1px solid #e2e8f0}<\/style><\/head><body><h2>'+t+'<\/h2>'+(c||'')+'<button onclick="window.print()" style="background:#2563EB;color:#fff;border:none;padding:9px 24px;border-radius:7px;font-weight:700;cursor:pointer;margin-top:14px">Print<\/button><\/body><\/html>';wi.document.write(h);wi.document.close();};
+w.dlCSV=w.dlCSV||function(rows,h,fn){if(!rows||!rows.length)return;var keys=h||Object.keys(rows[0]);var L=[keys.map(function(k){return'"'+k+'"';}).join(',')];rows.forEach(function(r){L.push(keys.map(function(k){return'"'+String(r[k]||'')+'"';}).join(','));});var blob=new Blob([L.join('\n')],{type:'text/csv'});var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=(fn||'export')+'.csv';document.body.appendChild(a);a.click();document.body.removeChild(a);};
+w.tdm=w.tdm||function(){var d=document.body.classList.toggle('dark-mode');localStorage.setItem('wfi_dark_mode',d?'1':'0');var b=document.getElementById('dmt');if(b)b.classList.toggle('on',d);};
+w.toggleDarkMode=w.tdm;
+w.st=w.st||function(msg,ok){var t=document.getElementById('toast');if(!t)return;t.textContent=msg;t.style.background=ok!==false?'linear-gradient(135deg,#059669,#047857)':'linear-gradient(135deg,#DC2626,#B91C1C)';t.classList.add('show');setTimeout(function(){t.classList.remove('show');},3000);};
+w.showToast=w.st;
+w.logout=w.logout||function(){localStorage.clear();window.location.href='login.html';};
+w.ac=w.ac||function(){var b=document.getElementById('ckb');if(b)b.style.display='none';try{localStorage.setItem('wfi_ck','1');}catch(e){}};
+w.dc=w.dc||function(){var b=document.getElementById('ckb');if(b)b.style.display='none';};
+w.acceptCookies=w.ac;w.declineCookies=w.dc;
+// init
+if(localStorage.getItem('wfi_dark_mode')==='1') document.body.classList.add('dark-mode');
+if(!localStorage.getItem('wfi_ck')) setTimeout(function(){var b=document.getElementById('ckb');if(b)b.style.display='flex';},1000);
+})();
+
+function filterTable(q) {
+  var rows = document.querySelectorAll('#assetTable tbody tr');
+  rows.forEach(function(r) {
+    r.style.display = r.textContent.toLowerCase().includes(q.toLowerCase()) ? '' : 'none';
+  });
+}
+</script>
+
+<footer class="wiq-footer" style="background:#0F172A;border-top:1px solid #1E293B;padding:16px 24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-top:auto;flex-shrink:0">
+  <div style="display:flex;align-items:center;gap:10px">
+    <div style="width:26px;height:26px;background:linear-gradient(135deg,#1D4ED8,#6D28D9);border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:.75rem">&#9889;</div>
+    <div>
+      <div style="font-size:.73rem;font-weight:800;color:#E2E8F0">Workforce Intelligence</div>
+      <div style="font-size:.60rem;color:#475569">Enterprise HRMS &bull; DPDP 2023 &bull; PoSH 2013 &bull; ISO 27001</div>
+    </div>
+  </div>
+  <div style="display:flex;gap:14px;flex-wrap:wrap">
+    <a href="privacy-policy.html" style="color:#475569;font-size:.66rem;text-decoration:none;font-weight:600" onmouseover="this.style.color='#60A5FA'" onmouseout="this.style.color='#475569'">Privacy</a>
+    <a href="cookie-policy.html" style="color:#475569;font-size:.66rem;text-decoration:none;font-weight:600" onmouseover="this.style.color='#60A5FA'" onmouseout="this.style.color='#475569'">Cookies</a>
+    <a href="security-policy.html" style="color:#475569;font-size:.66rem;text-decoration:none;font-weight:600" onmouseover="this.style.color='#60A5FA'" onmouseout="this.style.color='#475569'">Security</a>
+    <a href="company-policies.html" style="color:#475569;font-size:.66rem;text-decoration:none;font-weight:600" onmouseover="this.style.color='#60A5FA'" onmouseout="this.style.color='#475569'">Policies</a>
+    <a href="112-emergency.html" style="color:#DC2626;font-size:.66rem;text-decoration:none;font-weight:700">&#128680; Emergency</a>
+  </div>
+  <div style="font-size:.60rem;color:#334155">&copy; 2026 Workforce Intelligence. All rights reserved.</div>
+</footer>
+
+<script id="wfi-xlsx">
+window.dlXLSX=window.dlXLSX||function(rows,headers,filename){
+  if(!rows||!rows.length){window.st&&window.st('No data to export',false);return;}
+  var keys=headers||Object.keys(rows[0]);
+  var BOM='\uFEFF';
+  var lines=[keys.map(function(k){return'"'+String(k).replace(/"/g,'""')+'"';}).join(',')];
+  rows.forEach(function(r){lines.push(keys.map(function(k){var v=r[k]===null||r[k]===undefined?'':String(r[k]);return'"'+v.replace(/"/g,'""')+'"';}).join(','));});
+  var blob=new Blob([BOM+lines.join('\n')],{type:'application/vnd.ms-excel;charset=utf-8'});
+  var a=document.createElement('a');a.href=URL.createObjectURL(blob);
+  a.download=(filename||'export')+'.csv';document.body.appendChild(a);a.click();
+  setTimeout(function(){URL.revokeObjectURL(a.href);document.body.removeChild(a);},1000);
+  window.st&&window.st('Excel file ready for download',true);
+};
+window.exportExcel=window.dlXLSX;</script>
+<script id="wfi-showtab">window.showTab=window.showTab||function(id,btn){var lo=id.toLowerCase();var el=document.getElementById("tab"+id)||document.getElementById("tab"+id.charAt(0).toUpperCase()+id.slice(1))||document.getElementById(id);document.querySelectorAll("[id^=tab]").forEach(function(s){if(s!==el)s.style.display="none";});if(el)el.style.display="";document.querySelectorAll(".tab-btn,.tb").forEach(function(b){b.classList.remove("active");});if(btn)btn.classList.add("active");};window.switchTab=window.showTab;</script>
+</body>
+</html>

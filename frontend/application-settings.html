@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Application settings · Workforce Intelligence</title>
+    <link rel="stylesheet" href="/workspace.css" />
+    <link rel="stylesheet" href="/modules.css" />
+    <link rel="stylesheet" href="/navigation.css" />
+
+    <script src="/vendor/passkey-browser.js" defer></script>
+    <script src="/passkeys.js" defer></script>
+    <script src="/application-settings.js" defer></script>
+    <script src="/navigation.js" defer></script>
+
+    <script src="/appearance.js" defer></script>
+
+<link rel="stylesheet" href="/preferences.css">
+<link rel="stylesheet" href="/theme.css">
+</head>
+  <body class="wfi-module-page">
+    <main id="main-content">
+      <div class="page-heading">
+        <h1>Application settings</h1>
+        <p>
+          Choose your appearance, location privacy and device sign-in options.
+        </p>
+      </div>
+      <p id="settings-message" role="status" aria-live="polite"></p>
+      <div class="settings-cards">
+        <section id="company-settings" class="records-surface" hidden>
+          <h2>Registration companies</h2>
+          <p>
+            Company labels belong to this shared workforce workspace. They are
+            not separate security tenants.
+          </p>
+          <form id="company-form">
+            <label for="company-name">Company name</label
+            ><input id="company-name" maxlength="150" required /><button
+              type="submit"
+            >
+              Add company
+            </button>
+          </form>
+          <div id="company-list"></div>
+        </section>
+        <section class="records-surface">
+          <h2>Appearance</h2>
+          <form id="appearance-form">
+            <label for="theme">Theme</label
+            ><select id="theme">
+              <option value="system">Follow device</option>
+              <option value="light">Light</option>
+              <option value="day">Daylight</option>
+              <option value="night">Night</option>
+              <option value="dark">Dark</option></select
+            >
+            <label for="accent">Accent color</label>
+            <select id="accent" required></select>
+            <button type="submit">Save appearance</button>
+          </form>
+          <form id="wallpaper-form">
+            <label for="wallpaper">Background image on this browser</label>
+            <input type="file" id="wallpaper" accept="image/png,image/jpeg,image/webp" required>
+            <button type="submit">Use background image</button>
+            <button type="button" id="remove-wallpaper">Remove background image</button>
+          </form>
+        </section>
+        <section class="records-surface">
+          <h2>Location privacy</h2>
+          <p id="connection-ip">Loading connection information…</p>
+          <p>
+            Connection IP supports security auditing. It is not proof of
+            physical location. Browser location requires your permission. IP
+            lookup sends your connection IP to the configured location service
+            and is approximate.
+          </p>
+          <form id="location-form">
+            <label
+              ><input id="location-enabled" type="checkbox" /> Enable location
+              features</label
+            ><label for="location-source">Location source</label
+            ><select id="location-source">
+              <option value="manual">Manual city</option>
+              <option value="gps">Browser location with permission</option>
+              <option value="ip">Approximate IP lookup</option></select
+            ><label for="manual-city">City</label
+            ><input id="manual-city" maxlength="100" /><label for="manual-state"
+              >State or region</label
+            ><input id="manual-state" maxlength="100" /><label
+              ><input id="weather-enabled" type="checkbox" /> Enable weather
+              requests</label
+            ><button type="submit">Save location preferences</button>
+          </form>
+          <button type="button" id="detect-location">Update location now</button
+          ><a href="/location-settings.html">Location and session history</a>
+        </section>
+        <section class="records-surface">
+          <h2>Device sign-in and attendance</h2>
+          <p>
+            A passkey can use your device's face recognition, fingerprint, PIN
+            or security key. Your device chooses the available method. Biometric
+            information stays on the device.
+          </p>
+          <label for="enrollment-password">Confirm your current password</label
+          ><input
+            id="enrollment-password"
+            type="password"
+            autocomplete="current-password"
+            maxlength="100"
+          /><button type="button" id="enroll-passkey">
+            Enroll this device
+          </button>
+          <div id="passkey-list"></div>
+          <details>
+            <summary>Attendance security history</summary>
+            <div id="attendance-audit"></div>
+          </details>
+          <a href="/attendance.html">Attendance</a>
+        </section>
+        <section class="records-surface">
+          <h2>AI and financial services</h2>
+          <a href="/ai-chat-settings.html"
+            >AI provider settings (administrator)</a
+          >
+          <p>
+            OpenAI, Anthropic, Gemini/Google AI Studio, NVIDIA and OpenRouter
+            are configurable. Availability, free quotas and billing depend on
+            your provider account.
+          </p>
+          <a
+            href="https://aistudio.google.com/api-keys"
+            target="_blank"
+            rel="noopener noreferrer"
+            >Google AI Studio keys</a
+          ><a
+            href="https://build.nvidia.com/"
+            target="_blank"
+            rel="noopener noreferrer"
+            >NVIDIA API catalog</a
+          ><a href="/bank-directory.html"
+            >Official bank websites and applications</a
+          ><a href="/credit-score.html">Credit reports and loan planning</a
+          ><a href="/tax-portal.html">Official income-tax filing links</a>
+        </section>
+      </div>
+    </main>
+  </body>
+</html>

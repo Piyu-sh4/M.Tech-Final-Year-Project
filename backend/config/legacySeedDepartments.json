@@ -1,0 +1,155 @@
+[
+  {
+    "legacyId": 1,
+    "department": "Engineering",
+    "emails": [
+      "vikram@techcorp.in",
+      "arjun@techcorp.in",
+      "suresh@techcorp.in",
+      "priya@techcorp.in",
+      "sneha@techcorp.in",
+      "rahul@techcorp.in",
+      "divya@techcorp.in",
+      "manish@techcorp.in",
+      "anjali@techcorp.in",
+      "rohan@techcorp.in",
+      "kiran@techcorp.in",
+      "nikhil@techcorp.in",
+      "tanvi@techcorp.in",
+      "aditya@techcorp.in",
+      "siddharth@techcorp.in",
+      "pooja@techcorp.in",
+      "vivek@techcorp.in",
+      "harsh@techcorp.in",
+      "sonal@techcorp.in",
+      "neeraj@techcorp.in",
+      "riya@techcorp.in",
+      "sahil@techcorp.in",
+      "tushar@techcorp.in",
+      "kavita.i@techcorp.in",
+      "pankaj@techcorp.in",
+      "sarita@techcorp.in",
+      "mukesh@techcorp.in",
+      "lalitha@techcorp.in",
+      "ashok@techcorp.in",
+      "hemant@techcorp.in",
+      "preeti@techcorp.in",
+      "aakash@techcorp.in",
+      "naveen@techcorp.in"
+    ]
+  },
+  {
+    "legacyId": 2,
+    "department": "Quality Assurance",
+    "emails": [
+      "ramesh@techcorp.in",
+      "ananya@techcorp.in",
+      "raj@techcorp.in",
+      "swati@techcorp.in",
+      "mohit@techcorp.in",
+      "shruti@techcorp.in",
+      "vishal@techcorp.in",
+      "pallavi@techcorp.in",
+      "sunita.j@techcorp.in"
+    ]
+  },
+  {
+    "legacyId": 3,
+    "department": "DevOps",
+    "emails": [
+      "deepak@techcorp.in",
+      "sanjay@techcorp.in",
+      "gaurav@techcorp.in",
+      "amit@techcorp.in",
+      "neeti@techcorp.in",
+      "tarun@techcorp.in",
+      "ramdev@techcorp.in"
+    ]
+  },
+  {
+    "legacyId": 4,
+    "department": "AI / Data Science",
+    "emails": [
+      "pmenon@techcorp.in",
+      "priya.n@techcorp.in",
+      "ashish@techcorp.in",
+      "kaveri@techcorp.in",
+      "vikram.b@techcorp.in",
+      "ritika@techcorp.in",
+      "ishaan@techcorp.in",
+      "geeta@techcorp.in"
+    ]
+  },
+  {
+    "legacyId": 5,
+    "department": "Product",
+    "emails": [
+      "karthik@techcorp.in",
+      "smita@techcorp.in",
+      "chirag@techcorp.in",
+      "nisha@techcorp.in",
+      "varun@techcorp.in"
+    ]
+  },
+  {
+    "legacyId": 6,
+    "department": "Human Resources",
+    "emails": [
+      "sunita@techcorp.in",
+      "neha@techcorp.in",
+      "priti@techcorp.in",
+      "kavita@techcorp.in",
+      "sumit@techcorp.in",
+      "latha@techcorp.in"
+    ]
+  },
+  {
+    "legacyId": 7,
+    "department": "Finance",
+    "emails": [
+      "vinod@techcorp.in",
+      "anita@techcorp.in",
+      "suresh.j@techcorp.in",
+      "rekha@techcorp.in"
+    ]
+  },
+  {
+    "legacyId": 8,
+    "department": "Leadership",
+    "emails": [
+      "rajesh@techcorp.in",
+      "anand@techcorp.in"
+    ]
+  },
+  {
+    "legacyId": 9,
+    "department": "Design",
+    "emails": [
+      "shalini@techcorp.in",
+      "ritu@techcorp.in",
+      "aryan@techcorp.in",
+      "meera@techcorp.in",
+      "tarun.g@techcorp.in",
+      "shipra@techcorp.in"
+    ]
+  },
+  {
+    "legacyId": 10,
+    "department": "Sales",
+    "emails": [
+      "arun@techcorp.in",
+      "ajay@techcorp.in",
+      "pooja.d@techcorp.in",
+      "rajan@techcorp.in"
+    ]
+  },
+  {
+    "legacyId": 11,
+    "department": "Marketing",
+    "emails": [
+      "shweta@techcorp.in",
+      "deepti@techcorp.in",
+      "harish@techcorp.in"
+    ]
+  }
+]

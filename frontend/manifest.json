@@ -1,0 +1,102 @@
+{
+  "name": "Workforce Intelligence Platform",
+  "short_name": "WIP",
+  "description": "AI-Powered HR & Payroll Platform — IIT Patna M.Tech CSE 2025-26",
+  "version": "7.0.0",
+  "start_url": "/frontend/login.html",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#0f172a",
+  "theme_color": "#1A3C6E",
+  "categories": ["business", "productivity"],
+  "lang": "en-IN",
+  "icons": [
+    {
+      "src": "/frontend/icons/icon-72.png",
+      "sizes": "72x72",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "/frontend/icons/icon-96.png",
+      "sizes": "96x96",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "/frontend/icons/icon-128.png",
+      "sizes": "128x128",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "/frontend/icons/icon-144.png",
+      "sizes": "144x144",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "/frontend/icons/icon-152.png",
+      "sizes": "152x152",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "/frontend/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "/frontend/icons/icon-384.png",
+      "sizes": "384x384",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "/frontend/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable any"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/frontend/screenshots/dashboard.png",
+      "sizes": "1400x900",
+      "type": "image/png",
+      "label": "Admin Dashboard"
+    },
+    {
+      "src": "/frontend/screenshots/tasks.png",
+      "sizes": "1400x900",
+      "type": "image/png",
+      "label": "Task Management"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Dashboard",
+      "short_name": "Dashboard",
+      "description": "Open Admin Dashboard",
+      "url": "/frontend/index.html",
+      "icons": [{ "src": "/frontend/icons/icon-96.png", "sizes": "96x96" }]
+    },
+    {
+      "name": "My Tasks",
+      "short_name": "Tasks",
+      "description": "View and manage tasks",
+      "url": "/frontend/tasks.html",
+      "icons": [{ "src": "/frontend/icons/icon-96.png", "sizes": "96x96" }]
+    },
+    {
+      "name": "Attendance",
+      "short_name": "Attendance",
+      "description": "Clock in / out",
+      "url": "/frontend/attendance.html",
+      "icons": [{ "src": "/frontend/icons/icon-96.png", "sizes": "96x96" }]
+    }
+  ],
+  "related_applications": [],
+  "prefer_related_applications": false
+}

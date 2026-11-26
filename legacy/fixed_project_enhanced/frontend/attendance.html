@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Attendance – Workforce Intelligence v6.0</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+  body{background:#F0F4F8}
+  .page-wrap{max-width:1200px;margin:0 auto;padding:24px}
+  .card{background:#fff;border-radius:12px;padding:24px;margin-bottom:24px;box-shadow:0 2px 12px rgba(0,0,0,.08)}
+  .card h3{margin-top:0;color:#1B4F8A;font-size:1.1rem;margin-bottom:16px}
+  .btn{padding:9px 22px;border:none;border-radius:7px;font-weight:600;cursor:pointer;font-size:14px;transition:.15s}
+  .btn-primary{background:#1B4F8A;color:#fff} .btn-primary:hover{background:#1a3f72}
+  .btn-success{background:#27AE60;color:#fff} .btn-success:hover{background:#1e8449}
+  .btn-danger{background:#C0392B;color:#fff}  .btn-danger:hover{background:#a93226}
+  .btn-sm{padding:5px 14px;font-size:12px;border-radius:5px;border:none;font-weight:600;cursor:pointer}
+  .btn-outline{background:#fff;border:1.5px solid #1B4F8A;color:#1B4F8A}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+  .grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+  @media(max-width:700px){.grid2,.grid4{grid-template-columns:1fr}}
+  table{width:100%;border-collapse:collapse;font-size:13px}
+  th{background:#1B4F8A;color:#fff;padding:10px 12px;text-align:left;white-space:nowrap}
+  td{padding:9px 12px;border-bottom:1px solid #EEF2F7;vertical-align:middle}
+  tr:hover td{background:#F8FAFB}
+  .badge{padding:3px 10px;border-radius:12px;font-size:11px;font-weight:700}
+  .badge.present{background:#D5F5E3;color:#1E8449}
+  .badge.absent{background:#FADBD8;color:#C0392B}
+  .badge.late{background:#FEF9E7;color:#D4AC0D}
+  .badge.half_day{background:#D6EAF8;color:#1B4F8A}
+  .badge.leave{background:#EEF2F7;color:#5D6D7E}
+  #msg{padding:11px 16px;border-radius:8px;margin-bottom:16px;display:none;font-weight:600}
+  #msg.success{background:#D5F5E3;color:#1E8449;display:block}
+  #msg.error{background:#FADBD8;color:#C0392B;display:block}
+  .tabs{display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap}
+  .tab{padding:9px 22px;border-radius:8px;border:2px solid #BDC3C7;background:#fff;color:#5D6D7E;font-weight:600;cursor:pointer;font-size:14px}
+  .tab.active{background:#1B4F8A;color:#fff;border-color:#1B4F8A}
+  /* Clock widget */
+  .clock-card{background:linear-gradient(135deg,#1B4F8A,#2563eb);border-radius:12px;padding:28px;color:#fff;text-align:center}
+  .clock-time{font-size:3rem;font-weight:800;letter-spacing:2px;font-family:'Courier New',monospace;margin-bottom:6px}
+  .clock-date{font-size:.95rem;opacity:.8;margin-bottom:20px}
+  .clock-status{background:rgba(255,255,255,.15);border-radius:8px;padding:10px 16px;font-size:.95rem;margin-bottom:20px}
+  .clock-status.clocked-in{background:rgba(39,174,96,.3)}
+  .clock-status.clocked-out{background:rgba(192,57,43,.2)}
+  .clock-btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+  .clock-btn{padding:12px 28px;border:none;border-radius:8px;font-size:15px;font-weight:700;cursor:pointer;transition:.15s}
+  .clock-btn.in{background:#27AE60;color:#fff} .clock-btn.in:hover{background:#1e8449}
+  .clock-btn.out{background:#C0392B;color:#fff} .clock-btn.out:hover{background:#a93226}
+  .clock-btn:disabled{opacity:.4;cursor:not-allowed}
+  /* Stat cards */
+  .stat-card{background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:10px;padding:16px;text-align:center}
+  .stat-num{font-size:2rem;font-weight:800;color:#1B4F8A}
+  .stat-label{font-size:.8rem;font-weight:700;color:#64748b;margin-top:3px;text-transform:uppercase;letter-spacing:.05em}
+  .stat-sub{font-size:.75rem;color:#94a3b8;margin-top:3px}
+  /* Today dot */
+  .today-dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px}
+  .dot-present{background:#27AE60}
+  .dot-absent{background:#C0392B}
+  .dot-late{background:#D4AC0D}
+  /* Form */
+  .form-group{margin-bottom:14px}
+  .form-group label{display:block;font-weight:600;color:#1B4F8A;margin-bottom:5px;font-size:13px}
+  .form-group input,.form-group select,.form-group textarea{width:100%;padding:9px 12px;border:1px solid #BDC3C7;border-radius:7px;font-size:14px;box-sizing:border-box}
+  .pbar{height:8px;background:#e2e8f0;border-radius:4px;overflow:hidden;margin-top:6px}
+  .pfill{height:100%;border-radius:4px;transition:width 1s ease}
+</style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar">
+  <div class="nav-brand">⚡ Workforce Intelligence</div>
+  <div class="nav-links">
+    <span id="navName" style="color:#fff;font-weight:600"></span>
+    <a href="admin-dashboard.html" style="color:#fff;margin-left:16px">🏠 Dashboard</a>
+    <a href="leave.html" style="color:#fff;margin-left:16px">🏖 Leave</a>
+    <a href="salary.html" style="color:#fff;margin-left:16px">💰 Salary</a>
+    <a href="profile.html" style="color:#fff;margin-left:16px">👤 Profile</a>
+    <a href="login.html" onclick="localStorage.clear()" style="color:#fff;margin-left:16px">Logout</a>
+  </div>
+</nav>
+
+<div class="page-wrap">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px">
+    <h2 style="margin:0;color:#1B4F8A">📅 Attendance Management</h2>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button class="btn btn-outline btn-sm" onclick="exportAttendance()">📥 Export CSV</button>
+      <button class="btn btn-primary btn-sm admin-only" style="display:none" onclick="switchTab('mark')">✏️ Mark Attendance</button>
+    </div>
+  </div>
+
+  <div id="msg"></div>
+
+  <!-- TODAY SUMMARY STATS -->
+  <div class="grid4" style="margin-bottom:20px" id="statsRow">
+    <div class="stat-card"><div class="stat-num" id="statPresent">—</div><div class="stat-label">Present Today</div><div class="stat-sub">clocked in</div></div>
+    <div class="stat-card"><div class="stat-num" style="color:#C0392B" id="statAbsent">—</div><div class="stat-label">Absent</div><div class="stat-sub">not clocked in</div></div>
+    <div class="stat-card"><div class="stat-num" style="color:#D4AC0D" id="statLate">—</div><div class="stat-label">Late</div><div class="stat-sub">after grace period</div></div>
+    <div class="stat-card"><div class="stat-num" style="color:#0891b2" id="statOT">—</div><div class="stat-label">Avg OT Today</div><div class="stat-sub">overtime hrs</div></div>
+  </div>
+
+  <!-- TABS -->
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab('clock')">⏱ Clock In/Out</button>
+    <button class="tab" onclick="switchTab('my')">📋 My Attendance</button>
+    <button class="tab admin-only" style="display:none" onclick="switchTab('today')">👥 Today All</button>
+    <button class="tab admin-only" style="display:none" onclick="switchTab('mark')">✏️ Manual Mark</button>
+    <button class="tab admin-only" style="display:none" onclick="switchTab('summary')">📊 Summary</button>
+  </div>
+
+  <!-- ── TAB: CLOCK IN/OUT ───────────────────────────────────────── -->
+  <div id="tab-clock">
+    <div class="grid2">
+      <div class="clock-card">
+        <div class="clock-time" id="liveClock">00:00:00</div>
+        <div class="clock-date" id="liveDate"></div>
+        <div class="clock-status" id="clockStatus">Loading today's status…</div>
+        <div class="clock-btns">
+          <button class="clock-btn in" id="btnClockIn" onclick="clockIn()" disabled>⬤ Clock In</button>
+          <button class="clock-btn out" id="btnClockOut" onclick="clockOut()" disabled>⬛ Clock Out</button>
+        </div>
+      </div>
+      <div>
+        <div class="card" style="margin-bottom:14px">
+          <h3>📊 Today's Detail</h3>
+          <div id="todayDetail"><p style="color:#94a3b8">Loading…</p></div>
+        </div>
+        <div class="card">
+          <h3>📈 This Month</h3>
+          <div id="monthSummary"><p style="color:#94a3b8">Loading…</p></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── TAB: MY ATTENDANCE ──────────────────────────────────────── -->
+  <div id="tab-my" style="display:none">
+    <div class="card">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:8px">
+        <h3 style="margin:0">📋 My Attendance History</h3>
+        <select id="myMonthFilter" onchange="loadMyAttendance()" style="padding:7px 12px;border:1px solid #BDC3C7;border-radius:7px;font-size:13px">
+          <option value="">Last 60 days</option>
+          <option value="2026-06">June 2026</option>
+          <option value="2026-05">May 2026</option>
+          <option value="2026-04">April 2026</option>
+          <option value="2026-03">March 2026</option>
+        </select>
+      </div>
+      <div style="overflow-x:auto">
+        <table>
+          <thead><tr><th>Date</th><th>Day</th><th>Clock In</th><th>Clock Out</th><th>Total Hrs</th><th>OT Hrs</th><th>Status</th><th>Remarks</th></tr></thead>
+          <tbody id="myAttBody"><tr><td colspan="8" style="text-align:center;color:#94a3b8;padding:28px">Loading…</td></tr></tbody>
+        </table>
+      </div>
+      <div id="myAttFooter" style="margin-top:14px;font-size:13px;color:#64748b"></div>
+    </div>
+  </div>
+
+  <!-- ── TAB: TODAY ALL (ADMIN) ─────────────────────────────────── -->
+  <div id="tab-today" style="display:none">
+    <div class="card">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:8px">
+        <h3 style="margin:0">👥 Today's Attendance — All Employees</h3>
+        <button class="btn btn-primary btn-sm" onclick="loadTodayAll()">↻ Refresh</button>
+      </div>
+      <div style="overflow-x:auto">
+        <table>
+          <thead><tr><th>#</th><th>Employee</th><th>Dept</th><th>Clock In</th><th>Clock Out</th><th>Hours</th><th>OT</th><th>Status</th></tr></thead>
+          <tbody id="todayAllBody"><tr><td colspan="8" style="text-align:center;color:#94a3b8;padding:28px">Loading…</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── TAB: MANUAL MARK (ADMIN/HR) ──────────────────────────────  -->
+  <div id="tab-mark" style="display:none">
+    <div class="card" style="max-width:520px">
+      <h3>✏️ Manually Mark Attendance</h3>
+      <div class="form-group"><label>Employee</label>
+        <select id="markUser"><option value="">Select employee…</option></select>
+      </div>
+      <div class="grid2">
+        <div class="form-group"><label>Date</label><input type="date" id="markDate"/></div>
+        <div class="form-group"><label>Status</label>
+          <select id="markStatus">
+            <option value="present">Present</option>
+            <option value="absent">Absent</option>
+            <option value="late">Late</option>
+            <option value="half_day">Half Day</option>
+            <option value="leave">On Leave</option>
+          </select>
+        </div>
+      </div>
+      <div class="grid2">
+        <div class="form-group"><label>Clock In (optional)</label><input type="time" id="markClockIn"/></div>
+        <div class="form-group"><label>Clock Out (optional)</label><input type="time" id="markClockOut"/></div>
+      </div>
+      <div class="form-group"><label>Remarks</label><input type="text" id="markRemarks" placeholder="Reason / note…"/></div>
+      <button class="btn btn-primary" onclick="manualMark()">✅ Save Attendance</button>
+    </div>
+  </div>
+
+  <!-- ── TAB: SUMMARY (ADMIN/HR) ──────────────────────────────────  -->
+  <div id="tab-summary" style="display:none">
+    <div class="card">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:8px">
+        <h3 style="margin:0">📊 Monthly Attendance Summary</h3>
+        <select id="sumMonthFilter" onchange="loadSummary()" style="padding:7px 12px;border:1px solid #BDC3C7;border-radius:7px;font-size:13px">
+          <option value="">Current Month</option>
+          <option value="2026-05">May 2026</option>
+          <option value="2026-04">April 2026</option>
+          <option value="2026-03">March 2026</option>
+        </select>
+      </div>
+      <div style="overflow-x:auto">
+        <table>
+          <thead><tr><th>Employee</th><th>Dept</th><th>Present</th><th>Absent</th><th>Late</th><th>Leave</th><th>OT Hrs</th><th>Attendance %</th></tr></thead>
+          <tbody id="summaryBody"><tr><td colspan="8" style="text-align:center;color:#94a3b8;padding:28px">Loading…</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div><!-- /page-wrap -->
+
+<script>
+const API  = 'http://localhost:5000';
+const tok  = () => localStorage.getItem('token');
+const user = () => { try { return JSON.parse(atob(tok().split('.')[1])); } catch { return null; } };
+
+function hdr() { return { 'Content-Type':'application/json', 'Authorization':'Bearer '+tok() }; }
+function showMsg(txt,type='success'){const el=document.getElementById('msg');el.textContent=txt;el.className=type;setTimeout(()=>el.style.display='none',4000);}
+
+// ── Init ──────────────────────────────────────────────────────────
+window.onload = () => {
+  const u = user();
+  if (!u || !tok()) { location.href='login.html'; return; }
+  document.getElementById('navName').textContent = u.full_name || '';
+
+  // Show admin tabs
+  if (u.role_id === 1 || u.role_id === 3 || u.role_id === 4) {
+    document.querySelectorAll('.admin-only').forEach(el => el.style.display = '');
+    loadTodayStats();
+    loadUsers();
+  }
+
+  startClock();
+  loadTodayStatus();
+  loadMyAttendance();
+  // Pre-fill today's date for manual mark
+  document.getElementById('markDate').value = new Date().toISOString().slice(0,10);
+};
+
+// ── Live clock ────────────────────────────────────────────────────
+function startClock() {
+  function tick() {
+    const now = new Date();
+    document.getElementById('liveClock').textContent =
+      now.toLocaleTimeString('en-IN', {hour12:false});
+    document.getElementById('liveDate').textContent =
+      now.toLocaleDateString('en-IN', {weekday:'long', year:'numeric', month:'long', day:'numeric'});
+  }
+  tick(); setInterval(tick, 1000);
+}
+
+// ── Tab switching ─────────────────────────────────────────────────
+function switchTab(name) {
+  ['clock','my','today','mark','summary'].forEach(t => {
+    document.getElementById('tab-'+t).style.display = t===name ? '' : 'none';
+  });
+  document.querySelectorAll('.tab').forEach(btn => btn.classList.remove('active'));
+  event.target.classList.add('active');
+  if (name==='today')   loadTodayAll();
+  if (name==='summary') loadSummary();
+  if (name==='my')      loadMyAttendance();
+}
+
+// ── Today's clock-in status ───────────────────────────────────────
+async function loadTodayStatus() {
+  try {
+    const res = await fetch(`${API}/api/admin/attendance/today`, {headers:hdr()});
+    if (!res.ok) throw new Error();
+    const rec = await res.json();
+
+    const statusEl = document.getElementById('clockStatus');
+    const btnIn    = document.getElementById('btnClockIn');
+    const btnOut   = document.getElementById('btnClockOut');
+    const detail   = document.getElementById('todayDetail');
+
+    if (!rec) {
+      statusEl.textContent = '⬤ Not clocked in yet today';
+      statusEl.className = 'clock-status';
+      btnIn.disabled  = false;
+      btnOut.disabled = true;
+      detail.innerHTML = '<p style="color:#94a3b8;font-size:13px">No attendance record for today yet.</p>';
+    } else if (rec.clock_in && !rec.clock_out) {
+      statusEl.textContent = `✅ Clocked in at ${rec.clock_in.slice(11,16)}`;
+      statusEl.className = 'clock-status clocked-in';
+      btnIn.disabled  = true;
+      btnOut.disabled = false;
+      detail.innerHTML = `
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+          <div class="stat-card"><div class="stat-num" style="font-size:1.4rem">${rec.clock_in.slice(11,16)}</div><div class="stat-label">Clock In</div></div>
+          <div class="stat-card"><div class="stat-num" style="font-size:1.4rem">—</div><div class="stat-label">Clock Out</div></div>
+          <div class="stat-card"><div class="stat-num" style="font-size:1.4rem;color:#27AE60">${rec.total_hours||'—'}</div><div class="stat-label">Hours</div></div>
+          <div class="stat-card"><div class="stat-num" style="font-size:1.4rem;color:#D4AC0D">${rec.ot_hours||0}</div><div class="stat-label">OT Hrs</div></div>
+        </div>
+        <div style="margin-top:10px"><span class="badge ${rec.status}">${rec.status}</span></div>`;
+    } else if (rec.clock_out) {
+      statusEl.textContent = `✅ Completed — ${rec.total_hours}h worked`;
+      statusEl.className = 'clock-status';
+      btnIn.disabled  = true;
+      btnOut.disabled = true;
+      detail.innerHTML = `
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+          <div class="stat-card"><div class="stat-num" style="font-size:1.4rem">${rec.clock_in.slice(11,16)}</div><div class="stat-label">Clock In</div></div>
+          <div class="stat-card"><div class="stat-num" style="font-size:1.4rem">${rec.clock_out.slice(11,16)}</div><div class="stat-label">Clock Out</div></div>
+          <div class="stat-card"><div class="stat-num" style="font-size:1.4rem;color:#27AE60">${rec.total_hours}</div><div class="stat-label">Total Hrs</div></div>
+          <div class="stat-card"><div class="stat-num" style="font-size:1.4rem;color:#D4AC0D">${rec.ot_hours}</div><div class="stat-label">OT Hrs</div></div>
+        </div>`;
+    }
+
+    // Month summary
+    loadMonthSummary();
+  } catch(e) {
+    document.getElementById('clockStatus').textContent = 'Could not load today status';
+    document.getElementById('btnClockIn').disabled  = false;
+    document.getElementById('btnClockOut').disabled = true;
+  }
+}
+
+async function loadMonthSummary() {
+  try {
+    const res  = await fetch(`${API}/api/admin/attendance/my`, {headers:hdr()});
+    const recs = await res.json();
+    const cnt  = {present:0,absent:0,late:0,leave:0,ot:0};
+    recs.forEach(r => {
+      if (r.status==='present') cnt.present++;
+      else if (r.status==='absent') cnt.absent++;
+      else if (r.status==='late') cnt.late++;
+      else if (r.status==='leave') cnt.leave++;
+      cnt.ot += parseFloat(r.ot_hours||0);
+    });
+    const pct = recs.length ? Math.round((cnt.present+cnt.late)/recs.length*100) : 0;
+    document.getElementById('monthSummary').innerHTML = `
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">
+        <div class="stat-card" style="padding:10px"><div class="stat-num" style="font-size:1.3rem;color:#27AE60">${cnt.present}</div><div class="stat-label" style="font-size:.7rem">Present</div></div>
+        <div class="stat-card" style="padding:10px"><div class="stat-num" style="font-size:1.3rem;color:#C0392B">${cnt.absent}</div><div class="stat-label" style="font-size:.7rem">Absent</div></div>
+        <div class="stat-card" style="padding:10px"><div class="stat-num" style="font-size:1.3rem;color:#D4AC0D">${cnt.late}</div><div class="stat-label" style="font-size:.7rem">Late</div></div>
+        <div class="stat-card" style="padding:10px"><div class="stat-num" style="font-size:1.3rem;color:#0891b2">${cnt.ot.toFixed(1)}h</div><div class="stat-label" style="font-size:.7rem">OT Hours</div></div>
+      </div>
+      <div style="font-size:12px;color:#64748b;margin-bottom:4px">Attendance Rate</div>
+      <div class="pbar"><div class="pfill" style="width:${pct}%;background:${pct>=90?'#27AE60':pct>=75?'#D4AC0D':'#C0392B'}"></div></div>
+      <div style="font-size:13px;font-weight:700;color:#1B4F8A;margin-top:4px">${pct}%</div>`;
+  } catch(e) {}
+}
+
+// ── Clock In ──────────────────────────────────────────────────────
+async function clockIn() {
+  document.getElementById('btnClockIn').disabled = true;
+  // Capture GPS location before clocking in
+  let lat = null, lng = null, locationLabel = '';
+  try {
+    const pos = await new Promise((res, rej) =>
+      navigator.geolocation.getCurrentPosition(res, rej, {timeout: 6000, enableHighAccuracy: true})
+    );
+    lat = pos.coords.latitude.toFixed(6);
+    lng = pos.coords.longitude.toFixed(6);
+    // Reverse geocode with Nominatim (free, no key)
+    try {
+      const geo = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json`, {headers:{'Accept-Language':'en'}});
+      const gd  = await geo.json();
+      locationLabel = gd.address ? (gd.address.suburb || gd.address.neighbourhood || gd.address.village || gd.address.city || 'Your location') : `${lat}, ${lng}`;
+    } catch(_) { locationLabel = `${lat}, ${lng}`; }
+  } catch(e) {
+    // GPS optional — proceed without if denied or unavailable
+    locationLabel = null;
+  }
+
+  try {
+    const body = { latitude: lat ? parseFloat(lat) : null, longitude: lng ? parseFloat(lng) : null };
+    const res  = await fetch(`${API}/api/admin/attendance/clock-in`, {
+      method: 'POST',
+      headers: Object.assign({'Content-Type':'application/json'}, hdr()),
+      body: JSON.stringify(body)
+    });
+    const data = await res.json();
+    if (!res.ok) { showMsg(data.message||'Clock-in failed','error'); document.getElementById('btnClockIn').disabled=false; return; }
+    const locMsg = locationLabel ? ` 📍 ${locationLabel}` : '';
+    showMsg('✅ ' + data.message + locMsg);
+    loadTodayStatus();
+  } catch(e) {
+    showMsg('Clock-in failed — check backend connection','error');
+    document.getElementById('btnClockIn').disabled = false;
+  }
+}
+
+// ── Clock Out ─────────────────────────────────────────────────────
+async function clockOut() {
+  if (!confirm('Clock out now?')) return;
+  document.getElementById('btnClockOut').disabled = true;
+  try {
+    const res = await fetch(`${API}/api/admin/attendance/clock-out`, {method:'POST',headers:hdr()});
+    const data = await res.json();
+    if (!res.ok) { showMsg(data.message||'Clock-out failed','error'); document.getElementById('btnClockOut').disabled=false; return; }
+    showMsg(`✅ ${data.message} · ${data.total_hours}h worked · OT: ${data.ot_hours}h`);
+    loadTodayStatus();
+  } catch(e) {
+    showMsg('Clock-out failed','error');
+    document.getElementById('btnClockOut').disabled = false;
+  }
+}
+
+// ── My Attendance ─────────────────────────────────────────────────
+async function loadMyAttendance() {
+  const body = document.getElementById('myAttBody');
+  body.innerHTML = '<tr><td colspan="8" style="text-align:center;color:#94a3b8;padding:20px">Loading…</td></tr>';
+  try {
+    const res  = await fetch(`${API}/api/admin/attendance/my`, {headers:hdr()});
+    const recs = await res.json();
+    if (!recs.length) { body.innerHTML='<tr><td colspan="8" style="text-align:center;color:#94a3b8;padding:20px">No attendance records found</td></tr>'; return; }
+
+    const days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+    body.innerHTML = recs.map(r => {
+      const d = new Date(r.work_date);
+      return `<tr>
+        <td style="font-weight:600;color:#1B4F8A">${r.work_date}</td>
+        <td>${days[d.getDay()]}</td>
+        <td style="font-family:monospace">${r.clock_in ? r.clock_in.slice(11,16) : '—'}</td>
+        <td style="font-family:monospace">${r.clock_out ? r.clock_out.slice(11,16) : '—'}</td>
+        <td style="font-family:monospace;color:${r.total_hours>=8?'#27AE60':'#D4AC0D'}">${r.total_hours||'—'}</td>
+        <td style="font-family:monospace;color:${r.ot_hours>0?'#D4AC0D':'#94a3b8'}">${r.ot_hours||0}</td>
+        <td><span class="badge ${r.status}">${r.status}</span></td>
+        <td style="color:#94a3b8;font-size:12px">${r.remarks||'—'}</td>
+      </tr>`;
+    }).join('');
+
+    // Footer summary
+    const present = recs.filter(r=>r.status==='present'||r.status==='late').length;
+    const totalOT = recs.reduce((s,r)=>s+parseFloat(r.ot_hours||0),0);
+    document.getElementById('myAttFooter').innerHTML =
+      `<b>Total records:</b> ${recs.length} &nbsp;·&nbsp; <b>Present days:</b> ${present} &nbsp;·&nbsp; <b>Total OT:</b> ${totalOT.toFixed(1)}h`;
+  } catch(e) {
+    body.innerHTML = '<tr><td colspan="8" style="text-align:center;color:#C0392B;padding:20px">Failed to load — check backend connection</td></tr>';
+  }
+}
+
+// ── Today All (Admin) ─────────────────────────────────────────────
+async function loadTodayAll() {
+  const body = document.getElementById('todayAllBody');
+  body.innerHTML = '<tr><td colspan="8" style="text-align:center;color:#94a3b8;padding:20px">Loading…</td></tr>';
+  try {
+    const res  = await fetch(`${API}/api/admin/attendance/today`, {headers:hdr()});
+    // fallback: use /attendance with today's date if /today returns single record
+    const res2 = await fetch(`${API}/api/admin/attendance`, {headers:hdr()});
+    const recs = await res2.json();
+    const today = new Date().toISOString().slice(0,10);
+    const todayRecs = Array.isArray(recs) ? recs.filter(r=>r.work_date&&r.work_date.slice(0,10)===today) : [];
+
+    if (!todayRecs.length) {
+      body.innerHTML='<tr><td colspan="8" style="text-align:center;color:#94a3b8;padding:20px">No attendance records for today yet</td></tr>';
+      return;
+    }
+    body.innerHTML = todayRecs.map((r,i) => `<tr>
+      <td>${i+1}</td>
+      <td><b>${r.full_name||r.user_id}</b></td>
+      <td>${r.dept_name||'—'}</td>
+      <td style="font-family:monospace">${r.clock_in?r.clock_in.slice(11,16):'—'}</td>
+      <td style="font-family:monospace">${r.clock_out?r.clock_out.slice(11,16):'—'}</td>
+      <td style="font-family:monospace">${r.total_hours||'—'}</td>
+      <td style="font-family:monospace;color:${r.ot_hours>0?'#D4AC0D':'#94a3b8'}">${r.ot_hours||0}</td>
+      <td><span class="badge ${r.status}">${r.status}</span></td>
+    </tr>`).join('');
+  } catch(e) {
+    body.innerHTML = '<tr><td colspan="8" style="text-align:center;color:#C0392B;padding:20px">Failed to load</td></tr>';
+  }
+}
+
+// ── Today Stats (Admin) ───────────────────────────────────────────
+async function loadTodayStats() {
+  try {
+    const res  = await fetch(`${API}/api/admin/attendance`, {headers:hdr()});
+    const recs = await res.json();
+    const today = new Date().toISOString().slice(0,10);
+    const tr = Array.isArray(recs) ? recs.filter(r=>r.work_date&&r.work_date.slice(0,10)===today) : [];
+    document.getElementById('statPresent').textContent = tr.filter(r=>r.status==='present').length;
+    document.getElementById('statAbsent').textContent  = tr.filter(r=>r.status==='absent').length;
+    document.getElementById('statLate').textContent    = tr.filter(r=>r.status==='late').length;
+    const avgOT = tr.length ? (tr.reduce((s,r)=>s+parseFloat(r.ot_hours||0),0)/tr.length).toFixed(1) : '0.0';
+    document.getElementById('statOT').textContent = avgOT+'h';
+  } catch(e) {}
+}
+
+// ── Monthly Summary (Admin) ───────────────────────────────────────
+async function loadSummary() {
+  const body = document.getElementById('summaryBody');
+  body.innerHTML = '<tr><td colspan="8" style="text-align:center;color:#94a3b8;padding:20px">Loading…</td></tr>';
+  try {
+    const res  = await fetch(`${API}/api/admin/attendance/summary`, {headers:hdr()});
+    const data = await res.json();
+    if (!data.length) { body.innerHTML='<tr><td colspan="8" style="text-align:center;color:#94a3b8;padding:20px">No data</td></tr>'; return; }
+    body.innerHTML = data.map(r => {
+      const pct = r.total_days ? Math.round((r.present_days+r.late_days)/r.total_days*100) : 0;
+      return `<tr>
+        <td><b>${r.full_name}</b></td>
+        <td>${r.dept_name||'—'}</td>
+        <td style="color:#27AE60;font-weight:700">${r.present_days||0}</td>
+        <td style="color:#C0392B;font-weight:700">${r.absent_days||0}</td>
+        <td style="color:#D4AC0D;font-weight:700">${r.late_days||0}</td>
+        <td>${r.leave_days||0}</td>
+        <td style="font-family:monospace;color:#D4AC0D">${parseFloat(r.total_ot||0).toFixed(1)}</td>
+        <td>
+          <div style="display:flex;align-items:center;gap:8px">
+            <div class="pbar" style="flex:1"><div class="pfill" style="width:${pct}%;background:${pct>=90?'#27AE60':pct>=75?'#D4AC0D':'#C0392B'}"></div></div>
+            <span style="font-weight:700;font-size:12px;color:#1B4F8A">${pct}%</span>
+          </div>
+        </td>
+      </tr>`;
+    }).join('');
+  } catch(e) {
+    body.innerHTML = '<tr><td colspan="8" style="text-align:center;color:#C0392B;padding:20px">Failed to load summary</td></tr>';
+  }
+}
+
+// ── Load users for manual mark dropdown ──────────────────────────
+async function loadUsers() {
+  try {
+    const res   = await fetch(`${API}/api/admin/users`, {headers:hdr()});
+    const users = await res.json();
+    const sel   = document.getElementById('markUser');
+    (Array.isArray(users)?users:users.users||[]).forEach(u => {
+      const opt = document.createElement('option');
+      opt.value = u.user_id;
+      opt.textContent = `${u.full_name} (${u.designation||u.role_name||''})`;
+      sel.appendChild(opt);
+    });
+  } catch(e) {}
+}
+
+// ── Manual mark ───────────────────────────────────────────────────
+async function manualMark() {
+  const uid    = document.getElementById('markUser').value;
+  const date   = document.getElementById('markDate').value;
+  const status = document.getElementById('markStatus').value;
+  const ci     = document.getElementById('markClockIn').value;
+  const co     = document.getElementById('markClockOut').value;
+  const rem    = document.getElementById('markRemarks').value;
+  if (!uid||!date) { showMsg('Select employee and date','error'); return; }
+  try {
+    const body = {user_id:parseInt(uid),work_date:date,status};
+    if (ci) body.clock_in  = date+'T'+ci+':00';
+    if (co) body.clock_out = date+'T'+co+':00';
+    if (rem) body.remarks  = rem;
+    const res  = await fetch(`${API}/api/admin/attendance`, {method:'POST',headers:hdr(),body:JSON.stringify(body)});
+    const data = await res.json();
+    if (!res.ok) { showMsg(data.message||'Failed','error'); return; }
+    showMsg('✅ Attendance marked successfully');
+  } catch(e) { showMsg('Error: '+e.message,'error'); }
+}
+
+// ── Export attendance CSV ─────────────────────────────────────────
+async function exportAttendance() {
+  try {
+    const res = await fetch(`${API}/api/admin/attendance/export`, {headers:hdr()});
+    if (!res.ok) { showMsg('Export failed','error'); return; }
+    const blob = await res.blob();
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement('a');
+    a.href = url; a.download = 'attendance_export.csv'; a.click();
+    URL.revokeObjectURL(url);
+  } catch(e) { showMsg('Export failed: '+e.message,'error'); }
+}
+</script>
+</body>
+</html>

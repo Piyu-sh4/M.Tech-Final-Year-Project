@@ -1,0 +1,1222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Employee Dashboard – Workforce Intelligence</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="chat.css">
+  <style>
+    .tab-nav  { display:flex; gap:6px; flex-wrap:wrap; margin-bottom:20px; background:#f1f5f9; padding:8px; border-radius:14px; }
+    .tab-btn  { padding:8px 16px; border:none; border-radius:10px; cursor:pointer; font-size:.85rem; font-weight:600; background:transparent; color:#64748b; transition:all .2s; }
+    .tab-btn.active { background:#fff; color:#2563eb; box-shadow:0 2px 8px rgba(37,99,235,.15); }
+    .tab-btn:hover:not(.active) { background:#e2e8f0; }
+    .tab-panel { display:none; } .tab-panel.active { display:block; }
+    .access-badge { display:inline-flex;align-items:center;gap:6px;background:#f0fdf4;border:1px solid #86efac;border-radius:999px;padding:4px 12px;font-size:.82rem;font-weight:700;color:#15803d; }
+
+    /* Clock widget */
+    .clock-widget { display:flex; gap:12px; align-items:center; flex-wrap:wrap; }
+    .clock-btn { padding:12px 24px; border:none; border-radius:12px; font-size:1rem; font-weight:700; cursor:pointer; transition:all .2s; }
+    .clock-in-btn  { background:linear-gradient(135deg,#22c55e,#16a34a); color:#fff; box-shadow:0 4px 14px rgba(34,197,94,.35); }
+    .clock-out-btn { background:linear-gradient(135deg,#f97316,#ea580c); color:#fff; box-shadow:0 4px 14px rgba(249,115,22,.35); }
+    .clock-btn:disabled { opacity:.5; cursor:not-allowed; box-shadow:none; }
+    .today-status { flex:1; min-width:180px; background:#f8fafc; border:1.5px solid #e2e8f0; border-radius:12px; padding:14px 18px; }
+    .today-status.clocked-in  { background:#f0fdf4; border-color:#86efac; }
+    .today-status.clocked-out { background:#fff7ed; border-color:#fed7aa; }
+
+    /* Attendance history */
+    .att-hist-item { display:flex; align-items:center; justify-content:space-between; padding:10px 14px; border:1.5px solid #e2e8f0; border-radius:10px; margin-bottom:8px; font-size:.84rem; }
+    .att-hist-item.present  { border-color:#86efac; background:#f0fdf4; }
+    .att-hist-item.absent   { border-color:#fca5a5; background:#fff5f5; }
+    .att-hist-item.late     { border-color:#fde047; background:#fefce8; }
+    .att-hist-item.half_day { border-color:#a5b4fc; background:#f5f3ff; }
+    .att-hist-item.leave    { border-color:#cbd5e1; background:#f8fafc; }
+
+    /* Salary slip */
+    .salary-slip { border:1.5px solid #e2e8f0; border-radius:14px; padding:20px; margin-bottom:14px; background:#fff; }
+    .salary-slip.paid { border-color:#86efac; }
+    .slip-header { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:14px; flex-wrap:wrap; gap:8px; }
+    .slip-net { font-size:1.5rem; font-weight:800; color:#2563eb; }
+    .slip-row { display:flex; justify-content:space-between; padding:6px 0; border-bottom:1px solid #f1f5f9; font-size:.85rem; }
+    .slip-row:last-child { border-bottom:none; }
+
+    /* Team members */
+    .team-member-card { display:flex; align-items:center; gap:14px; padding:14px 16px; border:1.5px solid #e2e8f0; border-radius:12px; margin-bottom:8px; transition:border-color .15s; }
+    .team-member-card:hover { border-color:#2563eb; }
+    .member-avatar { width:40px; height:40px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:1.1rem; font-weight:800; color:#fff; flex-shrink:0; }
+    .locked-section { opacity:.6; pointer-events:none; filter:grayscale(1); }
+    .locked-banner { background:#fef9c3; border:1.5px solid #fde047; border-radius:10px; padding:12px 16px; font-size:.85rem; color:#854d0e; margin-bottom:12px; }
+
+
+    /* ── DateTime/Weather Widget ── */
+    .dt-weather-bar{display:flex;align-items:center;gap:16px;background:linear-gradient(135deg,#1e3a8a,#2563eb);border-radius:16px;padding:14px 22px;margin-bottom:20px;flex-wrap:wrap;justify-content:space-between;box-shadow:0 4px 20px rgba(37,99,235,.3)}
+    .dt-left{display:flex;flex-direction:column}
+    .dt-time{font-size:2rem;font-weight:900;color:#fff;letter-spacing:1px;line-height:1}
+    .dt-date{font-size:.88rem;color:#93c5fd;margin-top:4px;font-weight:600}
+    .dt-right{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+    .weather-block{display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.12);border-radius:12px;padding:10px 16px}
+    .weather-icon{font-size:2rem}
+    .weather-info{display:flex;flex-direction:column}
+    .weather-temp{font-size:1.5rem;font-weight:800;color:#fff}
+    .weather-desc{font-size:.78rem;color:#bfdbfe;text-transform:capitalize}
+    .weather-city{font-size:.75rem;color:#93c5fd;margin-top:2px}
+    .weather-loading{color:#93c5fd;font-size:.85rem;animation:dtpulse 1.5s infinite}
+    @keyframes dtpulse{0%,100%{opacity:1}50%{opacity:.4}}
+
+    /* ── CAB BOOKING TAB ── */
+    .cab-step{background:#fff;border:1.5px solid #e2e8f0;border-radius:14px;padding:22px;margin-bottom:16px}
+    .cab-step-title{font-size:.9rem;font-weight:700;color:#1e293b;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+    .vehicle-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin-bottom:4px}
+    .vehicle-option{border:2px solid #e2e8f0;border-radius:12px;padding:14px 10px;text-align:center;cursor:pointer;transition:all .2s;background:#fafafa}
+    .vehicle-option:hover{border-color:#2563eb;background:#f0f4ff}
+    .vehicle-option.selected{border-color:#2563eb;background:#eff6ff;box-shadow:0 0 0 3px rgba(37,99,235,.12)}
+    .vehicle-icon{font-size:1.8rem;margin-bottom:6px}
+    .vehicle-name{font-size:.8rem;font-weight:700;color:#1e293b}
+    .vehicle-cap{font-size:.7rem;color:#64748b;margin-top:2px}
+    .route-option{border:1.5px solid #e2e8f0;border-radius:10px;padding:12px 14px;cursor:pointer;transition:all .2s;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center}
+    .route-option:hover{border-color:#2563eb;background:#f0f4ff}
+    .route-option.selected{border-color:#2563eb;background:#eff6ff}
+    .route-name{font-weight:700;font-size:.85rem;color:#1e293b}
+    .route-meta{font-size:.75rem;color:#64748b;margin-top:2px}
+    .route-badge{font-size:.72rem;padding:3px 9px;border-radius:999px;font-weight:700}
+    .slots-bar{display:flex;align-items:center;gap:10px;margin-top:10px;background:#f8fafc;border-radius:10px;padding:12px 14px;border:1px solid #e2e8f0}
+    .slots-num{font-size:1.6rem;font-weight:900;color:#2563eb}
+    .slots-label{font-size:.78rem;color:#64748b}
+    .trip-options{display:flex;gap:10px;flex-wrap:wrap}
+    .trip-btn{flex:1;min-width:100px;border:2px solid #e2e8f0;border-radius:10px;padding:10px;text-align:center;cursor:pointer;font-size:.82rem;font-weight:600;color:#64748b;transition:all .2s;background:#fafafa}
+    .trip-btn:hover{border-color:#2563eb;color:#2563eb}
+    .trip-btn.selected{border-color:#2563eb;background:#eff6ff;color:#1d4ed8}
+    .booking-card{border:1.5px solid #e2e8f0;border-radius:12px;padding:16px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:flex-start;gap:10px;flex-wrap:wrap}
+    .booking-card.status-pending{border-color:#fde047;background:#fefce8}
+    .booking-card.status-approved{border-color:#86efac;background:#f0fdf4}
+    .booking-card.status-rejected{border-color:#fca5a5;background:#fff5f5}
+    .booking-card.status-cancelled{border-color:#e2e8f0;background:#f8fafc;opacity:.7}
+    .status-pill{font-size:.72rem;font-weight:700;padding:3px 10px;border-radius:999px}
+    .sp-pending{background:#fef9c3;color:#854d0e}
+    .sp-approved{background:#dcfce7;color:#15803d}
+    .sp-rejected{background:#fee2e2;color:#991b1b}
+    .sp-cancelled{background:#f1f5f9;color:#64748b}
+    .night-badge{background:linear-gradient(135deg,#1e3a8a,#7c3aed);color:#fff;font-size:.7rem;padding:2px 8px;border-radius:999px;font-weight:600}
+    .shift-info-box{background:linear-gradient(135deg,#f0f4ff,#f5f3ff);border:1px solid #c7d2fe;border-radius:10px;padding:12px 14px;margin-bottom:14px;font-size:.82rem;color:#4338ca}
+    .availability-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(36px,1fr));gap:6px;margin-top:8px}
+    .seat-box{width:36px;height:36px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:700;border:1.5px solid}
+    .seat-free{background:#f0fdf4;border-color:#86efac;color:#15803d;cursor:pointer}
+    .seat-taken{background:#fee2e2;border-color:#fca5a5;color:#991b1b;cursor:not-allowed}
+    .cab-warning{background:#fef9c3;border:1px solid #fde047;border-radius:8px;padding:10px 14px;font-size:.8rem;color:#854d0e;margin-bottom:12px}
+    @media(max-width:600px){ .tab-btn{font-size:.78rem;padding:6px 10px;} .clock-widget{flex-direction:column;} }
+  </style>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+</head>
+<body>
+  <nav class="navbar">
+    <div class="nav-brand">⚡ Workforce Intelligence</div>
+    <div class="nav-info">
+      <a href="analytics.html" id="navAnalytics" class="btn btn-sm btn-outline">📊 Analytics</a>
+      <a href="reports.html"   id="navReports"   class="btn btn-sm btn-outline">📈 Reports</a>
+      <a href="chat.html"      id="navChat"       class="btn btn-sm" style="background:linear-gradient(135deg,#6ee7f7,#a78bfa);color:#000">🤖 AI Chat</a>
+      <span id="empName" class="nav-user"></span>
+      <span class="badge badge-emp">Employee</span>
+      <button onclick="logout()" class="btn btn-sm btn-outline">Logout</button>
+    </div>
+    <a href="salary.html" style="color:#fff;margin-left:12px;">💰 Salary</a>
+    <a href="leave.html" style="color:#fff;margin-left:12px;">🏖️ Leave</a>
+  <a href="leaderboard.html" style="color:#fff;margin-left:12px;">🏆 Board</a>
+  <a href="meetings.html" style="color:#fff;margin-left:12px">📹 Meetings</a>
+    <a href="notifications.html" style="color:#fff;margin-left:12px;">🔔 Alerts</a>
+  <a href="tasks.html" style="color:#fff;margin-left:12px;">📋 Tasks</a>
+  <a href="profile.html" style="color:#fff;margin-left:12px;">👤 Profile</a>
+</nav>
+
+  <div class="dashboard">
+    <!-- ═══ DATE / TIME / WEATHER BAR ═══ -->
+    <div class="dt-weather-bar">
+      <div class="dt-left">
+        <div class="dt-time" id="liveTime">--:--:--</div>
+        <div class="dt-date" id="liveDate">Loading…</div>
+      </div>
+      <div class="dt-right">
+        <div class="weather-block" id="weatherBlock">
+          <span class="weather-loading">⛅ Loading weather…</span>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- Leave Balance Quick View -->
+    <div id="leaveBalWidget" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px;margin-bottom:20px"></div>
+
+    <!-- Productivity + Access Banner -->
+    <div class="card productivity-card">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:8px">
+        <h3 style="margin:0">📊 My Productivity</h3>
+        <div id="accessBadge" class="access-badge">🔓 Access Level 1</div>
+      </div>
+      <div class="stats-row">
+        <div class="stat-card"><div class="stat-num" id="pTotal">–</div><div class="stat-label">Total Tasks</div></div>
+        <div class="stat-card"><div class="stat-num green" id="pCompleted">–</div><div class="stat-label">Completed</div></div>
+        <div class="stat-card"><div class="stat-num red" id="pOverdue">–</div><div class="stat-label">Overdue</div></div>
+        <div class="stat-card"><div class="stat-num blue" id="pScore">–</div><div class="stat-label">Score</div></div>
+      </div>
+      <div id="accessAdvice" style="margin-top:12px;font-size:.85rem;color:#64748b;background:#f8faff;padding:10px;border-radius:8px;display:none"></div>
+    </div>
+
+    <!-- Tab Navigation -->
+    <div class="tab-nav">
+      <button class="tab-btn active" onclick="switchTab(this,'tasks')">📋 My Tasks</button>
+      <button class="tab-btn" onclick="switchTab(this,'attendance')">📅 Attendance</button>
+      <button class="tab-btn" id="tabSalaryBtn" onclick="switchTab(this,'salary')">💰 Salary Slips</button>
+      <button class="tab-btn" id="tabTeamBtn"   onclick="switchTab(this,'team')">🏢 My Team</button>
+      <button class="tab-btn" onclick="switchTab(this,'achievements')">🏆 Achievements</button>
+      <button class="tab-btn" onclick="switchTab(this,'cab')">🚌 Cab Booking</button>
+      <button class="tab-btn" onclick="switchTab(this,'emp_meetings')">📹 Meetings</button>
+    </div>
+
+    <!-- ═══════════════ TASKS TAB ═══════════════ -->
+    <div id="tab-tasks" class="tab-panel active">
+
+      <!-- AI Suggestions -->
+      <div class="card" style="background:linear-gradient(135deg,#f0f4ff,#f0fdf4)">
+        <h3>🤖 AI Task Suggestions</h3>
+        <div id="suggestionList"><p class="empty-msg">Loading suggestions…</p></div>
+      </div>
+
+      <!-- My Tasks List -->
+      <div class="card">
+        <div class="card-header">
+          <h3>📋 My Tasks</h3>
+          <button onclick="loadMyTasks()" class="btn btn-sm">Refresh</button>
+        </div>
+        <div id="myTasks" class="task-grid"><p class="empty-msg">Loading…</p></div>
+      </div>
+
+      <div class="grid-2">
+        <!-- Update Status -->
+        <div class="card">
+          <h3>✏️ Update Task Status</h3>
+          <div class="form-group"><label>Task ID</label><input id="updateTaskId" type="number" placeholder="Enter task ID"></div>
+          <div class="form-group"><label>New Status</label>
+            <select id="newStatus">
+              <option value="Pending">Pending</option>
+              <option value="In Progress">In Progress</option>
+              <option value="Completed">Completed</option>
+            </select>
+          </div>
+          <div class="form-group"><label>Remarks</label><input id="remarks" placeholder="Optional remarks"></div>
+          <button onclick="updateMyTask()" class="btn btn-full">Update Status</button>
+          <p id="updateMsg" class="msg"></p>
+        </div>
+
+        <!-- Extension Request -->
+        <div class="card" id="extCard" style="background:#fffbeb">
+          <h3>⏳ Request Time Extension</h3>
+          <p style="font-size:.85rem;color:#92400e;margin-bottom:12px">Request extra time for a task. Your manager will approve or reject.</p>
+          <div class="form-group"><label>Task ID</label><input id="extTaskId" type="number" placeholder="Task ID to extend"></div>
+          <div class="form-group"><label>Extra Hours</label>
+            <select id="extHours">
+              <option value="24">+24 hours</option>
+              <option value="48">+48 hours</option>
+              <option value="72">+72 hours</option>
+            </select>
+          </div>
+          <div class="form-group"><label>Reason</label><textarea id="extReason" rows="2" placeholder="Explain why you need more time…"></textarea></div>
+          <button onclick="requestExtension()" class="btn btn-full" style="background:#d97706">Request Extension</button>
+          <p id="extMsg" class="msg"></p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════ ATTENDANCE TAB ═══════════════ -->
+    <div id="tab-attendance" class="tab-panel">
+
+      <!-- Clock In / Out Widget -->
+      <div class="card">
+        <h3>🕐 Today's Attendance</h3>
+        <div class="clock-widget" style="margin-bottom:16px">
+          <button id="clockInBtn" class="clock-btn clock-in-btn" onclick="clockIn()">🟢 Clock In</button>
+          <button id="clockOutBtn" class="clock-btn clock-out-btn" onclick="clockOut()" disabled>🔴 Clock Out</button>
+          <div id="todayStatus" class="today-status">
+            <div style="font-size:.8rem;color:#94a3b8;font-weight:600">TODAY'S STATUS</div>
+            <div id="todayStatusText" style="font-size:1rem;font-weight:700;margin-top:4px">Not clocked in yet</div>
+            <div id="todayClockIn"  style="font-size:.82rem;color:#64748b"></div>
+            <div id="todayClockOut" style="font-size:.82rem;color:#64748b"></div>
+          </div>
+        </div>
+        <p id="clockMsg" class="msg"></p>
+      </div>
+
+      <!-- Attendance History -->
+      <div class="card">
+        <div class="card-header">
+          <h3>📅 My Attendance History</h3>
+          <button onclick="loadMyAttendance()" class="btn btn-sm">Refresh</button>
+        </div>
+        <div id="attHistList" class="scroll-list" style="max-height:400px">
+          <p class="empty-msg">Loading…</p>
+        </div>
+      </div>
+
+      <!-- Monthly Summary (self) -->
+      <div class="card">
+        <h3>📊 My Monthly Summary</h3>
+        <div id="myAttSummary" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:10px">
+          <p class="empty-msg">Loading…</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════ SALARY TAB ═══════════════ -->
+    <div id="tab-salary" class="tab-panel">
+      <div id="salaryLockedBanner" class="locked-banner" style="display:none">
+        🔒 Salary view has been restricted by your admin. Please contact your manager.
+      </div>
+      <div id="salaryContent">
+        <div class="card" style="margin-bottom:0">
+          <div class="card-header">
+            <h3>💰 My Salary Slips</h3>
+            <button onclick="loadMySalary()" class="btn btn-sm">Refresh</button>
+          </div>
+        </div>
+        <div id="salarySlipList"><p class="empty-msg" style="padding:20px 0">Loading salary records…</p></div>
+      </div>
+    </div>
+
+    <!-- ═══════════════ TEAM TAB ═══════════════ -->
+    <div id="tab-team" class="tab-panel">
+      <div id="teamLockedBanner" class="locked-banner" style="display:none">
+        🔒 Team view has been restricted by your admin. Please contact your manager.
+      </div>
+      <div id="teamContent">
+        <div class="card">
+          <h3>🏢 My Department & Team</h3>
+          <div id="myDeptInfo" style="margin-bottom:16px"><p class="empty-msg">Loading…</p></div>
+          <div id="teamMemberList"><p class="empty-msg">No team members found.</p></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════ ACHIEVEMENTS TAB ═══════════════ -->
+    <div id="tab-achievements" class="tab-panel">
+      <div class="card">
+        <h3>🏆 My Achievements</h3>
+        <div id="achievementList" class="scroll-list"><p class="empty-msg">Loading…</p></div>
+      </div>
+    </div>
+
+
+    <!-- ═══════════════ CAB BOOKING TAB ═══════════════ -->
+    <div id="tab-cab" class="tab-panel">
+
+      <!-- My shift info -->
+      <div id="cabShiftInfo" class="shift-info-box" style="display:none"></div>
+
+      <!-- 18-hour rule warning -->
+      <div class="cab-warning">
+        ⏰ <b>Booking Rule:</b> All cab bookings must be made <b>at least 18 hours</b> before the pickup time. Night cab must be booked by <b>3:00 PM</b> on the day of travel.
+      </div>
+
+      <div class="grid-2">
+
+        <!-- ── LEFT: BOOKING FORM ── -->
+        <div>
+          <!-- STEP 1: Date -->
+          <div class="cab-step">
+            <div class="cab-step-title">📅 Step 1 — Travel Date</div>
+            <div class="form-group">
+              <label>Select Date</label>
+              <input type="date" id="cabDate" onchange="onCabDateChange()">
+            </div>
+            <div id="cabDateWarning" style="display:none;font-size:.78rem;color:#dc2626;margin-top:6px"></div>
+          </div>
+
+          <!-- STEP 2: Vehicle Type -->
+          <div class="cab-step">
+            <div class="cab-step-title">🚗 Step 2 — Choose Vehicle Type</div>
+            <div class="vehicle-grid" id="vehicleGrid">
+              <p class="empty-msg">Loading vehicles…</p>
+            </div>
+          </div>
+
+          <!-- STEP 3: Route -->
+          <div class="cab-step">
+            <div class="cab-step-title">📍 Step 3 — Select Route & Pickup Stop</div>
+            <div id="routeList"><p class="empty-msg">Loading routes…</p></div>
+            <!-- Mini route map preview -->
+            <div id="routeMapWrap" style="display:none;margin-top:12px">
+              <div style="font-size:.72rem;color:#64748b;font-weight:700;text-transform:uppercase;letter-spacing:.07em;margin-bottom:6px">🗺️ Route Preview</div>
+              <div id="routePreviewMap" style="height:200px;border-radius:12px;border:1.5px solid #e2e8f0;overflow:hidden"></div>
+              <div style="display:flex;gap:10px;margin-top:6px;font-size:.7rem;color:#64748b;flex-wrap:wrap">
+                <span>🟡 Pickup Stop</span>
+                <span>🔵 Office</span>
+                <span id="routeDistBadge"></span>
+              </div>
+            </div>
+          </div>
+
+          <!-- STEP 3b: Distance from pickup -->
+          <div class="cab-step" id="distanceStep">
+            <div class="cab-step-title">📏 Step 3b — Your Distance from Pickup Stop</div>
+            <div style="display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap">
+              <div class="form-group" style="flex:1;min-width:140px;margin:0">
+                <label>Distance (km)</label>
+                <input type="number" id="cabDistanceKm" min="0.5" max="100" step="0.5"
+                  placeholder="e.g. 8.5"
+                  oninput="checkDistanceLimit()"
+                  style="border:1.5px solid #e2e8f0;border-radius:8px;padding:9px 12px;font-size:.85rem;width:100%">
+              </div>
+              <button onclick="detectMyDistance()" class="btn btn-sm" style="background:#eff6ff;color:#1d4ed8;margin-bottom:0">
+                📍 Auto-detect
+              </button>
+            </div>
+            <div id="distanceLimitMsg" style="margin-top:8px;font-size:.78rem"></div>
+            <div style="font-size:.75rem;color:#94a3b8;margin-top:6px">Maximum allowed distance varies by route. Enter your home-to-stop distance.</div>
+          </div>
+
+          <!-- STEP 4: Seat availability -->
+          <div class="cab-step" id="seatStep" style="display:none">
+            <div class="cab-step-title">💺 Step 4 — Seat Availability</div>
+            <div class="slots-bar">
+              <div>
+                <div class="slots-num" id="slotsAvail">–</div>
+                <div class="slots-label">Seats Available</div>
+              </div>
+              <div style="flex:1;height:8px;background:#e2e8f0;border-radius:999px;overflow:hidden;margin-left:10px">
+                <div id="slotsBar" style="height:100%;background:linear-gradient(to right,#2563eb,#06b6d4);border-radius:999px;transition:width .4s"></div>
+              </div>
+              <div style="font-size:.8rem;color:#64748b"><span id="slotsTotal">–</span> total</div>
+            </div>
+            <div class="availability-grid" id="seatMap" style="margin-top:12px"></div>
+          </div>
+
+          <!-- STEP 5: Trip type + Night cab + Notes -->
+          <div class="cab-step">
+            <div class="cab-step-title">⚙️ Step 5 — Trip Options</div>
+            <div class="form-group">
+              <label>Trip Type</label>
+              <div class="trip-options" id="tripOptions">
+                <div class="trip-btn selected" data-val="both"     onclick="selectTrip(this)">🔄 Both Ways</div>
+                <div class="trip-btn"          data-val="pickup"   onclick="selectTrip(this)">🌅 Pickup Only<br><small>Office → Home</small></div>
+                <div class="trip-btn"          data-val="drop"     onclick="selectTrip(this)">🌇 Drop Only<br><small>Home → Office</small></div>
+              </div>
+            </div>
+            <div class="form-group" style="margin-top:12px">
+              <label style="display:flex;align-items:center;gap:8px;cursor:pointer">
+                <input type="checkbox" id="nightCabCheck" onchange="onNightCabToggle()" style="width:16px;height:16px">
+                <span>🌙 Request Night Cab (after 9 PM / working late)</span>
+              </label>
+              <div id="nightCabInfo" style="display:none;margin-top:8px;background:#1e1b4b;color:#a5b4fc;border-radius:8px;padding:10px 12px;font-size:.78rem">
+                Night cab will be assigned from the office gate. Live GPS tracking will be shared with your emergency contact. Women employees get a safety escort to the vehicle.
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Special Note (optional)</label>
+              <textarea id="cabNote" rows="2" placeholder="e.g. Medical emergency, pregnant, wheelchair assistance…" style="width:100%;border:1.5px solid #e2e8f0;border-radius:8px;padding:9px 12px;font-size:.84rem;resize:vertical"></textarea>
+            </div>
+            <button onclick="submitCabBooking()" class="btn btn-full" style="background:linear-gradient(135deg,#1a56db,#0891b2);font-size:.95rem">
+              🚌 Book Cab — Submit for Approval
+            </button>
+            <p id="cabBookMsg" class="msg" style="margin-top:10px"></p>
+          </div>
+        </div>
+
+        <!-- ── RIGHT: MY BOOKINGS ── -->
+        <div>
+          <div class="card">
+            <div class="card-header">
+              <h3>🎫 My Cab Bookings</h3>
+              <button onclick="loadMyBookings()" class="btn btn-sm">Refresh</button>
+            </div>
+            <div id="myBookingsList"><p class="empty-msg">Loading…</p></div>
+          </div>
+
+          <!-- Booking rules reminder -->
+          <div class="card" style="background:linear-gradient(135deg,#f0f4ff,#f0fdf4);margin-top:0">
+            <h3 style="margin-bottom:12px">📋 Booking Rules</h3>
+            <ul style="list-style:none;display:flex;flex-direction:column;gap:8px">
+              <li style="font-size:.82rem;color:#475569;display:flex;gap:8px"><span style="color:#2563eb;font-weight:700">→</span>Book at least <b>18 hours</b> before pickup time</li>
+              <li style="font-size:.82rem;color:#475569;display:flex;gap:8px"><span style="color:#2563eb;font-weight:700">→</span>One booking per date (cancel to rebook)</li>
+              <li style="font-size:.82rem;color:#475569;display:flex;gap:8px"><span style="color:#2563eb;font-weight:700">→</span><b>3 no-shows</b>/month = route suspension for 1 week</li>
+              <li style="font-size:.82rem;color:#475569;display:flex;gap:8px"><span style="color:#2563eb;font-weight:700">→</span>Night cab: request by <b>3:00 PM</b> on travel day</li>
+              <li style="font-size:.82rem;color:#475569;display:flex;gap:8px"><span style="color:#2563eb;font-weight:700">→</span>Carry valid <b>company ID card</b> during travel</li>
+              <li style="font-size:.82rem;color:#475569;display:flex;gap:8px"><span style="color:#2563eb;font-weight:700">→</span>Night cab is <b>free of charge</b> for all employees</li>
+              <li style="font-size:.82rem;color:#475569;display:flex;gap:8px"><span style="color:#2563eb;font-weight:700">→</span>Emergency helpline: <b>+91-9876543210</b></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div><!-- /#tab-cab -->
+
+
+    <!-- ═══ MEETINGS TAB (EMPLOYEE) ═══ -->
+    <div id="tab-emp_meetings" class="tab-panel">
+      <div class="card">
+        <div class="card-header">
+          <h3>📹 My Meetings</h3>
+          <a href="meetings.html" class="btn btn-sm" style="background:linear-gradient(135deg,#1a56db,#0891b2);text-decoration:none;color:#fff">📹 Open Meeting Room</a>
+        </div>
+        <!-- Quick join -->
+        <div style="background:linear-gradient(135deg,#f0f4ff,#f5f3ff);border-radius:12px;padding:14px 16px;margin-bottom:16px;display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+          <div style="flex:1;min-width:160px">
+            <div style="font-size:.82rem;font-weight:700;color:#1e293b;margin-bottom:4px">🔗 Got a meeting code?</div>
+            <input id="empJoinCode" placeholder="e.g. WIP-ABC123" maxlength="12"
+              style="padding:8px 12px;border:1.5px solid #c7d2fe;border-radius:8px;font-size:.83rem;width:100%;box-sizing:border-box"
+              onkeydown="if(event.key==='Enter')empQuickJoin()">
+          </div>
+          <button onclick="empQuickJoin()" class="btn btn-sm" style="background:#2563eb;color:#fff;padding:9px 16px;white-space:nowrap">Join Now →</button>
+        </div>
+        <div id="empMeetingList"><p class="empty-msg">Loading meetings…</p></div>
+      </div>
+    </div>
+
+  </div><!-- /.dashboard -->
+
+  <script src="app.js"></script>
+<script>
+async function loadLeaveBalance() {
+  try {
+    const API = 'http://localhost:5000/api';
+    const token = localStorage.getItem('token');
+    const yr = new Date().getFullYear();
+    const r = await fetch(`${API}/admin/leave-balances/my?year=${yr}`,{headers:{'Authorization':'Bearer '+token}});
+    const data = await r.json();
+    const el = document.getElementById('leaveBalWidget');
+    if (!el || !data.length) return;
+    el.innerHTML = data.filter(b=>b.entitled>0).map(b=>`
+      <div style="background:#fff;border:1.5px solid ${parseFloat(b.remaining)<=2?'#fca5a5':'#86efac'};border-radius:10px;padding:12px;text-align:center">
+        <div style="font-size:1.6rem;font-weight:800;color:${parseFloat(b.remaining)<=2?'#C0392B':'#1B4F8A'}">${parseFloat(b.remaining||0)}</div>
+        <div style="font-size:.75rem;color:#64748b;text-transform:capitalize">${b.leave_type} Leave</div>
+        <div style="font-size:.7rem;color:#94a3b8">of ${b.entitled}</div>
+      </div>`).join('');
+  } catch(e) { console.error(e); }
+}
+</script>
+  <script src="chat.js"></script>
+  <script>
+  var _myPerms = {};
+  var MONTHS = ['','January','February','March','April','May','June','July','August','September','October','November','December'];
+  var ATT_ICON = {present:'🟢',absent:'🔴',late:'🟡',half_day:'🔵',leave:'⚪'};
+
+  function switchTab(btn, name){
+    document.querySelectorAll('.tab-btn').forEach(function(b){b.classList.remove('active');});
+    document.querySelectorAll('.tab-panel').forEach(function(p){p.classList.remove('active');});
+    btn.classList.add('active');
+    document.getElementById('tab-'+name).classList.add('active');
+    if(name==='attendance'){loadTodayAttendance();loadMyAttendance();loadMyAttSummary();}
+    if(name==='salary'){loadMySalary();}
+    if(name==='team'){loadMyTeam();}
+    if(name==='achievements'){loadAchievements();}
+    if(name==='tasks'){loadMyTasks();loadSuggestions();}
+    if(name==='cab'){initCabTab();}
+    if(name==='emp_meetings'){loadEmpMeetings();}
+  }
+
+  /* ── Permissions: hide restricted nav links & tabs ── */
+  function applyPermissions(p){
+    _myPerms = p;
+    // Nav links
+    var na=document.getElementById('navAnalytics');
+    var nr=document.getElementById('navReports');
+    var nc=document.getElementById('navChat');
+    if(na && !p.can_view_analytics) na.style.display='none';
+    if(nr && !p.can_view_reports)   nr.style.display='none';
+    if(nc && !p.can_use_chat)       nc.style.display='none';
+    // Tab buttons
+    var ts=document.getElementById('tabSalaryBtn');
+    var tt=document.getElementById('tabTeamBtn');
+    // Extension card
+    var ec=document.getElementById('extCard');
+    if(ec && !p.can_request_extension){ ec.innerHTML='<div class="locked-banner">🔒 Extension requests are disabled for your account.</div>'; }
+  }
+
+  async function loadMyPermissions(){
+    try{
+      var u=getUser();
+      var r=await fetch(API+'/admin/users/'+u.user_id+'/permissions',{headers:authHeaders()});
+      if(!r.ok)return;
+      var p=await r.json();
+      applyPermissions(p);
+    }catch(e){}
+  }
+
+  /* ── Access Level ── */
+  async function loadAccessLevel(){
+    try{
+      var u=getUser();
+      var r=await fetch(API+'/auth/me',{headers:authHeaders()});
+      if(!r.ok)return;
+      var me=await r.json();
+      var lvlMap={1:'🔓 Access Level 1 — Basic',2:'🔑 Access Level 2 — Standard',3:'🔐 Access Level 3 — Full'};
+      var advMap={
+        1:'Complete tasks to reach 100 points and unlock Level 2 access.',
+        2:'Reach 300 points to unlock Level 3 full access.',
+        3:'🎉 You have full access! Keep up the outstanding work.'
+      };
+      var el=document.getElementById('accessBadge'); if(el)el.textContent=lvlMap[me.access_level||1];
+      var adv=document.getElementById('accessAdvice'); if(adv){adv.style.display='block';adv.textContent='💡 '+advMap[me.access_level||1];}
+    }catch(e){}
+  }
+
+  /* ══════════════════════════════════════════════
+     ATTENDANCE
+  ══════════════════════════════════════════════ */
+  async function loadTodayAttendance(){
+    try{
+      var r=await fetch(API+'/admin/attendance/today',{headers:authHeaders()});
+      if(!r.ok)return;
+      var att=await r.json();
+      var statusEl=document.getElementById('todayStatus');
+      var statusTxt=document.getElementById('todayStatusText');
+      var ciEl=document.getElementById('todayClockIn');
+      var coEl=document.getElementById('todayClockOut');
+      var inBtn=document.getElementById('clockInBtn');
+      var outBtn=document.getElementById('clockOutBtn');
+
+      if(!att){
+        statusEl.className='today-status';
+        statusTxt.textContent='Not clocked in yet';
+        ciEl.textContent=''; coEl.textContent='';
+        inBtn.disabled=false; outBtn.disabled=true;
+        return;
+      }
+      if(att.clock_in && !att.clock_out){
+        statusEl.className='today-status clocked-in';
+        statusTxt.textContent='🟢 Currently Working';
+        ciEl.textContent='Clocked in: '+String(att.clock_in).slice(11,16);
+        coEl.textContent='';
+        inBtn.disabled=true; outBtn.disabled=false;
+      } else if(att.clock_in && att.clock_out){
+        statusEl.className='today-status clocked-out';
+        statusTxt.textContent='✅ Day Completed';
+        ciEl.textContent='In: '+String(att.clock_in).slice(11,16);
+        coEl.textContent='Out: '+String(att.clock_out).slice(11,16);
+        inBtn.disabled=true; outBtn.disabled=true;
+      }
+    }catch(e){}
+  }
+
+  async function clockIn(){
+    try{
+      var r=await fetch(API+'/admin/attendance/clock-in',{method:'POST',headers:authHeaders()});
+      var d=await r.json();
+      showMsg('clockMsg',d.message,!r.ok);
+      if(r.ok)setTimeout(loadTodayAttendance,600);
+    }catch(e){showMsg('clockMsg','Failed.',true);}
+  }
+
+  async function clockOut(){
+    try{
+      var r=await fetch(API+'/admin/attendance/clock-out',{method:'POST',headers:authHeaders()});
+      var d=await r.json();
+      showMsg('clockMsg',d.message,!r.ok);
+      if(r.ok)setTimeout(loadTodayAttendance,600);
+    }catch(e){showMsg('clockMsg','Failed.',true);}
+  }
+
+  async function loadMyAttendance(){
+    var c=document.getElementById('attHistList');
+    try{
+      var r=await fetch(API+'/admin/attendance/my',{headers:authHeaders()});
+      var rows=await r.json();
+      if(!rows.length){c.innerHTML='<p class="empty-msg">No attendance records yet.</p>';return;}
+      c.innerHTML=rows.map(function(a){
+        var st=a.status||'present';
+        return '<div class="att-hist-item '+st+'">'
+          +'<div><b>'+(ATT_ICON[st]||'')+'&nbsp;'+formatDate(a.work_date)+'</b>'
+          +(a.remarks?'<span style="font-size:.78rem;color:#64748b;margin-left:8px">'+escHtml(a.remarks)+'</span>':'')
+          +'</div>'
+          +'<div style="text-align:right;font-size:.8rem;color:#64748b">'
+          +(a.clock_in?'In: '+String(a.clock_in).slice(11,16):'')
+          +(a.clock_in&&a.clock_out?' &nbsp;|&nbsp; ':'')
+          +(a.clock_out?'Out: '+String(a.clock_out).slice(11,16):'')
+          +'</div></div>';
+      }).join('');
+    }catch(e){c.innerHTML='<p class="empty-msg">Could not load.</p>';}
+  }
+
+  async function loadMyAttSummary(){
+    var c=document.getElementById('myAttSummary');
+    var now=new Date();
+    try{
+      var u=getUser();
+      var r=await fetch(API+'/admin/attendance/summary?month='+( now.getMonth()+1)+'&year='+now.getFullYear(),{headers:authHeaders()});
+      var rows=await r.json();
+      var me=rows.find(function(x){return x.user_id==u.user_id;});
+      if(!me){c.innerHTML='<p class="empty-msg">No summary data for this month.</p>';return;}
+      c.innerHTML=[
+        {label:'Present',val:me.days_present,color:'#15803d',bg:'#f0fdf4'},
+        {label:'Absent',val:me.days_absent,color:'#991b1b',bg:'#fff5f5'},
+        {label:'Late',val:me.days_late,color:'#854d0e',bg:'#fefce8'},
+        {label:'Half Day',val:me.days_half,color:'#6d28d9',bg:'#f5f3ff'},
+        {label:'Leave',val:me.days_leave,color:'#475569',bg:'#f8fafc'}
+      ].map(function(item){
+        return '<div style="background:'+item.bg+';border-radius:12px;padding:16px;text-align:center">'
+          +'<div style="font-size:1.8rem;font-weight:800;color:'+item.color+'">'+item.val+'</div>'
+          +'<div style="font-size:.8rem;color:#64748b;font-weight:600">'+item.label+'</div>'
+        +'</div>';
+      }).join('');
+    }catch(e){c.innerHTML='<p class="empty-msg">Could not load summary.</p>';}
+  }
+
+  /* ══════════════════════════════════════════════
+     SALARY
+  ══════════════════════════════════════════════ */
+  async function loadMySalary(){
+    var c=document.getElementById('salarySlipList');
+    var locked=document.getElementById('salaryLockedBanner');
+
+    // Check permission
+    if(_myPerms.can_view_salary===false){
+      if(locked)locked.style.display='block';
+      c.innerHTML=''; return;
+    }
+    if(locked)locked.style.display='none';
+
+    try{
+      var r=await fetch(API+'/admin/salary/my',{headers:authHeaders()});
+      var rows=await r.json();
+      if(!rows.length){c.innerHTML='<p class="empty-msg" style="padding:20px 0">No salary records yet. Contact your admin.</p>';return;}
+      c.innerHTML=rows.map(function(s){
+        var paid=s.payment_status==='paid';
+        return '<div class="salary-slip'+(paid?' paid':'')+'">'
+          +'<div class="slip-header">'
+          +'<div>'
+            +'<div style="font-weight:700;font-size:1rem">'+MONTHS[s.month]+' '+s.year+'</div>'
+            +'<div style="font-size:.8rem;color:#94a3b8;margin-top:2px">Salary Slip</div>'
+          +'</div>'
+          +'<div style="text-align:right">'
+            +'<div class="slip-net">₹'+Number(s.net_salary).toLocaleString('en-IN')+'</div>'
+            +'<div style="margin-top:4px">'+(paid?'<span style="background:#dcfce7;color:#15803d;padding:3px 10px;border-radius:999px;font-size:.75rem;font-weight:700">✅ Paid'+(s.paid_on?' ('+formatDate(s.paid_on)+')':'')+'</span>':'<span style="background:#fef9c3;color:#854d0e;padding:3px 10px;border-radius:999px;font-size:.75rem;font-weight:700">⏳ Pending</span>')+'</div>'
+          +'</div></div>'
+          +'<div class="slip-row"><span>Base Salary</span><span>₹'+Number(s.base_salary).toLocaleString('en-IN')+'</span></div>'
+          +(s.bonus>0?'<div class="slip-row"><span style="color:#15803d">+ Bonus</span><span style="color:#15803d">₹'+Number(s.bonus).toLocaleString('en-IN')+'</span></div>':'')
+          +(s.deductions>0?'<div class="slip-row"><span style="color:#991b1b">- Deductions</span><span style="color:#991b1b">₹'+Number(s.deductions).toLocaleString('en-IN')+'</span></div>':'')
+          +(s.remarks?'<div style="font-size:.78rem;color:#94a3b8;margin-top:6px">Note: '+escHtml(s.remarks)+'</div>':'')
+        +'</div>';
+      }).join('');
+    }catch(e){c.innerHTML='<p class="empty-msg" style="padding:20px 0">Could not load salary records.</p>';}
+  }
+
+  /* ══════════════════════════════════════════════
+     TEAM
+  ══════════════════════════════════════════════ */
+  async function loadMyTeam(){
+    var locked=document.getElementById('teamLockedBanner');
+    var ml=document.getElementById('teamMemberList');
+    var di=document.getElementById('myDeptInfo');
+
+    if(_myPerms.can_view_team===false){
+      if(locked)locked.style.display='block';
+      ml.innerHTML=''; di.innerHTML=''; return;
+    }
+    if(locked)locked.style.display='none';
+
+    try{
+      var u=getUser();
+      // Get my user profile to find dept
+      var r=await fetch(API+'/auth/me',{headers:authHeaders()});
+      if(!r.ok){di.innerHTML='<p class="empty-msg">Could not load profile.</p>';return;}
+      var me=await r.json();
+
+      if(!me.department_id){
+        di.innerHTML='<div style="color:#94a3b8;font-size:.9rem">You are not assigned to any department. Contact your admin.</div>';
+        ml.innerHTML=''; return;
+      }
+
+      // Get dept info
+      var rd=await fetch(API+'/admin/departments',{headers:authHeaders()});
+      var depts=await rd.json();
+      var myDept=depts.find(function(d){return d.dept_id===me.department_id;});
+
+      if(myDept){
+        di.innerHTML='<div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;padding:14px;background:linear-gradient(135deg,#f0f4ff,#f5f3ff);border-radius:12px">'
+          +'<div style="font-size:2.5rem">🏢</div>'
+          +'<div>'
+            +'<div style="font-size:1.1rem;font-weight:800;color:#1e293b">'+escHtml(myDept.dept_name)+'</div>'
+            +(myDept.description?'<div style="font-size:.85rem;color:#64748b">'+escHtml(myDept.description)+'</div>':'')
+            +(myDept.manager_name?'<div style="font-size:.82rem;color:#2563eb;font-weight:600;margin-top:4px">👔 Manager: '+escHtml(myDept.manager_name)+'</div>':'')
+            +'<div style="font-size:.8rem;color:#94a3b8;margin-top:2px">'+myDept.member_count+' team member'+(myDept.member_count!==1?'s':'')+'</div>'
+          +'</div></div>';
+      }
+
+      // Get dept members
+      var rm=await fetch(API+'/admin/departments/'+me.department_id+'/members',{headers:authHeaders()});
+      var members=await rm.json();
+
+      if(!members.length){ml.innerHTML='<p class="empty-msg">No other team members.</p>';return;}
+      var colors=['#2563eb','#7c3aed','#db2777','#ea580c','#16a34a','#0891b2','#9333ea'];
+      ml.innerHTML=members.map(function(m,i){
+        var initials=(m.full_name||'?').split(' ').map(function(w){return w[0];}).join('').slice(0,2).toUpperCase();
+        var isMe=(m.user_id==u.user_id);
+        return '<div class="team-member-card"'+(isMe?' style="border-color:#2563eb;background:#f0f4ff"':'')+'>'
+          +'<div class="member-avatar" style="background:'+colors[i%colors.length]+'">'+escHtml(initials)+'</div>'
+          +'<div style="flex:1">'
+            +'<div style="font-weight:700">'+escHtml(m.full_name)+(isMe?' <span style="font-size:.75rem;background:#dbeafe;color:#1d4ed8;padding:2px 8px;border-radius:999px">You</span>':'')+'</div>'
+            +'<div style="font-size:.8rem;color:#64748b">'+escHtml(m.role_name)+'</div>'
+          +'</div>'
+          +'<div style="text-align:right;font-size:.8rem;color:#94a3b8">'
+            +'<div>L'+m.access_level+'</div>'
+            +'<div>'+m.total_points+' pts</div>'
+          +'</div></div>';
+      }).join('');
+    }catch(e){ml.innerHTML='<p class="empty-msg">Could not load team.</p>';}
+  }
+
+
+  /* ── Live Clock ── */
+  function updateClock(){
+    var now=new Date();
+    var te=document.getElementById('liveTime'); if(te)te.textContent=now.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:true});
+    var de=document.getElementById('liveDate'); if(de)de.textContent=now.toLocaleDateString('en-IN',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+  }
+  updateClock(); setInterval(updateClock,1000);
+
+  /* ── Weather ── */
+  function loadWeather(){
+    var block=document.getElementById('weatherBlock'); if(!block)return;
+    function showW(icon,temp,city){block.innerHTML='<span style="font-size:1.8rem">'+icon+'</span><div style="display:flex;flex-direction:column"><span style="font-size:1.4rem;font-weight:800;color:#fff">'+temp+'°C</span><span style="font-size:.75rem;color:#93c5fd">📍 '+escHtml(city)+'</span></div>';}
+    function byCity(city){
+      fetch('https://geocoding-api.open-meteo.com/v1/search?name='+encodeURIComponent(city)+'&count=1')
+        .then(function(r){return r.json();}).then(function(g){
+          if(!g.results||!g.results.length)throw new Error();
+          var loc=g.results[0];
+          return fetch('https://api.open-meteo.com/v1/forecast?latitude='+loc.latitude+'&longitude='+loc.longitude+'&current_weather=true&timezone=auto')
+            .then(function(r){return r.json();}).then(function(d){
+              var w=d.current_weather,t=Math.round(w.temperature);
+              var ic=w.weathercode<=1?'☀️':w.weathercode<=3?'⛅':w.weathercode<=67?'🌧️':'☁️';
+              showW(ic,t,loc.name);
+            });
+        }).catch(function(){block.innerHTML='<span style="color:#93c5fd;font-size:.85rem">⛅ Weather unavailable</span>';});
+    }
+    if(!navigator.geolocation){byCity('Patna');return;}
+    navigator.geolocation.getCurrentPosition(function(pos){
+      fetch('https://api.open-meteo.com/v1/forecast?latitude='+pos.coords.latitude+'&longitude='+pos.coords.longitude+'&current_weather=true&timezone=auto')
+        .then(function(r){return r.json();}).then(function(d){
+          var w=d.current_weather,t=Math.round(w.temperature);
+          var ic=w.weathercode<=1?'☀️':w.weathercode<=3?'⛅':w.weathercode<=67?'🌧️':'☁️';
+          fetch('https://nominatim.openstreetmap.org/reverse?lat='+pos.coords.latitude+'&lon='+pos.coords.longitude+'&format=json')
+            .then(function(r){return r.json();}).then(function(g){
+              var city=(g.address&&(g.address.city||g.address.town||g.address.county))||'Your Location';
+              showW(ic,t,city);
+            }).catch(function(){showW(ic,t,'Your Location');});
+        }).catch(function(){byCity('Patna');});
+    },function(){byCity('Patna');},{timeout:5000});
+  }
+
+  /* ── Init ── */
+
+  /* ══════════════════════════════════════════════════════
+     CAB BOOKING — Full JS
+  ══════════════════════════════════════════════════════ */
+  var _cabState = {
+    routes:    [],
+    vehicles:  [],
+    selRoute:  null,
+    selVehicle:null,
+    selTrip:   'both',
+    slots:     null,
+    myShift:   null
+  };
+
+  /* ── Init tab ─────────────────────────────────────── */
+  async function initCabTab() {
+    // Set min date = tomorrow (must be 18h ahead)
+    var tomorrow = new Date(); tomorrow.setDate(tomorrow.getDate()+1);
+    var dd = document.getElementById('cabDate');
+    if(dd) { dd.min = tomorrow.toISOString().slice(0,10); dd.value = tomorrow.toISOString().slice(0,10); }
+
+    // Load shift info
+    try {
+      var me = await (await fetch(API+'/auth/me',{headers:authHeaders()})).json();
+      if(me.shift_id){
+        var shifts = await (await fetch(API+'/admin/shifts',{headers:authHeaders()})).json();
+        var sh = shifts.find(function(s){return s.shift_id==me.shift_id;});
+        _cabState.myShift = sh;
+        var box = document.getElementById('cabShiftInfo');
+        if(box && sh){
+          box.style.display='block';
+          box.innerHTML='🕐 <b>Your Shift:</b> '+escHtml(sh.shift_name)+
+            ' &nbsp;|&nbsp; ⏰ '+sh.start_time+' – '+sh.end_time+
+            ' &nbsp;|&nbsp; Night cab auto-available if shift ends after 9 PM';
+        }
+      }
+    } catch(e){}
+
+    await loadCabVehicles();
+    await loadCabRoutes();
+    await loadMyBookings();
+    onCabDateChange();
+  }
+
+  /* ── Load vehicles ────────────────────────────────── */
+  async function loadCabVehicles() {
+    try {
+      var r = await fetch(API+'/cab/vehicles',{headers:authHeaders()});
+      _cabState.vehicles = await r.json();
+      renderVehicleGrid();
+    } catch(e){ document.getElementById('vehicleGrid').innerHTML='<p class="empty-msg">Could not load vehicles</p>'; }
+  }
+
+  function renderVehicleGrid() {
+    var vg = document.getElementById('vehicleGrid');
+    if(!vg) return;
+    var groups = {};
+    _cabState.vehicles.forEach(function(v){
+      if(!groups[v.vehicle_type]) groups[v.vehicle_type]=[];
+      groups[v.vehicle_type].push(v);
+    });
+    var icons = {Bus:'🚌',Car:'🚗',Bike:'🏍️'};
+    var html = '';
+    Object.keys(groups).forEach(function(type){
+      groups[type].forEach(function(v){
+        html += '<div class="vehicle-option" data-id="'+v.vehicle_id+'" onclick="selectVehicle(this,'+v.vehicle_id+')">'+
+          '<div class="vehicle-icon">'+icons[v.vehicle_type]+'</div>'+
+          '<div class="vehicle-name">'+escHtml(v.vehicle_type)+'</div>'+
+          '<div class="vehicle-cap">'+escHtml(v.label)+'</div>'+
+          '<div style="font-size:.68rem;color:#94a3b8;margin-top:3px">Max '+v.capacity+' seat'+(v.capacity>1?'s':'')+'</div>'+
+        '</div>';
+      });
+    });
+    vg.innerHTML = html || '<p class="empty-msg">No vehicles</p>';
+  }
+
+  function selectVehicle(el, id) {
+    document.querySelectorAll('.vehicle-option').forEach(function(e){e.classList.remove('selected');});
+    el.classList.add('selected');
+    _cabState.selVehicle = id;
+    refreshSlots();
+  }
+
+  /* ── Load routes ──────────────────────────────────── */
+  async function loadCabRoutes() {
+    try {
+      var r = await fetch(API+'/cab/routes',{headers:authHeaders()});
+      _cabState.routes = await r.json();
+      renderRouteList();
+    } catch(e){ document.getElementById('routeList').innerHTML='<p class="empty-msg">Could not load routes</p>'; }
+  }
+
+  function renderRouteList() {
+    var rl = document.getElementById('routeList');
+    if(!rl || !_cabState.routes.length){ if(rl) rl.innerHTML='<p class="empty-msg">No routes available</p>'; return; }
+    var zoneColors = {North:'#dbeafe',South:'#dcfce7',West:'#fef9c3',East:'#fce7f3',All:'#ede9fe'};
+    var zoneText   = {North:'#1d4ed8',South:'#15803d',West:'#854d0e',East:'#9d174d',All:'#6d28d9'};
+    rl.innerHTML = _cabState.routes.map(function(r){
+      var bg = zoneColors[r.zone]||'#f1f5f9';
+      var tc = zoneText[r.zone]||'#475569';
+      return '<div class="route-option" data-id="'+r.route_id+'" onclick="selectRoute(this,'+r.route_id+')">'+
+        '<div>'+
+          '<div class="route-name">'+escHtml(r.route_name)+'</div>'+
+          '<div class="route-meta">📍 '+escHtml(r.pickup_stop)+
+            ' &nbsp;·&nbsp; 🕗 Pickup '+r.pickup_time.slice(0,5)+
+            ' &nbsp;·&nbsp; 🏠 Drop '+r.drop_time.slice(0,5)+
+            ' &nbsp;·&nbsp; 💺 '+r.total_seats+' seats</div>'+
+        '</div>'+
+        '<span class="route-badge" style="background:'+bg+';color:'+tc+'">'+escHtml(r.zone)+'</span>'+
+      '</div>';
+    }).join('');
+  }
+
+  function selectRoute(el, id) {
+    document.querySelectorAll('.route-option').forEach(function(e){e.classList.remove('selected');});
+    el.classList.add('selected');
+    _cabState.selRoute = id;
+    refreshSlots();
+    // Show route map preview
+    var route = _cabState.routes.find(function(r){ return r.route_id === id; });
+    if(route) showRoutePreviewMap(id, route.route_name, route.pickup_stop, parseFloat(route.pickup_lat)||null, parseFloat(route.pickup_lng)||null);
+  }
+
+  /* ── Date change ──────────────────────────────────── */
+  function onCabDateChange() {
+    var dateVal = (document.getElementById('cabDate')||{}).value;
+    if(!dateVal) return;
+    // Warn if date is today (18h rule likely violated)
+    var today = new Date().toISOString().slice(0,10);
+    var warn  = document.getElementById('cabDateWarning');
+    if(warn){
+      if(dateVal <= today){
+        warn.style.display='block';
+        warn.textContent='⚠️ Bookings must be for a future date and at least 18 hours before pickup.';
+      } else { warn.style.display='none'; }
+    }
+    refreshSlots();
+  }
+
+  /* ── Refresh slot count ───────────────────────────── */
+  async function refreshSlots() {
+    var date      = (document.getElementById('cabDate')||{}).value;
+    var routeId   = _cabState.selRoute;
+    var vehicleId = _cabState.selVehicle;
+    var seatStep  = document.getElementById('seatStep');
+    if(!date || !routeId){ if(seatStep) seatStep.style.display='none'; return; }
+    if(seatStep) seatStep.style.display='block';
+
+    try {
+      var url = API+'/cab/slots?route_id='+routeId+'&date='+date+(vehicleId?'&vehicle_id='+vehicleId:'');
+      var r   = await fetch(url,{headers:authHeaders()});
+      var d   = await r.json();
+      _cabState.slots = d;
+
+      setInner('slotsAvail', d.available);
+      setInner('slotsTotal', d.total_seats);
+      var pct = d.total_seats>0 ? ((d.booked/d.total_seats)*100) : 0;
+      var bar = document.getElementById('slotsBar');
+      if(bar){ bar.style.width=pct+'%'; bar.style.background=pct>80?'#dc2626':pct>50?'#f59e0b':'linear-gradient(to right,#2563eb,#06b6d4)'; }
+
+      // Seat map
+      var sm = document.getElementById('seatMap');
+      if(sm){
+        var takenNums = (d.booked_seats||[]).map(function(s){return s.seat_number;});
+        var html='';
+        for(var i=1;i<=d.total_seats;i++){
+          var taken = takenNums.includes(i);
+          html+='<div class="seat-box '+(taken?'seat-taken':'seat-free')+'" title="Seat '+i+(taken?' (taken)':' (free)')+'">'+i+'</div>';
+        }
+        sm.innerHTML = html||'';
+      }
+    } catch(e){ setInner('slotsAvail','?'); }
+  }
+
+  /* ── Trip type ────────────────────────────────────── */
+  function selectTrip(el){
+    document.querySelectorAll('.trip-btn').forEach(function(e){e.classList.remove('selected');});
+    el.classList.add('selected');
+    _cabState.selTrip = el.dataset.val;
+  }
+
+  /* ── Night cab toggle ─────────────────────────────── */
+  function onNightCabToggle(){
+    var chk  = document.getElementById('nightCabCheck');
+    var info = document.getElementById('nightCabInfo');
+    if(info) info.style.display = chk.checked ? 'block' : 'none';
+  }
+
+  /* ── Submit booking ───────────────────────────────── */
+  /* ── Distance helpers ────────────────────── */
+  function checkDistanceLimit() {
+    var val = parseFloat((document.getElementById('cabDistanceKm')||{}).value||0);
+    var msg = document.getElementById('distanceLimitMsg');
+    if(!msg) return;
+    if(!_cabState.selRoute || !val) { msg.innerHTML=''; return; }
+    var route = _cabState.routes.find(function(r){ return r.route_id === _cabState.selRoute; });
+    var maxDist = route ? parseFloat(route.max_distance_km||30) : 30;
+    if(val > maxDist) {
+      msg.innerHTML = '<span style="color:#dc2626;font-weight:600">⛔ '+val+' km exceeds the '+maxDist+' km limit for this route. Choose a different route.</span>';
+    } else if(val > 0) {
+      msg.innerHTML = '<span style="color:#16a34a;font-weight:600">✅ Within allowed range (max '+maxDist+' km)</span>';
+    } else { msg.innerHTML=''; }
+  }
+
+  function detectMyDistance() {
+    if(!navigator.geolocation) return alert('Geolocation not available on this device.');
+    var btn = document.querySelector('[onclick="detectMyDistance()"]');
+    if(btn) btn.textContent = '⏳ Detecting…';
+    navigator.geolocation.getCurrentPosition(function(pos) {
+      // Office coords (Patna)
+      var officeLat = 25.6093, officeLng = 85.1376;
+      var R = 6371;
+      var dLat = (pos.coords.latitude  - officeLat) * Math.PI/180;
+      var dLng = (pos.coords.longitude - officeLng) * Math.PI/180;
+      var a = Math.sin(dLat/2)*Math.sin(dLat/2) +
+        Math.cos(officeLat*Math.PI/180)*Math.cos(pos.coords.latitude*Math.PI/180)*
+        Math.sin(dLng/2)*Math.sin(dLng/2);
+      var dist = R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));
+      var inp = document.getElementById('cabDistanceKm');
+      if(inp) inp.value = dist.toFixed(1);
+      if(btn) btn.textContent = '📍 Auto-detect';
+      checkDistanceLimit();
+    }, function(){ if(btn) btn.textContent = '📍 Auto-detect'; alert('Could not get location. Enter manually.'); });
+  }
+
+  async function submitCabBooking() {
+    var date      = (document.getElementById('cabDate')||{}).value;
+    var routeId   = _cabState.selRoute;
+    var vehicleId = _cabState.selVehicle;
+    var tripType  = _cabState.selTrip;
+    var nightCab  = (document.getElementById('nightCabCheck')||{}).checked;
+    var note      = (document.getElementById('cabNote')||{}).value;
+
+    if(!date)      return showMsg('cabBookMsg','Please select a travel date.',true);
+    if(!routeId)   return showMsg('cabBookMsg','Please select a route.',true);
+    if(!vehicleId) return showMsg('cabBookMsg','Please select a vehicle type.',true);
+    if(_cabState.slots && _cabState.slots.available <= 0)
+      return showMsg('cabBookMsg','No seats available for selected route/vehicle. Choose another option.',true);
+
+    try {
+      var r = await fetch(API+'/cab/book',{
+        method:'POST', headers:authHeaders(),
+        body: JSON.stringify({ route_id:routeId, vehicle_id:vehicleId, booking_date:date,
+                               trip_type:tripType, night_cab:nightCab, special_note:note })
+      });
+      var d = await r.json();
+      showMsg('cabBookMsg', d.message, !r.ok);
+      if(r.ok){
+        // Reset selections
+        document.querySelectorAll('.route-option').forEach(function(e){e.classList.remove('selected');});
+        document.querySelectorAll('.vehicle-option').forEach(function(e){e.classList.remove('selected');});
+        _cabState.selRoute=null; _cabState.selVehicle=null;
+        if(document.getElementById('nightCabCheck')) document.getElementById('nightCabCheck').checked=false;
+        if(document.getElementById('nightCabInfo'))  document.getElementById('nightCabInfo').style.display='none';
+        if(document.getElementById('cabNote'))       document.getElementById('cabNote').value='';
+        if(document.getElementById('seatStep'))      document.getElementById('seatStep').style.display='none';
+        loadMyBookings();
+      }
+    } catch(e){ showMsg('cabBookMsg','Booking failed. Check connection.',true); }
+  }
+
+  /* ── My bookings list ─────────────────────────────── */
+  async function loadMyBookings() {
+    var c = document.getElementById('myBookingsList');
+    if(!c) return;
+    try {
+      var r = await fetch(API+'/cab/my',{headers:authHeaders()});
+      var list = await r.json();
+      if(!list.length){ c.innerHTML='<p class="empty-msg">No bookings yet.</p>'; return; }
+      c.innerHTML = list.map(function(b){
+        var stClass = 'status-'+b.status;
+        var spClass = 'sp-'+b.status;
+        var vIcon   = b.vehicle_type==='Bus'?'🚌':b.vehicle_type==='Car'?'🚗':'🏍️';
+        return '<div class="booking-card '+stClass+'">'+
+          '<div style="flex:1">'+
+            '<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">'+
+              '<b style="font-size:.9rem">'+escHtml(b.route_name)+'</b>'+
+              (b.night_cab?'<span class="night-badge">🌙 Night</span>':'')+
+            '</div>'+
+            '<div style="font-size:.78rem;color:#64748b;display:flex;flex-wrap:wrap;gap:8px">'+
+              '<span>'+vIcon+' '+escHtml(b.vehicle_label)+'</span>'+
+              '<span>📅 '+formatDate(b.booking_date)+'</span>'+
+              '<span>📍 '+escHtml(b.pickup_stop)+'</span>'+
+              '<span>🕗 '+String(b.pickup_time).slice(0,5)+'</span>'+
+              (b.seat_number?'<span>💺 Seat #'+b.seat_number+'</span>':'')+
+              (b.shift_name?'<span>⏰ '+escHtml(b.shift_name)+'</span>':'')+
+            '</div>'+
+            (b.reject_reason?'<div style="font-size:.75rem;color:#991b1b;margin-top:4px">Reason: '+escHtml(b.reject_reason)+'</div>':'')+
+            (b.approved_by_name && b.status==='approved'?'<div style="font-size:.73rem;color:#15803d;margin-top:3px">✅ Approved by '+escHtml(b.approved_by_name)+'</div>':'')+
+          '</div>'+
+          '<div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px">'+
+            '<span class="status-pill '+spClass+'">'+b.status.toUpperCase()+'</span>'+
+            (b.status==='pending'?'<button onclick="cancelMyBooking('+b.booking_id+')" class="btn btn-sm" style="background:#fee2e2;color:#991b1b;font-size:.72rem;padding:4px 10px">Cancel</button>':'')+(b.status==='approved'?'<a href="cab-tracking.html?booking='+b.booking_id+'" class="btn btn-sm" style="background:linear-gradient(135deg,#1a56db,#0891b2);color:#fff;font-size:.78rem;padding:6px 14px;text-decoration:none;font-weight:700">🗺️ Live Track & Emergency</a>':'')+
+          '</div>'+
+        '</div>';
+      }).join('');
+    } catch(e){ c.innerHTML='<p class="empty-msg">Could not load bookings.</p>'; }
+  }
+
+  async function cancelMyBooking(id){
+    if(!confirm('Cancel this cab booking?')) return;
+    try {
+      var r = await fetch(API+'/cab/my/'+id,{method:'DELETE',headers:authHeaders()});
+      var d = await r.json();
+      alert(d.message);
+      loadMyBookings();
+      refreshSlots();
+    } catch(e){ alert('Failed to cancel.'); }
+  }
+
+    document.addEventListener('DOMContentLoaded', function(){
+    if(!guardAuth(2))return;
+    var u=getUser();
+    setInner('empName','👤 '+u.full_name);
+    // Load tasks tab first
+    loadMyTasks();
+    loadSuggestions();
+    loadProductivity(u.user_id);
+    // Load access level
+    setTimeout(loadAccessLevel, 600);
+    // Load today attendance quietly
+    setTimeout(loadTodayAttendance, 400);
+    // Load permissions & apply
+    loadMyPermissions();
+    loadWeather();
+    loadLeaveBalance();
+  });
+  </script>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <a href="index.html" class="footer-brand">⚡ Workforce Intelligence Platform</a>
+      <nav class="footer-links">
+        <a href="employee-dashboard.html">Dashboard</a>
+        <a href="tasks.html">Tasks</a>
+        <a href="analytics.html">Analytics</a>
+        <a href="reports.html">Reports</a>
+        <a href="leave.html">Leave</a>
+        <a href="leaderboard.html">Leaderboard</a>
+        <a href="chat.html">AI Chat</a>
+        <a href="meetings.html" style="color:#fff;margin-left:12px">📹 Meetings</a>
+    <a href="notifications.html">Notifications</a>
+        <a href="profile.html">Profile</a>
+      </nav>
+      <p class="footer-copy">&copy; 2025 Workforce Intelligence Platform v6.0 — AI-Powered HR, Payroll & Workforce Management</p>
+    </div>
+  </footer>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script>
+  /* ── Route preview mini-map for cab booking ── */
+  var _previewMap = null;
+  var _previewPickup = null, _previewRoute = null;
+  var OFFICE_COORDS = {lat: 25.6093, lng: 85.1376};
+  var ROUTE_COORDS_DASH = {
+    1:{lat:25.6205,lng:85.1310}, 2:{lat:25.6012,lng:85.1482},
+    3:{lat:25.6097,lng:85.1121}, 4:{lat:25.6214,lng:85.1268},
+    5:{lat:25.6093,lng:85.1376}
+  };
+
+  function showRoutePreviewMap(routeId, routeName, pickupStop, pickupLat, pickupLng) {
+    var wrap = document.getElementById('routeMapWrap');
+    if(!wrap) return;
+    wrap.style.display = 'block';
+
+    var pLat = pickupLat || (ROUTE_COORDS_DASH[routeId]||{}).lat || OFFICE_COORDS.lat;
+    var pLng = pickupLng || (ROUTE_COORDS_DASH[routeId]||{}).lng || OFFICE_COORDS.lng;
+
+    if(!_previewMap) {
+      _previewMap = L.map('routePreviewMap', {zoomControl:false, attributionControl:false})
+        .setView([pLat, pLng], 13);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(_previewMap);
+      // Office marker
+      L.marker([OFFICE_COORDS.lat, OFFICE_COORDS.lng], {
+        icon: L.divIcon({className:'',
+          html:'<div style="background:#1a56db;color:#fff;padding:3px 8px;border-radius:6px;font-size:.65rem;font-weight:700;white-space:nowrap;box-shadow:0 2px 8px rgba(0,0,0,.3)">🏢 Office</div>',
+          iconAnchor:[36,14]})
+      }).addTo(_previewMap);
+    }
+
+    // Remove old pickup & route
+    if(_previewPickup) { _previewMap.removeLayer(_previewPickup); _previewPickup=null; }
+    if(_previewRoute)  { _previewMap.removeLayer(_previewRoute);  _previewRoute=null; }
+
+    // Pickup marker
+    _previewPickup = L.marker([pLat, pLng], {
+      icon: L.divIcon({className:'',
+        html:'<div style="background:#f59e0b;color:#fff;padding:3px 8px;border-radius:6px;font-size:.65rem;font-weight:700;white-space:nowrap;box-shadow:0 2px 8px rgba(0,0,0,.3)">🚏 '+escHtml(pickupStop||'Pickup')+'</div>',
+        iconAnchor:[44,14]})
+    }).addTo(_previewMap);
+
+    // Fit bounds
+    _previewMap.fitBounds(L.latLngBounds([[pLat,pLng],[OFFICE_COORDS.lat,OFFICE_COORDS.lng]]),{padding:[24,24]});
+
+    // Draw route line via OSRM
+    fetch('https://router.project-osrm.org/route/v1/driving/'+pLng+','+pLat+';'+OFFICE_COORDS.lng+','+OFFICE_COORDS.lat+'?overview=full&geometries=geojson',
+      {signal: AbortSignal.timeout(6000)})
+      .then(function(r){return r.json();})
+      .then(function(data){
+        if(data.code==='Ok'&&data.routes&&data.routes[0]){
+          var coords = data.routes[0].geometry.coordinates.map(function(c){return[c[1],c[0]];});
+          _previewRoute = L.polyline(coords,{color:'#f59e0b',weight:3,opacity:.8,dashArray:'8,5'}).addTo(_previewMap);
+          var dist = (data.routes[0].distance/1000).toFixed(1);
+          var mins = Math.ceil(data.routes[0].duration/60);
+          var badge = document.getElementById('routeDistBadge');
+          if(badge) badge.textContent = '📏 ~'+dist+' km · ⏱ ~'+mins+' min';
+        } else {
+          _previewRoute = L.polyline([[pLat,pLng],[OFFICE_COORDS.lat,OFFICE_COORDS.lng]],
+            {color:'#f59e0b',weight:2,opacity:.6,dashArray:'6,5'}).addTo(_previewMap);
+        }
+      })
+      .catch(function(){
+        _previewRoute = L.polyline([[pLat,pLng],[OFFICE_COORDS.lat,OFFICE_COORDS.lng]],
+          {color:'#f59e0b',weight:2,opacity:.6,dashArray:'6,5'}).addTo(_previewMap);
+      });
+  }
+  </script>
+</body>
+</html>

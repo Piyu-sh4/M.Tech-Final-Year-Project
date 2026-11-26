@@ -1,0 +1,123 @@
+name: workforce_intelligence_portable
+services:
+  db:
+    image: mysql:8.0.46
+    command: --default-authentication-plugin=mysql_native_password --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-wfi-local-root}
+      MYSQL_DATABASE: ${DB_NAME:-workforce_intelligence}
+      MYSQL_USER: ${DB_USER:-wfi_user}
+      MYSQL_PASSWORD: ${DB_PASSWORD:-wfi-local-db}
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - type: bind
+        source: ./database/snapshot.sql.gz
+        target: /docker-entrypoint-initdb.d/02_snapshot.sql.gz
+        read_only: true
+        bind:
+          create_host_path: false
+    healthcheck:
+      test: ["CMD-SHELL", "MYSQL_PWD=\"$$MYSQL_PASSWORD\" mysql --protocol=TCP -h 127.0.0.1 -u \"$$MYSQL_USER\" \"$$MYSQL_DATABASE\" -Nse 'SELECT 1 FROM wfi_bootstrap WHERE id = 1' | grep -qx 1"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 45s
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    volumes:
+      - redis_data:/data
+    command: redis-server --maxmemory 128mb --maxmemory-policy allkeys-lru --save 60 1
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  restore-files:
+    image: alpine:3.22
+    entrypoint: ["/bin/sh", "-eu", "-c"]
+    command:
+      - |
+        # The API waits for this first restore. Later starts keep changes in the volumes.
+        if [ -f /restore/state/.portable-restore-complete ]; then
+          exit 0
+        fi
+        tar -xzf /backup/volume-data.tar.gz -C /restore
+        chown -R 1000:1000 /restore/uploads /restore/state
+        chmod 700 /restore/state
+        touch /restore/state/.portable-restore-complete
+    volumes:
+      - type: bind
+        source: ./private-restore/volume-data.tar.gz
+        target: /backup/volume-data.tar.gz
+        read_only: true
+        bind:
+          create_host_path: false
+      - uploads_data:/restore/uploads
+      - ai_keys:/restore/state
+
+  api:
+    build: .
+    restart: unless-stopped
+    depends_on:
+      restore-files:
+        condition: service_completed_successfully
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      NODE_ENV: production
+      PORT: 5000
+      DB_HOST: db
+      DB_PORT: 3306
+      DB_USER: ${DB_USER:-wfi_user}
+      DB_PASSWORD: ${DB_PASSWORD:-wfi-local-db}
+      DB_NAME: ${DB_NAME:-workforce_intelligence}
+      JWT_SECRET: ${JWT_SECRET:-}
+      JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-8h}
+      DEMO_ACCESS_CODE: ${DEMO_ACCESS_CODE:-}
+      DEMO_MODE: ${DEMO_MODE:-true}
+      TRUSTED_PROXY_IPS: ${TRUSTED_PROXY_IPS:-}
+      RATE_LIMIT_LOGIN: ${RATE_LIMIT_LOGIN:-10}
+      RATE_LIMIT_LOGIN_ACCOUNT: ${RATE_LIMIT_LOGIN_ACCOUNT:-15}
+      RATE_LIMIT_REGISTER: ${RATE_LIMIT_REGISTER:-5}
+      CORS_ORIGIN: ${CORS_ORIGIN:-}
+      APP_ORIGINS: ${APP_ORIGINS:-}
+      PASSWORD_RESET_ORIGIN: ${PASSWORD_RESET_ORIGIN:-}
+      SMTP_HOST: ${SMTP_HOST:-}
+      SMTP_PORT: ${SMTP_PORT:-}
+      SMTP_SECURE: ${SMTP_SECURE:-}
+      SMTP_USER: ${SMTP_USER:-}
+      SMTP_PASS: ${SMTP_PASS:-}
+      SMTP_FROM: ${SMTP_FROM:-}
+      AI_PROVIDER: ${AI_PROVIDER:-openrouter}
+      AI_MODEL: ${AI_MODEL:-}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      OPENROUTER_API_KEY: ${OPENROUTER_API_KEY:-}
+      NVIDIA_API_KEY: ${NVIDIA_API_KEY:-}
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+      REDIS_URL: redis://redis:6379
+      COMPANY_NAME: ${COMPANY_NAME:-Workforce Intelligence}
+      COMPANY_DOMAIN: ${COMPANY_DOMAIN:-wfintelligence.internal}
+    ports:
+      - "127.0.0.1:${WFI_PORT:-5500}:5000"
+    volumes:
+      - uploads_data:/app/backend/uploads
+      - ai_keys:/app/backend/state
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:5000/api/health"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+
+volumes:
+  mysql_data:
+  redis_data:
+  uploads_data:
+  ai_keys:

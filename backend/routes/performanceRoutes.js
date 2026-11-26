@@ -1,0 +1,11 @@
+const router=require('express').Router(),ctrl=require('../controllers/performanceController');
+const protect=require('../middleware/authMiddleware');
+const {staffOrAbove}=require('../middleware/authMiddleware');
+const audit=require('../middleware/auditMiddleware');
+router.get('/my',protect,ctrl.getMyReviews);
+router.get('/team',protect,staffOrAbove,ctrl.getTeamReviews);
+router.get('/summary',protect,staffOrAbove,ctrl.getSummary);
+router.get('/all',protect,staffOrAbove,ctrl.getAllReviews);
+router.post('/',protect,staffOrAbove,audit('CREATE_REVIEW','performance_reviews'),ctrl.create);
+router.patch('/:id/acknowledge',protect,ctrl.acknowledge);
+module.exports=router;

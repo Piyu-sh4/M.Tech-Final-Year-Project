@@ -1,0 +1,1451 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<script src="/html.js"></script><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Employee Benefits – Workforce Intelligence</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+
+/* ── UNIVERSAL SIDEBAR NAV ── */
+.wiq-wrap{display:flex;min-height:100vh}
+.wiq-sidebar{width:220px;min-width:220px;background:#0a1220;border-right:1px solid rgba(255,255,255,.07);position:sticky;top:0;height:100vh;overflow-y:auto;flex-shrink:0;transition:width .2s;z-index:200}
+.wiq-sidebar::-webkit-scrollbar{width:3px}.wiq-sidebar::-webkit-scrollbar-thumb{background:#1e3a5f}
+.wiq-sidebar-header{padding:14px 14px 10px;border-bottom:1px solid rgba(255,255,255,.07)}
+.wiq-logo{font-size:.9rem;font-weight:900;color:#fff;display:flex;align-items:center;gap:7px}
+.wiq-user-pill{display:flex;align-items:center;gap:7px;padding:8px 10px;margin:8px 0 4px;background:rgba(255,255,255,.04);border-radius:8px;font-size:.7rem;color:#64748b}
+.wiq-user-name{font-weight:700;color:#cbd5e1;font-size:.72rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:120px}
+.wiq-logout-btn{display:flex;align-items:center;gap:6px;padding:7px 10px;margin:0 6px 6px;background:rgba(220,38,38,.1);border:1px solid rgba(220,38,38,.2);border-radius:7px;color:#f87171;font-size:.72rem;font-weight:700;cursor:pointer;width:calc(100% - 12px);text-decoration:none;transition:all .15s}
+.wiq-logout-btn:hover{background:rgba(220,38,38,.2)}
+.wiq-nav-group{margin-bottom:2px}
+.wiq-nav-label{font-size:.59rem;font-weight:800;color:#1e3a5f;text-transform:uppercase;letter-spacing:.09em;padding:8px 14px 3px;cursor:pointer;display:flex;align-items:center;justify-content:space-between}
+.wiq-nav-label:hover{color:#334155}
+.wiq-nav-label .arr{font-size:.6rem;transition:.2s;color:#1e3a5f}
+.wiq-nav-items{display:flex;flex-direction:column;gap:1px;padding:0 6px 4px}
+.wiq-nav-item{display:flex;align-items:center;gap:7px;padding:5px 8px;border-radius:6px;font-size:.71rem;font-weight:600;color:#475569;text-decoration:none;transition:all .15s;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.wiq-nav-item:hover{background:rgba(37,99,235,.12);color:#60a5fa}
+.wiq-nav-item.active{background:rgba(37,99,235,.18);color:#60a5fa;font-weight:800}
+.wiq-nav-item .ico{font-size:.8rem;flex-shrink:0;width:16px;text-align:center}
+.wiq-main{flex:1;min-width:0;overflow-x:hidden}
+.wiq-collapsed .wiq-sidebar{width:48px}
+.wiq-collapsed .wiq-nav-item span,.wiq-collapsed .wiq-nav-label span:first-child,.wiq-collapsed .wiq-user-name,.wiq-collapsed .wiq-logo span,.wiq-collapsed .wiq-logout-btn span{display:none}
+.wiq-collapsed .wiq-nav-items{padding:0 3px}
+.wiq-collapsed .wiq-nav-item{justify-content:center;padding:6px}
+.wiq-collapsed .wiq-logout-btn{justify-content:center;padding:7px;margin:0 3px 4px}
+.wiq-toggle{background:none;border:none;color:#475569;cursor:pointer;padding:4px 8px;font-size:.75rem;display:flex;align-items:center;gap:4px;margin-left:auto}
+.wiq-toggle:hover{color:#60a5fa}
+@media(max-width:768px){.wiq-sidebar{position:fixed;left:-220px;top:0;transition:left .2s}.wiq-sidebar.open{left:0;box-shadow:4px 0 20px rgba(0,0,0,.5)}.wiq-mob-toggle{display:flex!important}}
+.wiq-mob-toggle{display:none;position:fixed;top:12px;left:12px;z-index:300;background:#1e3a5f;border:none;border-radius:8px;padding:7px 10px;color:#fff;font-size:.8rem;cursor:pointer}
+
+.tab-nav{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:20px;background:#f1f5f9;padding:8px;border-radius:14px}
+.tab-btn{padding:8px 18px;border:none;border-radius:10px;cursor:pointer;font-size:.85rem;font-weight:600;background:transparent;color:#64748b;transition:all .2s}
+.tab-btn.active{background:#fff;color:#16a34a;box-shadow:0 2px 8px rgba(22,163,74,.15)}
+.tab-panel{display:none}.tab-panel.active{display:block}
+.card{background:#fff;border-radius:14px;box-shadow:0 2px 12px rgba(0,0,0,.07);padding:24px;margin-bottom:20px;color:#1e293b}
+.card h3{font-size:.95rem;font-weight:800;margin-bottom:16px;color:#1e293b}
+.summary-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:14px;margin-bottom:20px}
+.sum-card{border-radius:12px;padding:18px;text-align:center}
+.sum-val{font-size:1.6rem;font-weight:900}
+.sum-lbl{font-size:.75rem;font-weight:700;margin-top:4px}
+.plan-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px}
+.plan-card{border:2px solid #e2e8f0;border-radius:14px;padding:20px;background:#f8fafc;transition:all .2s}
+.plan-card:hover{border-color:#16a34a;box-shadow:0 4px 16px rgba(22,163,74,.12)}
+.plan-card.enrolled{border-color:#16a34a;background:#f0fdf4}
+.plan-icon{font-size:2.2rem;margin-bottom:10px}
+.plan-name{font-weight:800;font-size:.95rem;color:#1e293b;margin-bottom:4px}
+.plan-provider{font-size:.76rem;color:#64748b;margin-bottom:10px}
+.plan-cover{font-size:1.2rem;font-weight:900;color:#2563eb;margin-bottom:6px}
+.plan-premium-row{display:flex;justify-content:space-between;font-size:.76rem;color:#64748b;margin-bottom:4px}
+.plan-premium-row span:last-child{font-weight:700;color:#1e293b}
+.plan-tag{display:inline-block;padding:3px 10px;border-radius:999px;font-size:.7rem;font-weight:700;margin-bottom:12px}
+.pt-health{background:#dbeafe;color:#1d4ed8}
+.pt-life{background:#ede9fe;color:#6d28d9}
+.pt-dental{background:#fef9c3;color:#854d0e}
+.pt-maternity{background:#fce7f3;color:#9d174d}
+.pt-accidental{background:#fee2e2;color:#991b1b}
+.pt-family{background:#dcfce7;color:#15803d}
+.benefit-card{border:1.5px solid #e2e8f0;border-radius:12px;padding:16px;margin-bottom:10px;display:flex;gap:16px;align-items:flex-start;background:#fff}
+.benefit-card.active-ben{border-color:#16a34a;background:#f0fdf4}
+.benefit-card.expired-ben{border-color:#fca5a5;background:#fff5f5;opacity:.75}
+.ben-icon{font-size:2rem;flex-shrink:0}
+.ben-name{font-weight:800;font-size:.9rem;color:#1e293b}
+.ben-meta{font-size:.76rem;color:#64748b;margin-top:3px;line-height:1.7}
+.status-pill{display:inline-block;padding:3px 10px;border-radius:999px;font-size:.72rem;font-weight:700}
+.st-active{background:#dcfce7;color:#15803d}
+.st-pending{background:#fef9c3;color:#854d0e}
+.st-expired{background:#fee2e2;color:#991b1b}
+.st-cancelled{background:#f1f5f9;color:#475569}
+.dep-card{border:1.5px solid #e2e8f0;border-radius:10px;padding:14px;display:flex;align-items:center;gap:14px;margin-bottom:8px;background:#f8fafc}
+.dep-avatar{width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#16a34a,#15803d);color:#fff;font-size:1rem;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.dep-name{font-weight:700;font-size:.88rem;color:#1e293b}
+.dep-meta{font-size:.75rem;color:#64748b;margin-top:2px}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
+.form-group label{font-size:.82rem;font-weight:600;color:#475569;display:block;margin-bottom:5px}
+.sim-input,.sim-select{width:100%;padding:9px 12px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:.87rem;background:#f8fafc;font-family:var(--wfi-font);color:#1e293b}
+.sim-input:focus,.sim-select:focus{outline:none;border-color:#16a34a;background:#fff}
+.btn-primary{background:#16a34a;color:#fff;border:none;padding:10px 24px;border-radius:10px;font-size:.87rem;font-weight:700;cursor:pointer}
+.btn-outline{border:1.5px solid #16a34a;color:#16a34a;background:#fff;padding:10px 20px;border-radius:10px;font-size:.87rem;font-weight:700;cursor:pointer}
+.btn-sm{padding:6px 14px;font-size:.78rem;border-radius:8px}
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:999;align-items:center;justify-content:center}
+.modal-overlay.open{display:flex}
+.modal-box{background:#fff;border-radius:18px;padding:28px;width:min(500px,95vw);max-height:90vh;overflow-y:auto}
+.modal-title{font-size:1.05rem;font-weight:800;margin-bottom:18px;color:#1e293b}
+.modal-footer{display:flex;gap:8px;justify-content:flex-end;margin-top:20px}
+.btn-cancel{padding:9px 20px;border:1.5px solid #e2e8f0;border-radius:8px;background:#fff;cursor:pointer;font-size:.85rem;font-weight:600}
+.toast{position:fixed;bottom:24px;right:24px;background:#1e293b;color:#fff;padding:12px 22px;border-radius:12px;font-size:.87rem;font-weight:600;z-index:9999;transform:translateY(80px);opacity:0;transition:all .3s}
+.toast.show{transform:translateY(0);opacity:1}
+@media(max-width:600px){.form-row{grid-template-columns:1fr}.plan-grid{grid-template-columns:1fr}}
+
+/* ── TOPBAR FIXES  ─────────────────────────────── */
+.navbar,.wiq-topbar,nav.topbar{
+  display:flex!important;align-items:center!important;
+  padding:0 20px!important;height:54px!important;
+  background:#fff!important;
+  border-bottom:2px solid #e8f0ff!important;
+  position:sticky!important;top:0!important;z-index:100!important;
+  gap:12px!important;flex-wrap:nowrap!important;
+  box-shadow:0 1px 8px rgba(37,99,235,.08)!important;
+}
+.nav-brand{
+  font-size:.88rem!important;font-weight:900!important;
+  color:#1E3A5F!important;white-space:nowrap!important;
+  display:flex!important;align-items:center!important;gap:6px!important;
+  flex-shrink:0!important;letter-spacing:-.01em!important;
+}
+.nav-brand .logo-icon{
+  width:28px!important;height:28px!important;
+  background:linear-gradient(135deg,#2563EB,#7C3AED)!important;
+  border-radius:7px!important;display:inline-flex!important;
+  align-items:center!important;justify-content:center!important;
+  font-size:.9rem!important;flex-shrink:0!important;
+}
+.nav-brand .logo-text{
+  font-size:.85rem!important;font-weight:900!important;color:#1E3A5F!important;
+}
+.nav-brand .logo-version{
+  font-size:.55rem!important;font-weight:700!important;
+  color:#2563EB!important;background:#EFF6FF!important;
+  padding:1px 5px!important;border-radius:4px!important;
+  border:1px solid #BFDBFE!important;
+}
+.nav-info{
+  display:flex!important;align-items:center!important;
+  gap:8px!important;flex-shrink:0!important;margin-left:auto!important;
+}
+.nav-divider{width:1px!important;height:20px!important;background:#E2E8F0!important}
+
+/* ── CARD COLOR SHADOWS ─────────────────────────────── */
+.card,.wiq-card,[class*="-card"]{
+  transition:all .25s cubic-bezier(.34,1.56,.64,1)!important;
+  border-radius:12px!important;
+}
+.card:hover,.wiq-card:hover{
+  transform:translateY(-4px) scale(1.006)!important;
+  box-shadow:0 12px 32px rgba(37,99,235,.18),
+             0 2px 8px rgba(37,99,235,.1)!important;
+}
+/* Module-specific card shadows */
+.card-payroll:hover{box-shadow:0 12px 32px rgba(5,150,105,.18)!important}
+.card-leave:hover{box-shadow:0 12px 32px rgba(245,158,11,.18)!important}
+.card-alert:hover{box-shadow:0 12px 32px rgba(220,38,38,.18)!important}
+
+/* ── BUTTON SYSTEM ─────────────────────────────────── */
+.btn{
+  display:inline-flex!important;align-items:center!important;
+  gap:5px!important;padding:7px 16px!important;
+  border-radius:8px!important;font-size:.76rem!important;
+  font-weight:700!important;cursor:pointer!important;
+  border:none!important;transition:all .2s!important;
+  white-space:nowrap!important;font-family:var(--wfi-font);
+}
+.btn-primary{
+  background:linear-gradient(135deg,#2563EB,#1D4ED8)!important;
+  color:#fff!important;
+  box-shadow:0 2px 8px rgba(37,99,235,.3)!important;
+}
+.btn-primary:hover{
+  background:linear-gradient(135deg,#1D4ED8,#1E40AF)!important;
+  box-shadow:0 4px 14px rgba(37,99,235,.4)!important;
+  transform:translateY(-1px)!important;
+}
+.btn-outline,.btn-sm.btn-outline{
+  background:#fff!important;color:#2563EB!important;
+  border:1.5px solid #BFDBFE!important;
+  padding:5px 13px!important;font-size:.72rem!important;
+}
+.btn-outline:hover{
+  background:#EFF6FF!important;
+  border-color:#2563EB!important;
+  box-shadow:0 2px 8px rgba(37,99,235,.15)!important;
+}
+.btn-danger{
+  background:linear-gradient(135deg,#DC2626,#B91C1C)!important;
+  color:#fff!important;
+}
+.btn-danger:hover{box-shadow:0 4px 14px rgba(220,38,38,.35)!important}
+.btn-success{
+  background:linear-gradient(135deg,#059669,#047857)!important;
+  color:#fff!important;
+}
+.btn-success:hover{box-shadow:0 4px 14px rgba(5,150,105,.35)!important}
+.btn-sm{padding:5px 12px!important;font-size:.7rem!important}
+.btn-lg{padding:10px 22px!important;font-size:.82rem!important}
+
+/* ── STATUS BADGES ─────────────────────────────────── */
+.badge,.status-badge,[class*=badge]{
+  display:inline-flex!important;align-items:center!important;
+  padding:3px 10px!important;border-radius:999px!important;
+  font-size:.62rem!important;font-weight:800!important;
+  text-transform:uppercase!important;letter-spacing:.04em!important;
+}
+
+/* ── SIDEBAR BRAND ─────────────────────────────────── */
+.wiq-logo{
+  display:flex!important;align-items:center!important;
+  gap:8px!important;padding:0 4px!important;
+}
+.wiq-logo .logo-mark{
+  width:32px!important;height:32px!important;
+  background:linear-gradient(135deg,#2563EB,#7C3AED)!important;
+  border-radius:9px!important;display:flex!important;
+  align-items:center!important;justify-content:center!important;
+  font-size:1rem!important;flex-shrink:0!important;
+  box-shadow:0 4px 12px rgba(37,99,235,.35)!important;
+}
+.wiq-logo span{
+  font-weight:900!important;font-size:.82rem!important;
+  color:#F8FAFC!important;letter-spacing:-.01em!important;
+}
+
+/* ═══ DARK/LIGHT MODE  ════════════════════════════════════ */
+:root{--dm-bg:#F8FAFC;--dm-card:#ffffff;--dm-text:#1e293b;--dm-muted:#64748b;--dm-border:#e2e8f0;--dm-sidebar:#0a1220;--dm-topbar:#ffffff;--dm-input:#ffffff;--dm-hover:#f1f5f9}
+body.dark-mode{--dm-bg:#0B1120;--dm-card:#111827;--dm-text:#e2e8f0;--dm-muted:#94a3b8;--dm-border:#1e2d4a;--dm-sidebar:#060d18;--dm-topbar:#111827;--dm-input:#1e2d4a;--dm-hover:#1e293b}
+body{background:var(--dm-bg)!important;color:var(--dm-text)!important;transition:background .25s,color .25s}
+.wiq-sidebar,aside{background:var(--dm-sidebar)!important}
+.navbar,.wiq-topbar,nav{background:var(--dm-topbar)!important;border-bottom-color:var(--dm-border)!important}
+.card,.wiq-card,.stat-card,.kpi-card{background:var(--dm-card)!important;border-color:var(--dm-border)!important}
+main,.main-content,.wiq-content,.page-wrap{background:var(--dm-bg)!important}
+input:not([type=checkbox]):not([type=radio]),select,textarea,.form-input{background:var(--dm-input)!important;border-color:var(--dm-border)!important;color:var(--dm-text)!important}
+table{background:var(--dm-card)!important}thead tr{background:#1e3a5f!important}tbody tr:hover{background:var(--dm-hover)!important}
+h1,h2,h3,h4,h5,h6,p,span,label,li,td,th{color:inherit}
+.dm-toggle{width:40px;height:22px;border-radius:999px;border:none;cursor:pointer;position:relative;background:#e2e8f0;transition:background .3s;flex-shrink:0;outline:none}
+.dm-toggle.on{background:linear-gradient(135deg,#4f46e5,#7c3aed)}
+.dm-toggle::after{content:'';position:absolute;top:2px;left:2px;width:18px;height:18px;border-radius:50%;background:#fff;transition:transform .3s;box-shadow:0 1px 4px rgba(0,0,0,.2)}
+.dm-toggle.on::after{transform:translateX(18px)}
+.dm-icon{font-size:.85rem;cursor:pointer}
+
+
+/* ═══ COOKIE CONSENT BANNER ════════════════════════════════ */
+#cookieBanner{
+  position:fixed;bottom:0;left:0;right:0;z-index:9998;
+  background:linear-gradient(135deg,#0F172A,#1E293B);
+  border-top:2px solid #2563EB;
+  padding:16px 32px;
+  display:flex;align-items:center;justify-content:space-between;
+  flex-wrap:wrap;gap:12px;
+  box-shadow:0 -4px 24px rgba(0,0,0,.3);
+  transform:translateY(100%);transition:transform .4s ease;
+}
+#cookieBanner.visible{transform:translateY(0)}
+.cookie-text{font-size:.78rem;color:#CBD5E1;line-height:1.6;max-width:700px}
+.cookie-text a{color:#60A5FA;text-decoration:none;font-weight:600}
+.cookie-text a:hover{text-decoration:underline}
+.cookie-actions{display:flex;gap:8px;flex-shrink:0}
+.cookie-btn-accept{
+  background:linear-gradient(135deg,#2563EB,#4F46E5);color:#fff;
+  border:none;border-radius:8px;padding:8px 20px;font-size:.74rem;
+  font-weight:700;cursor:pointer;font-family:var(--wfi-font);
+  box-shadow:0 4px 12px rgba(37,99,235,.4);transition:all .2s;
+}
+.cookie-btn-accept:hover{transform:translateY(-1px);box-shadow:0 6px 16px rgba(37,99,235,.5)}
+.cookie-btn-settings{
+  background:transparent;color:#94A3B8;
+  border:1.5px solid #334155;border-radius:8px;padding:8px 16px;font-size:.74rem;
+  font-weight:700;cursor:pointer;font-family:var(--wfi-font);transition:all .2s;
+}
+.cookie-btn-settings:hover{color:#F1F5F9;border-color:#64748B}
+.cookie-btn-decline{
+  background:transparent;color:#64748B;border:none;
+  font-size:.7rem;cursor:pointer;font-family:var(--wfi-font);padding:4px 8px;
+}
+
+</style>
+
+<style id="wfi-card-fix">
+.card,.stat-card,.kpi-card{margin-bottom:12px}
+.grid,.stats-grid{gap:14px}
+.export-bar{padding:10px 0;margin-bottom:12px}
+.tab-panel{padding:4px 0}
+.wiq-main{padding:16px 20px}
+@media(max-width:768px){.wiq-main{padding:12px}}
+/* Dark mode button always visible */
+#dmt,#dmToggle{display:flex!important;opacity:1!important;visibility:visible!important}
+/* Print improvements */
+@media print{
+  .wiq-sidebar,.navbar,.topbar,.export-bar,.wiq-mob-toggle{display:none!important}
+  .wiq-main,.main{margin:0!important;padding:20px!important;max-width:100%!important}
+  table{page-break-inside:avoid}
+  .card{page-break-inside:avoid;border:1px solid #e2e8f0!important}
+}
+</style>
+
+<style id="wiq-sb-css">
+
+
+/* ── UNIVERSAL SIDEBAR NAV ── */
+.wiq-wrap{display:flex;min-height:100vh}
+.wiq-sidebar{width:220px;min-width:220px;background:#0a1220;border-right:1px solid rgba(255,255,255,.07);position:sticky;top:0;height:100vh;overflow-y:auto;flex-shrink:0;transition:width .2s;z-index:200}
+.wiq-sidebar::-webkit-scrollbar{width:3px}.wiq-sidebar::-webkit-scrollbar-thumb{background:#1e3a5f}
+.wiq-sidebar-header{padding:14px 14px 10px;border-bottom:1px solid rgba(255,255,255,.07)}
+.wiq-logo{font-size:.9rem;font-weight:900;color:#fff;display:flex;align-items:center;gap:7px}
+.wiq-user-pill{display:flex;align-items:center;gap:7px;padding:8px 10px;margin:8px 0 4px;background:rgba(255,255,255,.04);border-radius:8px;font-size:.7rem;color:#64748b}
+.wiq-user-name{font-weight:700;color:#cbd5e1;font-size:.72rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:120px}
+.wiq-logout-btn{display:flex;align-items:center;gap:6px;padding:7px 10px;margin:0 6px 6px;background:rgba(220,38,38,.1);border:1px solid rgba(220,38,38,.2);border-radius:7px;color:#f87171;font-size:.72rem;font-weight:700;cursor:pointer;width:calc(100% - 12px);text-decoration:none;transition:all .15s}
+.wiq-logout-btn:hover{background:rgba(220,38,38,.2)}
+.wiq-nav-group{margin-bottom:2px}
+.wiq-nav-label{font-size:.59rem;font-weight:800;color:#1e3a5f;text-transform:uppercase;letter-spacing:.09em;padding:8px 14px 3px;cursor:pointer;display:flex;align-items:center;justify-content:space-between}
+.wiq-nav-label:hover{color:#334155}
+.wiq-nav-label .arr{font-size:.6rem;transition:.2s;color:#1e3a5f}
+.wiq-nav-items{display:flex;flex-direction:column;gap:1px;padding:0 6px 4px}
+.wiq-nav-item{display:flex;align-items:center;gap:7px;padding:5px 8px;border-radius:6px;font-size:.71rem;font-weight:600;color:#475569;text-decoration:none;transition:all .15s;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.wiq-nav-item:hover{background:rgba(37,99,235,.12);color:#60a5fa}
+.wiq-nav-item.active{background:rgba(37,99,235,.18);color:#60a5fa;font-weight:800}
+.wiq-nav-item .ico{font-size:.8rem;flex-shrink:0;width:16px;text-align:center}
+.wiq-main{flex:1;min-width:0;overflow-x:hidden}
+.wiq-collapsed .wiq-sidebar{width:48px}
+.wiq-collapsed .wiq-nav-item span,.wiq-collapsed .wiq-nav-label span:first-child,.wiq-collapsed .wiq-user-name,.wiq-collapsed .wiq-logo span,.wiq-collapsed .wiq-logout-btn span{display:none}
+.wiq-collapsed .wiq-nav-items{padding:0 3px}
+.wiq-collapsed .wiq-nav-item{justify-content:center;padding:6px}
+.wiq-collapsed .wiq-logout-btn{justify-content:center;padding:7px;margin:0 3px 4px}
+.wiq-toggle{background:none;border:none;color:#475569;cursor:pointer;padding:4px 8px;font-size:.75rem;display:flex;align-items:center;gap:4px;margin-left:auto}
+.wiq-toggle:hover{color:#60a5fa}
+@media(max-width:768px){.wiq-sidebar{position:fixed;left:-220px;top:0;transition:left .2s}.wiq-sidebar.open{left:0;box-shadow:4px 0 20px rgba(0,0,0,.5)}.wiq-mob-toggle{display:flex!important}}
+.wiq-mob-toggle{display:none;position:fixed;top:12px;left:12px;z-index:300;background:#1e3a5f;border:none;border-radius:8px;padding:7px 10px;color:#fff;font-size:.8rem;cursor:pointer}
+
+  body{background:#F0F4F8}
+  .page-wrap{max-width:1200px;margin:0 auto;padding:24px}
+  .card{background:#fff;border-radius:12px;padding:24px;margin-bottom:24px;box-shadow:0 2px 12px rgba(0,0,0,.08)}
+  .card h3{margin-top:0;color:#1B4F8A;font-size:1.1rem;margin-bottom:16px}
+  .btn{padding:9px 22px;border:none;border-radius:7px;font-weight:600;cursor:pointer;font-size:14px;transition:.15s}
+  .btn-primary{background:#1B4F8A;color:#fff} .btn-primary:hover{background:#1a3f72}
+  .btn-success{background:#27AE60;color:#fff} .btn-success:hover{background:#1e8449}
+  .btn-danger{background:#C0392B;color:#fff}  .btn-danger:hover{background:#a93226}
+  .btn-sm{padding:5px 14px;font-size:12px;border-radius:5px;border:none;font-weight:600;cursor:pointer}
+  .btn-outline{background:#fff;border:1.5px solid #1B4F8A;color:#1B4F8A}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+  .grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+  @media(max-width:700px){.grid2,.grid4{grid-template-columns:1fr}}
+  table{width:100%;border-collapse:collapse;font-size:13px}
+  th{background:#1B4F8A;color:#fff;padding:10px 12px;text-align:left;white-space:nowrap}
+  td{padding:9px 12px;border-bottom:1px solid #EEF2F7;vertical-align:middle}
+  tr:hover td{background:#F8FAFB}
+  .badge{padding:3px 10px;border-radius:12px;font-size:11px;font-weight:700}
+  .badge.present{background:#D5F5E3;color:#1E8449}
+  .badge.absent{background:#FADBD8;color:#C0392B}
+  .badge.late{background:#FEF9E7;color:#D4AC0D}
+  .badge.half_day{background:#D6EAF8;color:#1B4F8A}
+  .badge.leave{background:#EEF2F7;color:#5D6D7E}
+  #msg{padding:11px 16px;border-radius:8px;margin-bottom:16px;display:none;font-weight:600}
+  #msg.success{background:#D5F5E3;color:#1E8449;display:block}
+  #msg.error{background:#FADBD8;color:#C0392B;display:block}
+  .tabs{display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap}
+  .tab{padding:9px 22px;border-radius:8px;border:2px solid #BDC3C7;background:#fff;color:#5D6D7E;font-weight:600;cursor:pointer;font-size:14px}
+  .tab.active{background:#1B4F8A;color:#fff;border-color:#1B4F8A}
+  /* Clock widget */
+  .clock-card{background:linear-gradient(135deg,#1B4F8A,#2563eb);border-radius:12px;padding:28px;color:#fff;text-align:center}
+  .clock-time{font-size:3rem;font-weight:800;letter-spacing:2px;font-family:var(--wfi-font);margin-bottom:6px}
+  .clock-date{font-size:.95rem;opacity:.8;margin-bottom:20px}
+  .clock-status{background:rgba(255,255,255,.15);border-radius:8px;padding:10px 16px;font-size:.95rem;margin-bottom:20px}
+  .clock-status.clocked-in{background:rgba(39,174,96,.3)}
+  .clock-status.clocked-out{background:rgba(192,57,43,.2)}
+  .clock-btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+  .clock-btn{padding:12px 28px;border:none;border-radius:8px;font-size:15px;font-weight:700;cursor:pointer;transition:.15s}
+  .clock-btn.in{background:#27AE60;color:#fff} .clock-btn.in:hover{background:#1e8449}
+  .clock-btn.out{background:#C0392B;color:#fff} .clock-btn.out:hover{background:#a93226}
+  .clock-btn:disabled{opacity:.4;cursor:not-allowed}
+  /* Stat cards */
+  .stat-card{background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:10px;padding:16px;text-align:center}
+  .stat-num{font-size:2rem;font-weight:800;color:#1B4F8A}
+  .stat-label{font-size:.8rem;font-weight:700;color:#64748b;margin-top:3px;text-transform:uppercase;letter-spacing:.05em}
+  .stat-sub{font-size:.75rem;color:#94a3b8;margin-top:3px}
+  /* Today dot */
+  .today-dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px}
+  .dot-present{background:#27AE60}
+  .dot-absent{background:#C0392B}
+  .dot-late{background:#D4AC0D}
+  /* Form */
+  .form-group{margin-bottom:14px}
+  .form-group label{display:block;font-weight:600;color:#1B4F8A;margin-bottom:5px;font-size:13px}
+  .form-group input,.form-group select,.form-group textarea{width:100%;padding:9px 12px;border:1px solid #BDC3C7;border-radius:7px;font-size:14px;box-sizing:border-box}
+  .pbar{height:8px;background:#e2e8f0;border-radius:4px;overflow:hidden;margin-top:6px}
+  .pfill{height:100%;border-radius:4px;transition:width 1s ease}
+.toast{position:fixed;bottom:24px;right:24px;background:#1e293b;color:#fff;padding:13px 22px;border-radius:12px;font-size:.87rem;font-weight:600;z-index:9999;transform:translateY(80px);opacity:0;transition:all .3s;max-width:360px;word-break:break-word;box-shadow:0 8px 30px rgba(0,0,0,.25)}
+.toast.show{transform:translateY(0);opacity:1}
+.toast.success{background:#16a34a}
+.toast.error{background:#dc2626}
+.toast.warn{background:#d97706}
+
+/* ── TOPBAR FIXES  ─────────────────────────────── */
+.navbar,.wiq-topbar,nav.topbar{
+  display:flex!important;align-items:center!important;
+  padding:0 20px!important;height:54px!important;
+  background:#fff!important;
+  border-bottom:2px solid #e8f0ff!important;
+  position:sticky!important;top:0!important;z-index:100!important;
+  gap:12px!important;flex-wrap:nowrap!important;
+  box-shadow:0 1px 8px rgba(37,99,235,.08)!important;
+}
+.nav-brand{
+  font-size:.88rem!important;font-weight:900!important;
+  color:#1E3A5F!important;white-space:nowrap!important;
+  display:flex!important;align-items:center!important;gap:6px!important;
+  flex-shrink:0!important;letter-spacing:-.01em!important;
+}
+.nav-brand .logo-icon{
+  width:28px!important;height:28px!important;
+  background:linear-gradient(135deg,#2563EB,#7C3AED)!important;
+  border-radius:7px!important;display:inline-flex!important;
+  align-items:center!important;justify-content:center!important;
+  font-size:.9rem!important;flex-shrink:0!important;
+}
+.nav-brand .logo-text{
+  font-size:.85rem!important;font-weight:900!important;color:#1E3A5F!important;
+}
+.nav-brand .logo-version{
+  font-size:.55rem!important;font-weight:700!important;
+  color:#2563EB!important;background:#EFF6FF!important;
+  padding:1px 5px!important;border-radius:4px!important;
+  border:1px solid #BFDBFE!important;
+}
+.nav-info{
+  display:flex!important;align-items:center!important;
+  gap:8px!important;flex-shrink:0!important;margin-left:auto!important;
+}
+.nav-divider{width:1px!important;height:20px!important;background:#E2E8F0!important}
+
+/* ── CARD COLOR SHADOWS ─────────────────────────────── */
+.card,.wiq-card,[class*="-card"]{
+  transition:all .25s cubic-bezier(.34,1.56,.64,1)!important;
+  border-radius:12px!important;
+}
+.card:hover,.wiq-card:hover{
+  transform:translateY(-4px) scale(1.006)!important;
+  box-shadow:0 12px 32px rgba(37,99,235,.18),
+             0 2px 8px rgba(37,99,235,.1)!important;
+}
+/* Module-specific card shadows */
+.card-payroll:hover{box-shadow:0 12px 32px rgba(5,150,105,.18)!important}
+.card-leave:hover{box-shadow:0 12px 32px rgba(245,158,11,.18)!important}
+.card-alert:hover{box-shadow:0 12px 32px rgba(220,38,38,.18)!important}
+
+/* ── BUTTON SYSTEM ─────────────────────────────────── */
+.btn{
+  display:inline-flex!important;align-items:center!important;
+  gap:5px!important;padding:7px 16px!important;
+  border-radius:8px!important;font-size:.76rem!important;
+  font-weight:700!important;cursor:pointer!important;
+  border:none!important;transition:all .2s!important;
+  white-space:nowrap!important;font-family:var(--wfi-font);
+}
+.btn-primary{
+  background:linear-gradient(135deg,#2563EB,#1D4ED8)!important;
+  color:#fff!important;
+  box-shadow:0 2px 8px rgba(37,99,235,.3)!important;
+}
+.btn-primary:hover{
+  background:linear-gradient(135deg,#1D4ED8,#1E40AF)!important;
+  box-shadow:0 4px 14px rgba(37,99,235,.4)!important;
+  transform:translateY(-1px)!important;
+}
+.btn-outline,.btn-sm.btn-outline{
+  background:#fff!important;color:#2563EB!important;
+  border:1.5px solid #BFDBFE!important;
+  padding:5px 13px!important;font-size:.72rem!important;
+}
+.btn-outline:hover{
+  background:#EFF6FF!important;
+  border-color:#2563EB!important;
+  box-shadow:0 2px 8px rgba(37,99,235,.15)!important;
+}
+.btn-danger{
+  background:linear-gradient(135deg,#DC2626,#B91C1C)!important;
+  color:#fff!important;
+}
+.btn-danger:hover{box-shadow:0 4px 14px rgba(220,38,38,.35)!important}
+.btn-success{
+  background:linear-gradient(135deg,#059669,#047857)!important;
+  color:#fff!important;
+}
+.btn-success:hover{box-shadow:0 4px 14px rgba(5,150,105,.35)!important}
+.btn-sm{padding:5px 12px!important;font-size:.7rem!important}
+.btn-lg{padding:10px 22px!important;font-size:.82rem!important}
+
+/* ── STATUS BADGES ─────────────────────────────────── */
+.badge,.status-badge,[class*=badge]{
+  display:inline-flex!important;align-items:center!important;
+  padding:3px 10px!important;border-radius:999px!important;
+  font-size:.62rem!important;font-weight:800!important;
+  text-transform:uppercase!important;letter-spacing:.04em!important;
+}
+
+/* ── SIDEBAR BRAND ─────────────────────────────────── */
+.wiq-logo{
+  display:flex!important;align-items:center!important;
+  gap:8px!important;padding:0 4px!important;
+}
+.wiq-logo .logo-mark{
+  width:32px!important;height:32px!important;
+  background:linear-gradient(135deg,#2563EB,#7C3AED)!important;
+  border-radius:9px!important;display:flex!important;
+  align-items:center!important;justify-content:center!important;
+  font-size:1rem!important;flex-shrink:0!important;
+  box-shadow:0 4px 12px rgba(37,99,235,.35)!important;
+}
+.wiq-logo span{
+  font-weight:900!important;font-size:.82rem!important;
+  color:#F8FAFC!important;letter-spacing:-.01em!important;
+}
+
+/* ═══ DARK/LIGHT MODE  ════════════════════════════════════ */
+:root{--dm-bg:#F8FAFC;--dm-card:#ffffff;--dm-text:#1e293b;--dm-muted:#64748b;--dm-border:#e2e8f0;--dm-sidebar:#0a1220;--dm-topbar:#ffffff;--dm-input:#ffffff;--dm-hover:#f1f5f9}
+body.dark-mode{--dm-bg:#0B1120;--dm-card:#111827;--dm-text:#e2e8f0;--dm-muted:#94a3b8;--dm-border:#1e2d4a;--dm-sidebar:#060d18;--dm-topbar:#111827;--dm-input:#1e2d4a;--dm-hover:#1e293b}
+body{background:var(--dm-bg)!important;color:var(--dm-text)!important;transition:background .25s,color .25s}
+.wiq-sidebar,aside{background:var(--dm-sidebar)!important}
+.navbar,.wiq-topbar,nav{background:var(--dm-topbar)!important;border-bottom-color:var(--dm-border)!important}
+.card,.wiq-card,.stat-card,.kpi-card{background:var(--dm-card)!important;border-color:var(--dm-border)!important}
+main,.main-content,.wiq-content,.page-wrap{background:var(--dm-bg)!important}
+input:not([type=checkbox]):not([type=radio]),select,textarea,.form-input{background:var(--dm-input)!important;border-color:var(--dm-border)!important;color:var(--dm-text)!important}
+table{background:var(--dm-card)!important}thead tr{background:#1e3a5f!important}tbody tr:hover{background:var(--dm-hover)!important}
+h1,h2,h3,h4,h5,h6,p,span,label,li,td,th{color:inherit}
+.dm-toggle{width:40px;height:22px;border-radius:999px;border:none;cursor:pointer;position:relative;background:#e2e8f0;transition:background .3s;flex-shrink:0;outline:none}
+.dm-toggle.on{background:linear-gradient(135deg,#4f46e5,#7c3aed)}
+.dm-toggle::after{content:'';position:absolute;top:2px;left:2px;width:18px;height:18px;border-radius:50%;background:#fff;transition:transform .3s;box-shadow:0 1px 4px rgba(0,0,0,.2)}
+.dm-toggle.on::after{transform:translateX(18px)}
+.dm-icon{font-size:.85rem;cursor:pointer}
+
+
+/* ═══ COOKIE CONSENT BANNER ════════════════════════════════ */
+#cookieBanner{
+  position:fixed;bottom:0;left:0;right:0;z-index:9998;
+  background:linear-gradient(135deg,#0F172A,#1E293B);
+  border-top:2px solid #2563EB;
+  padding:16px 32px;
+  display:flex;align-items:center;justify-content:space-between;
+  flex-wrap:wrap;gap:12px;
+  box-shadow:0 -4px 24px rgba(0,0,0,.3);
+  transform:translateY(100%);transition:transform .4s ease;
+}
+#cookieBanner.visible{transform:translateY(0)}
+.cookie-text{font-size:.78rem;color:#CBD5E1;line-height:1.6;max-width:700px}
+.cookie-text a{color:#60A5FA;text-decoration:none;font-weight:600}
+.cookie-text a:hover{text-decoration:underline}
+.cookie-actions{display:flex;gap:8px;flex-shrink:0}
+.cookie-btn-accept{
+  background:linear-gradient(135deg,#2563EB,#4F46E5);color:#fff;
+  border:none;border-radius:8px;padding:8px 20px;font-size:.74rem;
+  font-weight:700;cursor:pointer;font-family:var(--wfi-font);
+  box-shadow:0 4px 12px rgba(37,99,235,.4);transition:all .2s;
+}
+.cookie-btn-accept:hover{transform:translateY(-1px);box-shadow:0 6px 16px rgba(37,99,235,.5)}
+.cookie-btn-settings{
+  background:transparent;color:#94A3B8;
+  border:1.5px solid #334155;border-radius:8px;padding:8px 16px;font-size:.74rem;
+  font-weight:700;cursor:pointer;font-family:var(--wfi-font);transition:all .2s;
+}
+.cookie-btn-settings:hover{color:#F1F5F9;border-color:#64748B}
+.cookie-btn-decline{
+  background:transparent;color:#64748B;border:none;
+  font-size:.7rem;cursor:pointer;font-family:var(--wfi-font);padding:4px 8px;
+}
+
+
+/* ── Dropdown nav groups ── */
+.wiq-nav-group-label{cursor:pointer;user-select:none;display:flex;align-items:center;justify-content:space-between;padding:7px 16px;font-size:.67rem;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:#64748B}
+.wiq-dropdown-toggle:hover{color:#93C5FD;background:rgba(37,99,235,.07);border-radius:8px}
+.wiq-arrow{font-size:.6rem;transition:transform .2s;flex-shrink:0}
+.wiq-dropdown-body{max-height:0;overflow:hidden;transition:max-height .3s ease}
+.wiq-dropdown-body.open{max-height:800px}
+/* ── Nav icons ── */
+.wiq-nav-item a .ico{width:20px;text-align:center;font-size:.88rem;flex-shrink:0}
+/* ── Active link highlight ── */
+.wiq-nav-item a.active,.wiq-nav-item a:has(.ico):hover{background:rgba(37,99,235,.15);color:#93C5FD}
+/* ── Logo ── */
+.wiq-logo-icon{width:32px;height:32px;background:linear-gradient(135deg,#1D4ED8,#6D28D9);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0}
+.wiq-logo-name{font-size:.78rem;font-weight:900;color:#E2E8F0;line-height:1.2}
+.wiq-logo-badge{font-size:.55rem;color:#60A5FA;background:rgba(37,99,235,.2);padding:1px 7px;border-radius:999px;margin-top:3px;display:inline-block;font-weight:700;letter-spacing:.05em}
+/* ── Card & Margin global fixes ── */
+.card,.stat-card,.kpi-card,.metric-card{margin-bottom:14px!important;border-radius:12px!important}
+.grid,.stats-grid,.kpi-grid{gap:14px!important}
+.wiq-main{padding:20px 24px!important;display:flex;flex-direction:column;min-height:100vh}
+.export-bar{padding:10px 0!important;margin-bottom:12px!important;display:flex;gap:8px;flex-wrap:wrap}
+@media(max-width:768px){
+  .wiq-mob-toggle{display:flex!important;align-items:center;justify-content:center}
+  .wiq-sidebar{position:fixed!important;left:-270px;top:0;height:100vh;z-index:500;transition:left .3s;overflow-y:auto}
+  .wiq-sidebar.open{left:0!important;box-shadow:4px 0 20px rgba(0,0,0,.5)}
+  .wiq-wrap{flex-direction:column}
+  .wiq-main{margin-left:0!important;padding:14px 16px!important}
+}
+/* ── Print ── */
+@media print{.wiq-sidebar,.wiq-mob-toggle,.export-bar,.cookie-banner,#ckb,#cookieBanner{display:none!important}.wiq-main{margin:0!important;padding:20px!important;max-width:100%!important}.card{page-break-inside:avoid;border:1px solid #e2e8f0!important}}
+</style>
+  <link rel="stylesheet" href="/workspace.css">
+  <script src="/workspace.js" defer></script>
+  <link rel="stylesheet" href="/navigation.css">
+  <script src="/navigation.js" defer></script>
+
+<script src="/appearance.js" defer></script>
+
+<link rel="stylesheet" href="/preferences.css">
+<link rel="stylesheet" href="/theme.css">
+</head>
+<body><button class="wiq-mob-toggle" onclick="openMobSidebar()" id="mobToggleBtn" style="display:none;position:fixed;top:14px;left:14px;z-index:600;background:#2563EB;color:#fff;border:none;border-radius:9px;padding:9px 13px;cursor:pointer;font-size:1rem;box-shadow:0 4px 16px rgba(37,99,235,.45)">&#9776;</button>
+<div class="wiq-wrap">
+<div class="wiq-sidebar" id="wiqSidebar">
+  <div class="wiq-sidebar-header">
+    <div class="wiq-logo">
+      <div class="wiq-logo-icon">&#9889;</div>
+      <div class="wiq-logo-text">
+        <span class="wiq-logo-name">Workforce<br>Intelligence</span>
+        <span class="wiq-logo-badge">Enterprise HRMS</span>
+      </div>
+    </div>
+    <div class="wiq-user-pill">
+      <span class="wiq-user-avatar">&#128100;</span>
+      <span class="wiq-user-name" id="sidebarUserName">Loading...</span>
+      <button class="wiq-tog" onclick="window.tdm&&window.tdm()" id="dmt" title="Toggle dark mode" style="width:28px;height:16px;border-radius:8px;border:none;background:#334155;cursor:pointer;flex-shrink:0"></button>
+    </div>
+  </div>
+  <nav class="wiq-nav">
+
+    <!-- DASHBOARDS -->
+    <div class="wiq-nav-group">
+      <div class="wiq-nav-group-label">Dashboards</div>
+      <div class="wiq-nav-item"><a href="admin-dashboard.html"><span class="ico">&#9711;</span><span>Admin Dashboard</span></a></div>
+      <div class="wiq-nav-item"><a href="employee-dashboard.html"><span class="ico">&#128100;</span><span>Employee Dashboard</span></a></div>
+      <div class="wiq-nav-item"><a href="manager.html"><span class="ico">&#128084;</span><span>Manager Dashboard</span></a></div>
+      <div class="wiq-nav-item"><a href="activity-history.html"><span class="ico">&#128203;</span><span>Activity History</span></a></div>
+    </div>
+
+    <!-- HR MANAGEMENT (dropdown) -->
+    <div class="wiq-nav-group">
+      <div class="wiq-nav-group-label wiq-dropdown-toggle" onclick="toggleGroup('grp-hr')">
+        &#128101; HR Management <span class="wiq-arrow" id="arr-hr">&#9660;</span>
+      </div>
+      <div id="grp-hr" class="wiq-dropdown-body">
+        <div class="wiq-nav-item"><a href="attendance.html"><span class="ico">&#128336;</span><span>Attendance</span></a></div>
+        <div class="wiq-nav-item"><a href="leave.html"><span class="ico">&#127964;</span><span>Leave Management</span></a></div>
+        <div class="wiq-nav-item"><a href="hiring.html"><span class="ico">&#127919;</span><span>Hiring & ATS</span></a></div>
+        <div class="wiq-nav-item"><a href="onboarding.html"><span class="ico">&#128640;</span><span>Onboarding</span></a></div>
+        <div class="wiq-nav-item"><a href="performance.html"><span class="ico">&#128202;</span><span>Performance</span></a></div>
+        <div class="wiq-nav-item"><a href="training.html"><span class="ico">&#127891;</span><span>Training & LMS</span></a></div>
+        <div class="wiq-nav-item"><a href="goals-okr.html"><span class="ico">&#127942;</span><span>Goals & OKR</span></a></div>
+        <div class="wiq-nav-item"><a href="exit.html"><span class="ico">&#128682;</span><span>Exit Management</span></a></div>
+        <div class="wiq-nav-item"><a href="employee-directory.html"><span class="ico">&#128101;</span><span>Employee Directory</span></a></div>
+        <div class="wiq-nav-item"><a href="org-chart.html"><span class="ico">&#127961;</span><span>Org Chart</span></a></div>
+        <div class="wiq-nav-item"><a href="shift-roster.html"><span class="ico">&#128197;</span><span>Shift Roster</span></a></div>
+        <div class="wiq-nav-item"><a href="shift-bidding.html"><span class="ico">&#128260;</span><span>Shift Bidding</span></a></div>
+        <div class="wiq-nav-item"><a href="wfh-tracker.html"><span class="ico">&#127968;</span><span>WFH Tracker</span></a></div>
+        <div class="wiq-nav-item"><a href="time-tracker.html"><span class="ico">&#9201;</span><span>Time Tracker</span></a></div>
+        <div class="wiq-nav-item"><a href="regularization.html"><span class="ico">&#128393;</span><span>Regularisation</span></a></div>
+      </div>
+    </div>
+
+    <!-- PAYROLL & FINANCE (dropdown) -->
+    <div class="wiq-nav-group">
+      <div class="wiq-nav-group-label wiq-dropdown-toggle" onclick="toggleGroup('grp-pay')">
+        &#128176; Payroll & Finance <span class="wiq-arrow" id="arr-pay">&#9660;</span>
+      </div>
+      <div id="grp-pay" class="wiq-dropdown-body">
+        <div class="wiq-nav-item"><a href="salary.html"><span class="ico">&#128176;</span><span>Payroll Processing</span></a></div>
+        <div class="wiq-nav-item"><a href="payslip-portal.html"><span class="ico">&#128196;</span><span>Payslip Portal</span></a></div>
+        <div class="wiq-nav-item"><a href="salary-revision.html"><span class="ico">&#128200;</span><span>Salary Revision</span></a></div>
+        <div class="wiq-nav-item"><a href="salary-advance.html"><span class="ico">&#128179;</span><span>Salary Advance</span></a></div>
+        <div class="wiq-nav-item"><a href="tax-portal.html"><span class="ico">&#129534;</span><span>TDS / Tax Portal</span></a></div>
+        <div class="wiq-nav-item"><a href="investment-declaration.html"><span class="ico">&#128209;</span><span>IT Declaration</span></a></div>
+        <div class="wiq-nav-item"><a href="form-24q.html"><span class="ico">&#127963;</span><span>Form 24Q</span></a></div>
+        <div class="wiq-nav-item"><a href="statutory-bonus.html"><span class="ico">&#127873;</span><span>Statutory Bonus</span></a></div>
+        <div class="wiq-nav-item"><a href="lwf-tracker.html"><span class="ico">&#127963;</span><span>LWF Tracker</span></a></div>
+        <div class="wiq-nav-item"><a href="benefits.html"><span class="ico">&#127973;</span><span>Benefits & Perks</span></a></div>
+        <div class="wiq-nav-item"><a href="loan-portal.html"><span class="ico">&#127991;</span><span>Loan Portal</span></a></div>
+        <div class="wiq-nav-item"><a href="banking.html"><span class="ico">&#127970;</span><span>Banking</span></a></div>
+      </div>
+    </div>
+
+    <!-- COMPLIANCE (dropdown) -->
+    <div class="wiq-nav-group">
+      <div class="wiq-nav-group-label wiq-dropdown-toggle" onclick="toggleGroup('grp-comp')">
+        &#9878;&#65039; Compliance <span class="wiq-arrow" id="arr-comp">&#9660;</span>
+      </div>
+      <div id="grp-comp" class="wiq-dropdown-body">
+        <div class="wiq-nav-item"><a href="compliance.html"><span class="ico">&#9878;&#65039;</span><span>Statutory Compliance</span></a></div>
+        <div class="wiq-nav-item"><a href="posh-complaints.html"><span class="ico">&#128737;</span><span>POSH / ICC</span></a></div>
+        <div class="wiq-nav-item"><a href="privacy-policy.html"><span class="ico">&#128274;</span><span>Privacy Policy</span></a></div>
+        <div class="wiq-nav-item"><a href="cookie-policy.html"><span class="ico">&#127850;</span><span>Cookie Policy</span></a></div>
+        <div class="wiq-nav-item"><a href="security-policy.html"><span class="ico">&#128737;</span><span>Security Policy</span></a></div>
+        <div class="wiq-nav-item"><a href="company-policies.html"><span class="ico">&#128220;</span><span>Company Policies</span></a></div>
+      </div>
+    </div>
+
+    <!-- AI & INTELLIGENCE -->
+    <div class="wiq-nav-group">
+      <div class="wiq-nav-group-label wiq-dropdown-toggle" onclick="toggleGroup('grp-ai')">
+        &#129302; AI & Intelligence <span class="wiq-arrow" id="arr-ai">&#9660;</span>
+      </div>
+      <div id="grp-ai" class="wiq-dropdown-body">
+        <div class="wiq-nav-item"><a href="ai-assistant.html"><span class="ico">&#129302;</span><span>AI Assistant</span></a></div>
+        <div class="wiq-nav-item"><a href="hr-copilot.html"><span class="ico">&#129504;</span><span>HR Copilot</span></a></div>
+        <div class="wiq-nav-item"><a href="ai-insights.html"><span class="ico">&#128202;</span><span>AI Insights</span></a></div>
+      </div>
+    </div>
+
+    <!-- SECURITY (dropdown) -->
+    <div class="wiq-nav-group">
+      <div class="wiq-nav-group-label wiq-dropdown-toggle" onclick="toggleGroup('grp-sec')">
+        &#128737; Security <span class="wiq-arrow" id="arr-sec">&#9660;</span>
+      </div>
+      <div id="grp-sec" class="wiq-dropdown-body">
+        <div class="wiq-nav-item"><a href="fraud-detection.html"><span class="ico">&#128269;</span><span>Fraud Detection</span></a></div>
+        <div class="wiq-nav-item"><a href="cybersecurity.html"><span class="ico">&#128737;</span><span>Cybersecurity</span></a></div>
+        <div class="wiq-nav-item"><a href="threat-monitor.html"><span class="ico">&#128308;</span><span>Threat Monitor</span></a></div>
+        <div class="wiq-nav-item"><a href="audit-log.html"><span class="ico">&#128196;</span><span>Audit Log</span></a></div>
+        <div class="wiq-nav-item"><a href="session-management.html"><span class="ico">&#128273;</span><span>Session Mgmt</span></a></div>
+      </div>
+    </div>
+
+    <!-- ANALYTICS (dropdown) -->
+    <div class="wiq-nav-group">
+      <div class="wiq-nav-group-label wiq-dropdown-toggle" onclick="toggleGroup('grp-ana')">
+        &#128202; Analytics <span class="wiq-arrow" id="arr-ana">&#9660;</span>
+      </div>
+      <div id="grp-ana" class="wiq-dropdown-body">
+        <div class="wiq-nav-item"><a href="analytics.html"><span class="ico">&#128200;</span><span>Analytics Dashboard</span></a></div>
+        <div class="wiq-nav-item"><a href="reports.html"><span class="ico">&#128209;</span><span>Reports Center</span></a></div>
+        <div class="wiq-nav-item"><a href="workforce-planning.html"><span class="ico">&#128202;</span><span>Workforce Planning</span></a></div>
+        <div class="wiq-nav-item"><a href="real-time-monitor.html"><span class="ico">&#128225;</span><span>Real-Time Monitor</span></a></div>
+        <div class="wiq-nav-item"><a href="headcount.html"><span class="ico">&#128101;</span><span>Headcount</span></a></div>
+        <div class="wiq-nav-item"><a href="diversity.html"><span class="ico">&#127752;</span><span>Diversity & DEI</span></a></div>
+      </div>
+    </div>
+
+    <!-- SAFETY & WELFARE (dropdown) -->
+    <div class="wiq-nav-group">
+      <div class="wiq-nav-group-label wiq-dropdown-toggle" onclick="toggleGroup('grp-safe')">
+        &#10084;&#65039; Welfare & Safety <span class="wiq-arrow" id="arr-safe">&#9660;</span>
+      </div>
+      <div id="grp-safe" class="wiq-dropdown-body">
+        <div class="wiq-nav-item"><a href="mental-health.html"><span class="ico">&#128156;</span><span>Mental Health & EAP</span></a></div>
+        <div class="wiq-nav-item"><a href="112-emergency.html"><span class="ico">&#128680;</span><span>112 Emergency & SOS</span></a></div>
+        <div class="wiq-nav-item"><a href="women-safety-policy.html"><span class="ico">&#127800;</span><span>Women Safety</span></a></div>
+        <div class="wiq-nav-item"><a href="cab-booking.html"><span class="ico">&#128663;</span><span>Cab & Transport</span></a></div>
+        <div class="wiq-nav-item"><a href="visitor-management.html"><span class="ico">&#127970;</span><span>Visitor Management</span></a></div>
+        <div class="wiq-nav-item"><a href="welfare.html"><span class="ico">&#10084;&#65039;</span><span>Welfare Hub</span></a></div>
+        <div class="wiq-nav-item"><a href="pulse-survey.html"><span class="ico">&#128202;</span><span>Pulse Survey</span></a></div>
+      </div>
+    </div>
+
+    <!-- EMPLOYEE SELF-SERVICE (dropdown) -->
+    <div class="wiq-nav-group">
+      <div class="wiq-nav-group-label wiq-dropdown-toggle" onclick="toggleGroup('grp-ess')">
+        &#128111; Self-Service <span class="wiq-arrow" id="arr-ess">&#9660;</span>
+      </div>
+      <div id="grp-ess" class="wiq-dropdown-body">
+        <div class="wiq-nav-item"><a href="employee-self-service.html"><span class="ico">&#128111;</span><span>Self-Service Portal</span></a></div>
+        <div class="wiq-nav-item"><a href="profile.html"><span class="ico">&#128100;</span><span>My Profile</span></a></div>
+        <div class="wiq-nav-item"><a href="document-vault.html"><span class="ico">&#128193;</span><span>Document Vault</span></a></div>
+        <div class="wiq-nav-item"><a href="expenses.html"><span class="ico">&#128184;</span><span>Expenses</span></a></div>
+        <div class="wiq-nav-item"><a href="tasks.html"><span class="ico">&#9989;</span><span>My Tasks</span></a></div>
+        <div class="wiq-nav-item"><a href="helpdesk.html"><span class="ico">&#127916;</span><span>IT Helpdesk</span></a></div>
+        <div class="wiq-nav-item"><a href="announcements.html"><span class="ico">&#128226;</span><span>Announcements</span></a></div>
+        <div class="wiq-nav-item"><a href="notifications.html"><span class="ico">&#128276;</span><span>Notifications</span></a></div>
+        <div class="wiq-nav-item"><a href="festival-calendar.html"><span class="ico">&#127881;</span><span>Festival Calendar</span></a></div>
+      </div>
+    </div>
+
+    <!-- BIOMETRICS (dropdown) -->
+    <div class="wiq-nav-group">
+      <div class="wiq-nav-group-label wiq-dropdown-toggle" onclick="toggleGroup('grp-bio')">
+        &#128272; Biometrics <span class="wiq-arrow" id="arr-bio">&#9660;</span>
+      </div>
+      <div id="grp-bio" class="wiq-dropdown-body">
+        <div class="wiq-nav-item"><a href="face-recognition.html"><span class="ico">&#128065;&#65039;</span><span>Face Recognition</span></a></div>
+        <div class="wiq-nav-item"><a href="biometric-enrollment.html"><span class="ico">&#128272;</span><span>Biometric Enrollment</span></a></div>
+      </div>
+    </div>
+
+    <!-- ADMIN (dropdown) -->
+    <div class="wiq-nav-group">
+      <div class="wiq-nav-group-label wiq-dropdown-toggle" onclick="toggleGroup('grp-adm')">
+        &#9881;&#65039; Administration <span class="wiq-arrow" id="arr-adm">&#9660;</span>
+      </div>
+      <div id="grp-adm" class="wiq-dropdown-body">
+        <div class="wiq-nav-item"><a href="settings.html"><span class="ico">&#9881;&#65039;</span><span>Settings</span></a></div>
+        <div class="wiq-nav-item"><a href="employee-grades.html"><span class="ico">&#127885;</span><span>Employee Grades</span></a></div>
+        <div class="wiq-nav-item"><a href="assets.html"><span class="ico">&#127963;</span><span>Assets</span></a></div>
+        <div class="wiq-nav-item"><a href="data-export.html"><span class="ico">&#128228;</span><span>Data Export</span></a></div>
+        <div class="wiq-nav-item"><a href="registration-tracker.html"><span class="ico">&#128203;</span><span>Registration Tracker</span></a></div>
+      </div>
+    </div>
+
+    <!-- LOGOUT -->
+    <div class="wiq-nav-group" style="margin-top:auto;padding-top:8px;border-top:1px solid rgba(255,255,255,.07)">
+      <div class="wiq-nav-item"><a href="#" onclick="window.logout&&window.logout();return false;" style="color:#EF4444!important"><span class="ico">&#128682;</span><span>Logout</span></a></div>
+    </div>
+
+  </nav>
+</div>
+
+<div class="wiq-main">
+<div style="display:flex;gap:8px;flex-wrap:wrap;padding:12px 0;margin-bottom:4px" class="export-bar">
+<button class="btn btn-outline" style="font-size:.74rem;padding:6px 14px;background:transparent;border:1.5px solid #e2e8f0;border-radius:8px;cursor:pointer;font-family:inherit;font-weight:700;color:#64748b;transition:all .2s" onmouseover="this.style.borderColor='#2563EB';this.style.color='#2563EB'" onmouseout="this.style.borderColor='#e2e8f0';this.style.color='#64748b'" onclick="window.dlPrint&&window.dlPrint('Employee Benefits Summary','<table><thead><tr><th>Benefit</th><th>Entitlement</th><th>Used</th><th>Balance</th><th>Expires</th></tr></thead><tbody><tr><td>Medical Insurance</td><td>₹5,00,000</td><td>₹45,000</td><td>₹4,55,000</td><td>Mar 2027</td></tr><tr><td>LTA</td><td>₹24,000/yr</td><td>₹0</td><td>₹24,000</td><td>Mar 2027</td></tr><tr><td>Food Wallet</td><td>₹3,600/mo</td><td>₹3,600</td><td>₹0</td><td>Monthly</td></tr></tbody></table>')">&#128438; Print Employee Benefits Summary</button><button class="btn btn-outline" style="font-size:.74rem;padding:6px 14px;background:transparent;border:1.5px solid #e2e8f0;border-radius:8px;cursor:pointer;font-family:inherit;font-weight:700;color:#64748b;transition:all .2s" onmouseover="this.style.borderColor='#059669';this.style.color='#059669'" onmouseout="this.style.borderColor='#e2e8f0';this.style.color='#64748b'" onclick="window.dlCSV&&window.dlCSV([{"benefit": "Medical Insurance", "entitlement": "500000", "used": "45000", "balance": "455000"}, {"benefit": "LTA", "entitlement": "24000", "used": "0", "balance": "24000"}],["benefit", "entitlement", "used", "balance"],'benefits_summary')">&#11015; Export CSV</button><button style="font-size:.74rem;padding:6px 14px;background:linear-gradient(135deg,#2563EB,#4F46E5);color:#fff;border:none;border-radius:8px;cursor:pointer;font-family:inherit;font-weight:700" onclick="window.print()">&#128438; Save as PDF</button>
+</div>
+
+
+<nav class="navbar">
+  <div class="nav-brand">
+      <span class="logo-icon">&#9889;</span>
+      <span class="logo-text">Workforce Intelligence</span>
+      <span class="logo-version"></span>
+    </div>
+  <div class="nav-info">
+    <a href="employee-dashboard.html" class="btn btn-sm btn-outline">← Dashboard</a>
+    <span id="userName" class="nav-user"></span>
+    <button onclick="logout()" class="btn btn-sm btn-outline">Logout</button>
+  </div>
+</nav>
+
+<div style="max-width:1000px;margin:0 auto;padding:24px">
+  <div style="margin-bottom:20px">
+    <h1 style="font-size:1.5rem;font-weight:900;color:#1e293b">🏥 Employee Benefits</h1>
+    <p style="color:#64748b;font-size:.9rem">Health · Life · Dental · Maternity · Accidental insurance & wellness benefits</p>
+  </div>
+
+  <!-- Summary row -->
+  <div class="summary-grid" id="summaryGrid">
+    <div class="sum-card" style="background:#dbeafe"><div class="sum-val" style="color:#1d4ed8" id="s-plans">–</div><div class="sum-lbl" style="color:#1d4ed8">Active Plans</div></div>
+    <div class="sum-card" style="background:#dcfce7"><div class="sum-val" style="color:#15803d" id="s-cover">–</div><div class="sum-lbl" style="color:#15803d">Total Coverage</div></div>
+    <div class="sum-card" style="background:#fef9c3"><div class="sum-val" style="color:#854d0e" id="s-deps">–</div><div class="sum-lbl" style="color:#854d0e">Dependents</div></div>
+    <div class="sum-card" style="background:#fee2e2"><div class="sum-val" style="color:#991b1b" id="s-emp-prem">–</div><div class="sum-lbl" style="color:#991b1b">Your Premium/mo</div></div>
+    <div class="sum-card" style="background:#f0fdf4"><div class="sum-val" style="color:#15803d" id="s-co-prem">–</div><div class="sum-lbl" style="color:#15803d">Company Pays/mo</div></div>
+  </div>
+
+  <div class="tab-nav">
+    <button class="tab-btn active" onclick="switchTab('plans',this)">📋 Available Plans</button>
+    <button class="tab-btn" onclick="switchTab('my',this)">✅ My Benefits</button>
+    <button class="tab-btn" onclick="switchTab('dependents',this)">👨‍👩‍👧 Dependents</button>
+    <button class="tab-btn" id="adminTab" style="display:none" onclick="switchTab('admin',this)">🔧 Manage Plans</button>
+  </div>
+
+  <!-- PLANS -->
+  <div id="tab-plans" class="tab-panel active">
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px">
+      <button class="btn-primary btn-sm" onclick="filterPlans('')">All</button>
+      <button class="btn-outline btn-sm" onclick="filterPlans('health')">🏥 Health</button>
+      <button class="btn-outline btn-sm" onclick="filterPlans('life')">💜 Life</button>
+      <button class="btn-outline btn-sm" onclick="filterPlans('dental')">🦷 Dental</button>
+      <button class="btn-outline btn-sm" onclick="filterPlans('maternity')">👶 Maternity</button>
+      <button class="btn-outline btn-sm" onclick="filterPlans('accidental')">🛡️ Accidental</button>
+      <button class="btn-outline btn-sm" onclick="filterPlans('family')">👨‍👩‍👧 Family</button>
+    </div>
+    <div class="plan-grid" id="planGrid"><div style="color:#94a3b8">Loading plans…</div></div>
+  </div>
+
+  <!-- MY BENEFITS -->
+  <div id="tab-my" class="tab-panel">
+    <div id="myBenefitsList"><div style="color:#94a3b8">Loading…</div></div>
+  </div>
+
+  <!-- DEPENDENTS -->
+  <div id="tab-dependents" class="tab-panel">
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+        <h3 style="margin:0">👨‍👩‍👧 My Dependents</h3>
+        <button class="btn-primary btn-sm" onclick="openDepModal()">+ Add Dependent</button>
+      </div>
+      <div id="depList"><div style="color:#94a3b8">Loading…</div></div>
+    </div>
+  </div>
+
+  <!-- ADMIN -->
+  <div id="tab-admin" class="tab-panel">
+    <div class="card">
+      <h3>➕ Add Insurance Plan</h3>
+      <div class="form-row">
+        <div class="form-group"><label>Plan Name *</label><input class="sim-input" id="np-name" placeholder="e.g. Group Health Gold"></div>
+        <div class="form-group"><label>Type *</label>
+          <select class="sim-select" id="np-type">
+            <option value="health">Health</option><option value="life">Life</option>
+            <option value="dental">Dental</option><option value="maternity">Maternity</option>
+            <option value="accidental">Accidental</option><option value="family">Family</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Provider</label><input class="sim-input" id="np-provider" placeholder="e.g. Star Health"></div>
+        <div class="form-group"><label>Coverage Amount (₹)</label><input class="sim-input" id="np-cover" type="number" placeholder="500000"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Employee Premium/mo (₹)</label><input class="sim-input" id="np-emp" type="number" placeholder="500"></div>
+        <div class="form-group"><label>Company Contribution/mo (₹)</label><input class="sim-input" id="np-co" type="number" placeholder="2000"></div>
+      </div>
+      <button class="btn-primary" onclick="addPlan()">💾 Save Plan</button>
+    </div>
+    <div class="card">
+      <h3>📊 All Employee Enrollments</h3>
+      <div id="allBenefits"><div style="color:#94a3b8">Loading…</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- Enroll Modal -->
+<div class="modal-overlay" id="enrollModal">
+  <div class="modal-box">
+    <div class="modal-title" id="enrollTitle">Enroll in Plan</div>
+    <input type="hidden" id="enroll-planId">
+    <div class="form-row">
+      <div class="form-group"><label>Nominee Name</label><input class="sim-input" id="enroll-nominee" placeholder="Full name"></div>
+      <div class="form-group"><label>Relation to Nominee</label>
+        <select class="sim-select" id="enroll-relation">
+          <option value="spouse">Spouse</option><option value="parent">Parent</option>
+          <option value="child">Child</option><option value="sibling">Sibling</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-group" style="margin-bottom:14px"><label>Policy Number (if known)</label><input class="sim-input" id="enroll-policy" placeholder="Optional"></div>
+    <div class="form-row">
+      <div class="form-group"><label>Enrollment Date</label><input class="sim-input" id="enroll-start" type="date"></div>
+      <div class="form-group"><label>Expiry Date</label><input class="sim-input" id="enroll-expiry" type="date"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="closeEnrollModal()">Cancel</button>
+      <button class="btn-primary" onclick="enrollInPlan()">✅ Enroll Now</button>
+    </div>
+  </div>
+</div>
+
+<!-- Dependent Modal -->
+<div class="modal-overlay" id="depModal">
+  <div class="modal-box">
+    <div class="modal-title">Add Dependent</div>
+    <div class="form-group" style="margin-bottom:12px"><label>Full Name *</label><input class="sim-input" id="dep-name" placeholder="Dependent's name"></div>
+    <div class="form-row">
+      <div class="form-group"><label>Relation *</label>
+        <select class="sim-select" id="dep-rel">
+          <option value="spouse">Spouse</option><option value="child">Child</option>
+          <option value="parent">Parent</option><option value="sibling">Sibling</option><option value="other">Other</option>
+        </select>
+      </div>
+      <div class="form-group"><label>Date of Birth</label><input class="sim-input" id="dep-dob" type="date"></div>
+    </div>
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;padding:12px;background:#f8fafc;border-radius:8px">
+      <input type="checkbox" id="dep-covered" style="width:16px;height:16px;accent-color:#16a34a">
+      <label for="dep-covered" style="font-size:.85rem;font-weight:600;color:#1e293b;cursor:pointer">Include in insurance coverage</label>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="closeDepModal()">Cancel</button>
+      <button class="btn-primary" onclick="saveDependent()">Save Dependent</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+function showToast(msg, ok, type) {
+  const t = document.getElementById('toast');
+  if (!t) return;
+  t.textContent = msg;
+  t.className = 'toast show';
+  if (type === 'success' || ok === true)  t.style.background = '#16a34a';
+  else if (type === 'error' || ok === false) t.style.background = '#dc2626';
+  else if (type === 'warn')  t.style.background = '#d97706';
+  else t.style.background = '#1e293b';
+  clearTimeout(t._timer);
+  t._timer = setTimeout(() => t.className = 'toast', 3500);
+}
+
+var API = '/api';
+let token=localStorage.getItem('token');
+let role=parseInt(localStorage.getItem('role_id')||'2');
+if(!token)location.href='login.html';
+document.getElementById('userName').textContent=localStorage.getItem('full_name')||'User';
+if([1,4].includes(role))document.getElementById('adminTab').style.display='';
+
+function logout(){localStorage.clear();location.href='login.html';}
+function authFetch(url,opts={}){opts.headers={...(opts.headers||{}),Authorization:'Bearer '+token,'Content-Type':'application/json'};return fetch(API+url,opts);}
+function toast(msg,ok=true){const t=document.getElementById('toast');t.textContent=msg;t.style.background=ok?'#16a34a':'#dc2626';t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3000);}
+function fmt(n){return '\u20B9'+Number(n).toLocaleString('en-IN');}
+
+function switchTab(id,btn){
+  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('tab-'+id).classList.add('active');btn.classList.add('active');
+  if(id==='my')loadMyBenefits();
+  if(id==='dependents')loadDependents();
+  if(id==='admin')loadAllBenefits();
+}
+
+async function loadSummary(){
+  try{
+    const r=await authFetch('/benefits/summary');const d=await r.json();
+    document.getElementById('s-plans').textContent=d.active_plans||0;
+    document.getElementById('s-cover').textContent=d.total_coverage>0?'\u20B9'+Number(d.total_coverage/100000).toFixed(1)+'L':'\u20B90';
+    document.getElementById('s-deps').textContent=d.dependents||0;
+    document.getElementById('s-emp-prem').textContent=fmt(d.employee_premium||0);
+    document.getElementById('s-co-prem').textContent=fmt(d.company_contribution||0);
+  }catch(e){}
+}
+
+const typeIcons={health:'🏥',life:'💜',dental:'🦷',vision:'👁️',maternity:'👶',accidental:'🛡️',family:'👨‍👩‍👧'};
+const typeCls={health:'pt-health',life:'pt-life',dental:'pt-dental',maternity:'pt-maternity',accidental:'pt-accidental',family:'pt-family'};
+let allPlans=[];
+
+async function filterPlans(type){
+  const el=document.getElementById('planGrid');
+  try{
+    const url=type?`/benefits/plans?type=${type}`:'/benefits/plans';
+    const r=await authFetch(url);allPlans=await r.json();
+    renderPlans(allPlans);
+  }catch(e){el.innerHTML='<div style="color:#dc2626">Error</div>';}
+}
+
+function renderPlans(plans){
+  const el=document.getElementById('planGrid');
+  if(!plans.length){el.innerHTML='<div style="color:#94a3b8">No plans available.</div>';return;}
+  el.innerHTML=plans.map(p=>`
+    <div class="plan-card">
+      <div class="plan-icon">${typeIcons[p.plan_type]||'📋'}</div>
+      <span class="plan-tag ${typeCls[p.plan_type]||'pt-health'}">${p.plan_type.toUpperCase()}</span>
+      <div class="plan-name">${p.plan_name}</div>
+      <div class="plan-provider">${p.provider||'–'}</div>
+      <div class="plan-cover">${fmt(p.coverage_amount)} coverage</div>
+      <div class="plan-premium-row"><span>Your Premium</span><span>${fmt(p.employee_share)}/mo</span></div>
+      <div class="plan-premium-row"><span>Company Pays</span><span style="color:#16a34a">${fmt(p.company_share)}/mo</span></div>
+      <div class="plan-premium-row"><span>Total Premium</span><span>${fmt(p.premium_monthly)}/mo</span></div>
+      ${p.description?`<div style="font-size:.74rem;color:#64748b;margin:10px 0;line-height:1.5">${wfiText(p.description)}</div>`:''}
+      <button class="btn-primary" style="width:100%;margin-top:10px" onclick="openEnrollModal(${p.plan_id},'${p.plan_name.replace(/'/g,"\\'")}')">\u2705 Enroll in This Plan</button>
+    </div>`).join('');
+}
+
+async function loadMyBenefits(){
+  const el=document.getElementById('myBenefitsList');
+  try{
+    const r=await authFetch('/benefits/my');const rows=await r.json();
+    if(!rows.length){el.innerHTML='<div style="background:#fff;border-radius:14px;box-shadow:0 2px 12px rgba(0,0,0,.07);padding:32px;text-align:center;color:#94a3b8">No active benefits. Browse available plans to enroll.</div>';return;}
+    el.innerHTML=rows.map(b=>`
+      <div class="benefit-card ${b.status==='active'?'active-ben':b.status==='expired'?'expired-ben':''}">
+        <div class="ben-icon">${typeIcons[b.plan_type]||'📋'}</div>
+        <div style="flex:1">
+          <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:4px">
+            <div class="ben-name">${b.plan_name}</div>
+            <span class="status-pill st-${b.status}">${b.status.toUpperCase()}</span>
+          </div>
+          <div class="ben-meta">
+            Coverage: ${fmt(b.coverage_amount)} · Your premium: ${fmt(b.employee_share)}/mo<br>
+            ${b.enrollment_date?'Enrolled: '+new Date(b.enrollment_date).toLocaleDateString():''}
+            ${b.expiry_date?' · Expires: '+new Date(b.expiry_date).toLocaleDateString():''}
+            ${b.nominee_name?`<br>Nominee: ${b.nominee_name} (${b.nominee_relation})`:''}
+            ${b.policy_number?`<br>Policy #: ${b.policy_number}`:''}
+          </div>
+        </div>
+        ${b.status==='active'?`<button style="padding:5px 12px;background:#fee2e2;color:#dc2626;border:none;border-radius:7px;font-size:.74rem;font-weight:700;cursor:pointer;flex-shrink:0" onclick="cancelBenefit(${b.benefit_id})">Cancel</button>`:''}
+      </div>`).join('');
+  }catch(e){el.innerHTML='<div style="color:#dc2626">Error</div>';}
+}
+
+async function cancelBenefit(id){
+  if(!confirm('Cancel this benefit plan?'))return;
+  const r=await authFetch(`/benefits/${id}/cancel`,{method:'PATCH'});
+  const d=await r.json();r.ok?(toast('Benefit cancelled'),loadMyBenefits(),loadSummary()):toast(d.message||'Error',false);
+}
+
+// Enroll modal
+function openEnrollModal(planId,planName){
+  document.getElementById('enroll-planId').value=planId;
+  document.getElementById('enrollTitle').textContent='Enroll: '+planName;
+  ['enroll-nominee','enroll-policy','enroll-start','enroll-expiry'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('enroll-start').value=new Date().toISOString().split('T')[0];
+  document.getElementById('enrollModal').classList.add('open');
+}
+function closeEnrollModal(){document.getElementById('enrollModal').classList.remove('open');}
+async function enrollInPlan(){
+  const body={plan_id:document.getElementById('enroll-planId').value,nominee_name:document.getElementById('enroll-nominee').value,nominee_relation:document.getElementById('enroll-relation').value,policy_number:document.getElementById('enroll-policy').value,enrollment_date:document.getElementById('enroll-start').value,expiry_date:document.getElementById('enroll-expiry').value||null};
+  const r=await authFetch('/benefits/enroll',{method:'POST',body:JSON.stringify(body)});
+  const d=await r.json();r.ok?(toast('\u2705 Enrolled successfully!'),closeEnrollModal(),loadSummary()):toast(d.message||'Error',false);
+}
+
+// Dependents
+async function loadDependents(){
+  const el=document.getElementById('depList');
+  try{
+    const r=await authFetch('/benefits/dependents');const rows=await r.json();
+    if(!rows.length){el.innerHTML='<div style="color:#94a3b8">No dependents added yet.</div>';return;}
+    el.innerHTML=rows.map(d=>`
+      <div class="dep-card">
+        <div class="dep-avatar">${d.name.charAt(0).toUpperCase()}</div>
+        <div style="flex:1">
+          <div class="dep-name">${wfiText(d.name)}</div>
+          <div class="dep-meta">${d.relation.charAt(0).toUpperCase()+d.relation.slice(1)} ${d.dob?'· DOB: '+new Date(d.dob).toLocaleDateString():''}
+          ${d.is_covered?'<span style="background:#dcfce7;color:#15803d;font-size:.68rem;font-weight:700;padding:1px 7px;border-radius:999px;margin-left:4px">\u2713 Insured</span>':''}
+          </div>
+        </div>
+        <button style="padding:5px 10px;background:#fee2e2;color:#dc2626;border:none;border-radius:7px;font-size:.74rem;font-weight:700;cursor:pointer" onclick="removeDependent(${d.dependent_id})">Remove</button>
+      </div>`).join('');
+  }catch(e){el.innerHTML='<div style="color:#dc2626">Error</div>';}
+}
+function openDepModal(){['dep-name','dep-dob'].forEach(id=>document.getElementById(id).value='');document.getElementById('dep-rel').value='spouse';document.getElementById('dep-covered').checked=false;document.getElementById('depModal').classList.add('open');}
+function closeDepModal(){document.getElementById('depModal').classList.remove('open');}
+async function saveDependent(){
+  const body={name:document.getElementById('dep-name').value,relation:document.getElementById('dep-rel').value,dob:document.getElementById('dep-dob').value||null,is_covered:document.getElementById('dep-covered').checked};
+  if(!body.name)return toast('Name required',false);
+  const r=await authFetch('/benefits/dependents',{method:'POST',body:JSON.stringify(body)});
+  const d=await r.json();r.ok?(toast('\u2705 Dependent added'),closeDepModal(),loadDependents(),loadSummary()):toast(d.message||'Error',false);
+}
+async function removeDependent(id){if(!confirm('Remove dependent?'))return;const r=await authFetch(`/benefits/dependents/${id}`,{method:'DELETE'});r.ok?(toast('Removed'),loadDependents(),loadSummary()):toast('Error',false);}
+
+// Admin
+async function addPlan(){
+  const body={plan_name:document.getElementById('np-name').value,plan_type:document.getElementById('np-type').value,provider:document.getElementById('np-provider').value,coverage_amount:parseFloat(document.getElementById('np-cover').value)||0,premium_monthly:(parseFloat(document.getElementById('np-emp').value)||0)+(parseFloat(document.getElementById('np-co').value)||0),employee_share:parseFloat(document.getElementById('np-emp').value)||0,company_share:parseFloat(document.getElementById('np-co').value)||0};
+  if(!body.plan_name)return toast('Plan name required',false);
+  const r=await authFetch('/benefits/plans',{method:'POST',body:JSON.stringify(body)});
+  const d=await r.json();r.ok?(toast('\u2705 Plan created'),filterPlans('')):toast(d.message||'Error',false);
+}
+async function loadAllBenefits(){
+  const el=document.getElementById('allBenefits');
+  try{const r=await authFetch('/benefits/');const rows=await r.json();if(!rows.length){el.innerHTML='<div style="color:#94a3b8">No enrollments yet.</div>';return;}
+  el.innerHTML=`<table style="width:100%;border-collapse:collapse;font-size:.8rem"><thead><tr style="background:#f8fafc"><th style="padding:8px;text-align:left;border-bottom:2px solid #e2e8f0">Employee</th><th style="padding:8px;text-align:left;border-bottom:2px solid #e2e8f0">Plan</th><th style="padding:8px;text-align:left;border-bottom:2px solid #e2e8f0">Coverage</th><th style="padding:8px;text-align:left;border-bottom:2px solid #e2e8f0">Status</th></tr></thead><tbody>${rows.map(b=>`<tr><td style="padding:8px;border-bottom:1px solid #f1f5f9"><b>${wfiText(b.full_name)}</b></td><td style="padding:8px;border-bottom:1px solid #f1f5f9">${b.plan_name}</td><td style="padding:8px;border-bottom:1px solid #f1f5f9">${fmt(b.coverage_amount)}</td><td style="padding:8px;border-bottom:1px solid #f1f5f9"><span class="status-pill st-${b.status}">${b.status.toUpperCase()}</span></td></tr>`).join('')}</tbody></table>`;}catch(e){el.innerHTML='<div style="color:#dc2626">Error</div>';}
+}
+
+loadSummary();
+filterPlans('');
+</script>
+</div></div>
+<script>
+
+function toggleGroup(el){
+  const items=el.nextElementSibling;
+  const arr=el.querySelector('.arr');
+  const collapsed=items.style.display==='none';
+  items.style.display=collapsed?'flex':'none';
+  if(arr)arr.style.transform=collapsed?'':'rotate(-90deg)';
+}
+function toggleSidebar(){
+  const w=document.querySelector('.wiq-wrap');
+  const btn=document.querySelector('.wiq-toggle');
+  if(!w)return;
+  const collapsed=w.classList.toggle('wiq-collapsed');
+  if(btn)btn.textContent=collapsed?'▶':'◀';
+}
+function openMobSidebar(){
+  document.getElementById('wiqSidebar').classList.toggle('open');
+}
+// Set active page highlight
+(function(){
+  const cur=location.pathname.split('/').pop()||'index.html';
+  document.querySelectorAll('.wiq-nav-item').forEach(a=>{
+    if(a.getAttribute('href')===cur)a.classList.add('active');
+  });
+})();
+// Set sidebar username
+(function(){
+  const name=document.getElementById('sidebarUserName');
+  if(!name)return;
+  const tok=localStorage.getItem('token');
+  if(!tok){name.textContent='Guest';return;}
+  fetch(('/api')+'/auth/me',
+    {headers:{'Authorization':'Bearer '+tok}})
+    .then(r=>r.json()).then(d=>{if(name)name.textContent=d.full_name||d.email||'User';}).catch(()=>{});
+})();
+
+
+
+function saveGTLNominee() {
+  var n = document.getElementById('gtlNominee').value;
+  var rel = document.getElementById('gtlRelation').value;
+  var share = document.getElementById('gtlShare').value || '100';
+  if (!n) { showToast('Enter nominee name', false); return; }
+  var r = document.getElementById('gtlResult');
+  r.style.display = '';
+  r.innerHTML = 'GTL nominee saved \u2705 -- <b>' + n + '</b> (' + rel + ', ' + share + '%) will receive \u20b954L tax-free. HR notified. Policy document updated.';
+  showToast('GTL nominee declaration saved \u2705', true);
+}
+function enrollCI(opt) {
+  showToast(opt ? 'Critical illness rider enrolled \u2705 -- \u20b9420/month deducted from salary. Effective after 90-day waiting period.' : 'CI rider opt-out saved \u2705 -- Effective next policy renewal.', true);
+}
+function saveTopup() { showToast('Top-up insurance selection saved \u2705 -- Premium calculation sent to payroll for next month deduction.', true); }
+
+
+
+// Dark/Light Mode
+window.toggleDarkMode=function(){
+  var d=document.body.classList.toggle('dark-mode');
+  localStorage.setItem('wfi_dark_mode',d?'1':'0');
+  var btn=document.getElementById('dmToggle');
+  var icon=document.getElementById('dmIcon');
+  if(btn)btn.classList.toggle('on',d);
+  if(icon)icon.textContent=d?'\u2600\uFE0F':'\uD83C\uDF19';
+};
+(function(){
+  if(localStorage.getItem('wfi_dark_mode')==='1'){
+    document.body.classList.add('dark-mode');
+    var btn=document.getElementById('dmToggle');if(btn)btn.classList.add('on');
+    var icon=document.getElementById('dmIcon');if(icon)icon.textContent='\u2600\uFE0F';
+  }
+})();
+
+
+
+// ── Universal Function Stubs  ─────────────────────────────
+// Sidebar/Mobile
+window.openMobSidebar = window.openMobSidebar || function(){
+  var s=document.querySelector('.wiq-sidebar,aside');
+  if(s){s.style.transform='translateX(0)';s.style.zIndex='999';}
+};
+window.toggleSidebar = window.toggleSidebar || function(){
+  var s=document.querySelector('.wiq-sidebar,aside');
+  if(s){var open=s.style.transform==='translateX(0)';s.style.transform=open?'':'translateX(0)';}
+};
+window.toggleGroup = window.toggleGroup || function(el){
+  var p=el&&el.closest?el.closest('.wiq-nav-group'):null;
+  if(p){var sub=p.querySelector('.wiq-sub');if(sub)sub.style.display=sub.style.display==='none'?'block':'none';}
+};
+// Tab switching
+window.switchTab = window.switchTab || function(tab,section){
+  var tabs=document.querySelectorAll('[onclick*=switchTab]');
+  tabs.forEach(function(t){t.classList.remove('active','btn-primary');t.classList.add('btn-outline');});
+  if(event&&event.target){event.target.classList.add('active','btn-primary');event.target.classList.remove('btn-outline');}
+  var sections=document.querySelectorAll('[id$="-section"],[id$="Tab"],[id$="-tab"],[class*=tab-pane]');
+  sections.forEach(function(s){s.style.display='none';});
+  var target=section?document.getElementById(section):null;
+  if(!target&&tab)target=document.getElementById(tab);
+  if(target)target.style.display='';
+};
+// CSV Download
+window.dlCSV=window.dlCSV||function(rows,headers,fn){var lines=[(headers||[]).join(',')];(rows||[]).forEach(function(r){lines.push((headers||[]).map(function(h){var v=String(r[h]!==undefined?r[h]:'').replace(/"/g,'""');return v.indexOf(',')>-1?'"'+v+'"':v;}).join(','));});var a=document.createElement('a');a.href=URL.createObjectURL(new Blob([lines.join('\n')],{type:'text/csv'}));a.download=(fn||'export')+'_'+new Date().toISOString().slice(0,10)+'.csv';document.body.appendChild(a);a.click();document.body.removeChild(a);if(typeof showToast==='function')showToast('Downloaded',true);};
+
+window.acceptCookies = function() {
+  localStorage.setItem('wfi_cookie_consent','all');
+  localStorage.setItem('wfi_cookie_pref','1');
+  localStorage.setItem('wfi_cookie_analytics','1');
+  var banner = document.getElementById('cookieBanner');
+  if(banner){banner.style.transform='translateY(100%)';setTimeout(function(){banner.style.display='none';},400);}
+  if(typeof showToast==='function') showToast('Cookie preferences saved ✅',true);
+};
+window.declineCookies = function() {
+  localStorage.setItem('wfi_cookie_consent','essential');
+  var banner = document.getElementById('cookieBanner');
+  if(banner){banner.style.transform='translateY(100%)';setTimeout(function(){banner.style.display='none';},400);}
+};
+window.showCookieSettings = function() {
+  var m = document.getElementById('cookieModal');
+  if(m){m.style.display='flex';}
+};
+window.closeCookieModal = function() {
+  var m = document.getElementById('cookieModal');
+  if(m){m.style.display='none';}
+};
+window.saveCookieSettings = function() {
+  var pref = document.getElementById('ckPref');
+  var analytics = document.getElementById('ckAnalytics');
+  localStorage.setItem('wfi_cookie_consent','custom');
+  if(pref) localStorage.setItem('wfi_cookie_pref',pref.checked?'1':'0');
+  if(analytics) localStorage.setItem('wfi_cookie_analytics',analytics.checked?'1':'0');
+  closeCookieModal();
+  var banner = document.getElementById('cookieBanner');
+  if(banner){banner.style.transform='translateY(100%)';}
+  if(typeof showToast==='function') showToast('Cookie preferences saved ✅',true);
+};
+
+</script>
+
+  <div class="card" style="margin-top:14px">
+    <div class="card-title">&#128149; Group Term Life — Nominee Declaration</div>
+    <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:9px 14px;margin-bottom:10px;font-size:.75rem;color:#15803d">
+      GTL Coverage = 3x annual CTC. &#8377;54L for CTC &#8377;18L. Nominee receives this amount tax-free (u/s 10(10D)) in case of employee's death in service.
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:12px">
+      <div><label class="form-label">Nominee Name</label><input id="gtlNominee" class="form-input" placeholder="Full legal name of nominee" /></div>
+      <div><label class="form-label">Relationship</label>
+        <select id="gtlRelation" class="form-input">
+          <option>Spouse</option><option>Father</option><option>Mother</option>
+          <option>Son</option><option>Daughter</option><option>Sibling</option>
+        </select></div>
+      <div><label class="form-label">Share % (multiple nominees)</label><input id="gtlShare" type="number" class="form-input" placeholder="e.g. 100 or 50" value="100" /></div>
+    </div>
+    <div><label class="form-label">Nominee Aadhaar / PAN</label>
+      <input id="gtlAadhaar" class="form-input" placeholder="Nominee's Aadhaar number (for KYC)" /></div>
+    <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:10px">
+      <button onclick="saveGTLNominee()" class="btn btn-primary">&#128149; Save GTL Nominee</button>
+      <button onclick="showToast('GTL policy document downloaded \u2705',true)" class="btn btn-outline">&#128196; Download Policy</button>
+    </div>
+    <div id="gtlResult" style="display:none;margin-top:8px;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:7px;padding:8px 12px;font-size:.75rem;color:#15803d"></div>
+  </div>
+  <div class="card" style="margin-top:14px">
+    <div class="card-title">&#9763; Critical Illness Rider + Voluntary Top-up Insurance</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:10px">
+      <div style="background:#fff7ed;border:1px solid #fed7aa;border-radius:9px;padding:14px">
+        <div style="font-size:.78rem;font-weight:800;color:#d97706;margin-bottom:6px">&#9763; Critical Illness Rider</div>
+        <div style="font-size:.68rem;color:#475569;margin-bottom:8px;line-height:1.5">Lump-sum payout on diagnosis of 36 critical illnesses: cancer, heart attack, stroke, kidney failure. Waiting period: 90 days from enrollment.</div>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+          <span style="font-size:.72rem;color:#1e293b;font-weight:700">CI Cover: &#8377;25L</span>
+          <span style="background:#fef9c3;color:#92400e;font-size:.62rem;padding:2px 7px;border-radius:999px;font-weight:700">Premium: &#8377;420/month</span>
+        </div>
+        <div style="display:flex;gap:6px">
+          <button onclick="enrollCI(true)" style="background:#d97706;color:#fff;border:none;border-radius:6px;padding:5px 12px;font-size:.64rem;cursor:pointer">&#10003; Opt In</button>
+          <button onclick="enrollCI(false)" style="background:#f8fafc;color:#64748b;border:1px solid #e2e8f0;border-radius:6px;padding:5px 12px;font-size:.64rem;cursor:pointer">Opt Out</button>
+        </div>
+      </div>
+      <div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:9px;padding:14px">
+        <div style="font-size:.78rem;font-weight:800;color:#2563eb;margin-bottom:6px">&#128112; Top-up Health Insurance</div>
+        <div style="font-size:.68rem;color:#475569;margin-bottom:8px;line-height:1.5">Voluntary additional cover for parents or spouse. Deducted from salary. Open enrollment: January 1–31 annually.</div>
+        <div style="display:flex;flex-direction:column;gap:5px">
+          <label style="display:flex;align-items:center;gap:8px;font-size:.7rem;cursor:pointer"><input type="checkbox" style="accent-color:#2563eb"> Spouse (+&#8377;240/month for &#8377;5L cover)</label>
+          <label style="display:flex;align-items:center;gap:8px;font-size:.7rem;cursor:pointer"><input type="checkbox" style="accent-color:#2563eb"> Parents (+&#8377;680/month for &#8377;5L cover each)</label>
+          <label style="display:flex;align-items:center;gap:8px;font-size:.7rem;cursor:pointer"><input type="checkbox" style="accent-color:#2563eb"> In-laws (+&#8377;680/month for &#8377;5L cover each)</label>
+        </div>
+        <button onclick="saveTopup()" style="background:#2563eb;color:#fff;border:none;border-radius:6px;padding:5px 12px;font-size:.64rem;cursor:pointer;margin-top:8px;width:100%">Save Top-up Selection</button>
+      </div>
+    </div>
+  </div>
+<script id="wfi-utils">
+(function(){
+var w=window;
+w.dlPrint=w.dlPrint||function(t,c){var wi=window.open('','_blank','width=1100,height=800');if(!wi)return;var h='<html><head><title>'+(t||'Report')+'<\/title><style>*{box-sizing:border-box}body{font-family:Segoe UI,sans-serif;padding:28px;color:#1e293b;max-width:960px;margin:0 auto}.hdr{display:flex;justify-content:space-between;align-items:center;border-bottom:2px solid #2563EB;padding-bottom:12px;margin-bottom:20px}.brand{font-weight:900;color:#2563EB;font-size:1rem}.meta{font-size:.72rem;color:#64748b}h2{color:#1e293b;margin-bottom:14px}table{width:100%;border-collapse:collapse;margin-top:10px}th{background:#1e3a5f;color:#fff;padding:8px 12px;text-align:left;font-size:.72rem;font-weight:700;text-transform:uppercase}td{padding:8px 12px;border-bottom:1px solid #e2e8f0;font-size:.8rem}tr:nth-child(even)td{background:#f8fafc}.ftr{margin-top:20px;padding-top:10px;border-top:1px solid #e2e8f0;font-size:.7rem;color:#94a3b8;display:flex;justify-content:space-between}.btn{background:#2563EB;color:#fff;border:none;padding:9px 24px;border-radius:7px;font-weight:700;cursor:pointer;font-size:.8rem;margin-top:14px}@media print{.btn{display:none}}<\/style><\/head><body><div class="hdr"><div class="brand">&#9889; WFI<\/div><div class="meta">'+new Date().toLocaleString()+'<\/div><\/div><h2>'+(t||'Report')+'<\/h2>'+(c||'<p>No data.<\/p>')+'<div class="ftr"><span>WFI<\/span><span>'+new Date().toLocaleDateString()+'<\/span><\/div><button class="btn" onclick="window.print()">Print \/ PDF<\/button><\/body><\/html>';wi.document.write(h);wi.document.close();};
+w.dlCSV=w.dlCSV||function(rows,h,fn){if(!rows||!rows.length)rows=[{}];var keys=h||Object.keys(rows[0]);var L=[keys.map(function(k){return'"'+k+'"';}).join(',')];rows.forEach(function(r){L.push(keys.map(function(k){return'"'+String(r[k]!==undefined?r[k]:'').replace(/"/g,'""')+'"';}).join(','));});var blob=new Blob([L.join('\n')],{type:'text/csv;charset=utf-8;'});var url=URL.createObjectURL(blob);var a=document.createElement('a');a.href=url;a.download=(fn||'export')+'.csv';document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(url);};
+w.tdm=w.tdm||function(){var d=document.body.classList.toggle('dark-mode');localStorage.setItem('wfi_dark_mode',d?'1':'0');var b=document.getElementById('dmt')||document.getElementById('dmToggle');var i=document.getElementById('dmi')||document.getElementById('dmIcon');if(b)b.classList.toggle('on',d);if(i)i.textContent=d?'&#9728;':'&#127769;';};
+w.toggleDarkMode=w.tdm;
+w.showTab=w.showTab||function(id,btn){var lo=id.toLowerCase();var el=document.getElementById('tab'+id)||document.getElementById('tab'+id.charAt(0).toUpperCase()+id.slice(1))||document.getElementById('tab-'+id)||document.getElementById(id)||document.getElementById('section-'+id);if(!el){var all=document.querySelectorAll('[id]');for(var i=0;i<all.length;i++){if(all[i].id.toLowerCase()==='tab'+lo||all[i].id.toLowerCase()===lo||all[i].id.toLowerCase()==='section-'+lo){el=all[i];break;}}}document.querySelectorAll('[id]').forEach(function(s){var sid=s.id.toLowerCase();if((sid.startsWith('tab')||sid.startsWith('section-')||sid.startsWith('panel-'))&&sid!==lo&&sid!=='tab'+lo&&sid!=='section-'+lo)s.style.display='none';});if(el){el.style.display='';el.classList.add('on');}document.querySelectorAll('.sc').forEach(function(e){e.classList.remove('on');});var sc=document.getElementById('tab'+id)||document.getElementById('tab'+id.charAt(0).toUpperCase()+id.slice(1));if(sc)sc.classList.add('on');document.querySelectorAll('.tb,.tab-btn,[role=tab]').forEach(function(b){b.classList.remove('active');});if(btn)btn.classList.add('active');};
+w.switchTab=w.switchTab||w.showTab;
+w.showSection=w.showSection||function(id,btn){document.querySelectorAll('[id^="section-"]').forEach(function(e){e.style.display='none';});var el=document.getElementById('section-'+id)||document.getElementById(id);if(el)el.style.display='block';document.querySelectorAll('.tb,.section-btn').forEach(function(b){b.classList.remove('active');});if(btn)btn.classList.add('active');};
+w.sw=w.sw||w.showSection;
+w.st=w.st||function(msg,ok){var t=document.getElementById('toast');if(!t)return;t.textContent=msg;t.style.background=ok!==false?'linear-gradient(135deg,#059669,#047857)':'linear-gradient(135deg,#DC2626,#B91C1C)';t.classList.add('show');setTimeout(function(){t.classList.remove('show');},3000);};
+w.showToast=w.st;
+w.logout=w.logout||function(){localStorage.clear();window.location.href='login.html';};
+w.ac=w.ac||function(){var b=document.getElementById('cookieBanner')||document.getElementById('ckb');if(b){b.style.display='none';try{localStorage.setItem('wfi_ck','1');}catch(e){}}};
+w.dc=w.dc||function(){var b=document.getElementById('cookieBanner')||document.getElementById('ckb');if(b)b.style.display='none';};
+w.acceptCookies=w.ac;w.declineCookies=w.dc;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+w.closeModal=w.closeModal||function(){document.querySelectorAll('.modal,.dialog').forEach(function(m){m.style.display='none';});};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+w.closeRejectModal=w.closeRejectModal||function(){document.querySelectorAll('.modal').forEach(function(m){m.style.display='none';});};
+
+
+w.openMobSidebar=w.openMobSidebar||function(){var s=document.querySelector('.wiq-sidebar');if(s)s.classList.toggle('open');};
+w.toggleSidebar=w.toggleSidebar||function(){var s=document.querySelector('.wiq-sidebar');if(s)s.classList.toggle('collapsed');};
+w.toggleGroup=w.toggleGroup||function(id){var el=document.getElementById(id);if(el)el.style.display=el.style.display==='none'?'block':'none';};
+
+
+
+
+window.dlXLSX=window.dlXLSX||function(rows,headers,filename){
+  if(!rows||!rows.length){window.st&&window.st('No data to export',false);return;}
+  var keys=headers||Object.keys(rows[0]);
+  // Build CSV that Excel can open as XLSX-like
+  var BOM='﻿';
+  var lines=[keys.map(function(k){return'"'+String(k).replace(/"/g,'""')+'"';}).join(',')];
+  rows.forEach(function(r){lines.push(keys.map(function(k){var v=r[k]===null||r[k]===undefined?'':String(r[k]);return'"'+v.replace(/"/g,'""')+'"';}).join(','));});
+  var csv=BOM+lines.join('\n');
+  var blob=new Blob([csv],{type:'application/vnd.ms-excel;charset=utf-8'});
+  var a=document.createElement('a');a.href=URL.createObjectURL(blob);
+  a.download=(filename||'export')+'.csv';document.body.appendChild(a);a.click();
+  setTimeout(function(){URL.revokeObjectURL(a.href);document.body.removeChild(a);},1000);
+  window.st&&window.st('Excel file downloaded',true);
+};
+window.exportExcel=window.dlXLSX;
+})();
+</script>
+
+
+
+<footer class="wiq-footer" style="background:#0F172A;border-top:1px solid #1E293B;padding:16px 24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-top:auto;flex-shrink:0">
+  <div style="display:flex;align-items:center;gap:10px">
+    <div style="width:26px;height:26px;background:linear-gradient(135deg,#1D4ED8,#6D28D9);border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:.75rem">&#9889;</div>
+    <div>
+      <div style="font-size:.73rem;font-weight:800;color:#E2E8F0">Workforce Intelligence</div>
+      <div style="font-size:.60rem;color:#475569">Enterprise HRMS &bull; DPDP 2023 &bull; PoSH 2013 &bull; ISO 27001</div>
+    </div>
+  </div>
+  <div style="display:flex;gap:14px;flex-wrap:wrap">
+    <a href="privacy-policy.html" style="color:#475569;font-size:.66rem;text-decoration:none;font-weight:600" onmouseover="this.style.color='#60A5FA'" onmouseout="this.style.color='#475569'">Privacy</a>
+    <a href="cookie-policy.html" style="color:#475569;font-size:.66rem;text-decoration:none;font-weight:600" onmouseover="this.style.color='#60A5FA'" onmouseout="this.style.color='#475569'">Cookies</a>
+    <a href="security-policy.html" style="color:#475569;font-size:.66rem;text-decoration:none;font-weight:600" onmouseover="this.style.color='#60A5FA'" onmouseout="this.style.color='#475569'">Security</a>
+    <a href="company-policies.html" style="color:#475569;font-size:.66rem;text-decoration:none;font-weight:600" onmouseover="this.style.color='#60A5FA'" onmouseout="this.style.color='#475569'">Policies</a>
+    <a href="112-emergency.html" style="color:#DC2626;font-size:.66rem;text-decoration:none;font-weight:700">&#128680; Emergency</a>
+  </div>
+  <div style="font-size:.60rem;color:#334155">&copy; 2026 Workforce Intelligence. All rights reserved.</div>
+</footer>
+<script id="wiq-dd">
+(function(){
+function toggleGroup(id){
+  var b=document.getElementById(id);
+  var a=document.getElementById(id.replace('grp-','arr-'));
+  if(!b)return;
+  var o=b.classList.contains('open');
+  b.classList.toggle('open',!o);
+  if(a)a.style.transform=o?'':'rotate(-90deg)';
+}
+window.toggleGroup=toggleGroup;
+// Auto-open active group
+var cur=window.location.pathname.split('/').pop();
+document.querySelectorAll('.wiq-sidebar a[href]').forEach(function(a){
+  if(a.getAttribute('href')===cur){
+    a.classList.add('active');
+    var g=a.closest('.wiq-dropdown-body');
+    if(g){g.classList.add('open');var ar=document.getElementById(g.id.replace('grp-','arr-'));if(ar)ar.style.transform='rotate(-90deg)';}
+  }
+});
+// Mobile sidebar
+window.openMobSidebar=window.openMobSidebar||function(){var s=document.getElementById('wiqSidebar');if(s)s.classList.toggle('open');};
+document.addEventListener('click',function(e){
+  var sb=document.getElementById('wiqSidebar');var mb=document.getElementById('mobToggleBtn');
+  if(sb&&sb.classList.contains('open')&&!sb.contains(e.target)&&mb&&!mb.contains(e.target))sb.classList.remove('open');
+});
+})();
+</script>
+</body>
+
+
+
+
+<div id="cookieBanner" style="position:fixed;bottom:0;left:0;right:0;z-index:9998;background:linear-gradient(135deg,#0F172A,#1E293B);border-top:2px solid #2563EB;padding:14px 28px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;transform:translateY(100%);transition:transform .4s ease"><p style="font-size:.76rem;color:#CBD5E1;margin:0">&#127850; We use cookies. <a href="privacy-policy.html" style="color:#60A5FA;font-weight:700;text-decoration:none">Privacy Policy</a></p><div style="display:flex;gap:8px"><button onclick="window.acceptCookies&&acceptCookies()" style="background:linear-gradient(135deg,#2563EB,#4F46E5);color:#fff;border:none;border-radius:8px;padding:7px 18px;font-size:.72rem;font-weight:700;cursor:pointer;font-family:inherit">Accept All</button><button onclick="window.declineCookies&&declineCookies()" style="background:transparent;color:#64748B;border:none;font-size:.7rem;cursor:pointer;font-family:inherit">Decline</button></div></div>
+<span id="dmIcon" style="display:none">&#127769;</span><button id="dmToggle" style="display:flex"></button>
+<script>
+
+</script>
+</html>

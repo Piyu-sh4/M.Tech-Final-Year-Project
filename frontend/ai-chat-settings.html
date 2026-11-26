@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AI Chat Settings · Workforce Intelligence</title>
+  <link rel="stylesheet" href="/workspace.css">
+  <link rel="stylesheet" href="/modules.css">
+  <script src="/ai-chat-settings.js" defer></script>
+  <link rel="stylesheet" href="/navigation.css">
+  <script src="/navigation.js" defer></script>
+
+<script src="/appearance.js" defer></script>
+
+<link rel="stylesheet" href="/preferences.css">
+<link rel="stylesheet" href="/theme.css">
+</head>
+<body class="wfi-module-page">
+  <a class="wfi-skip" href="#main-content">Skip to content</a>
+  <header class="workspace-header">
+    <a class="brand" href="/admin-dashboard.html"><span class="brand-mark" aria-hidden="true">W</span><span>Workforce Intelligence</span></a>
+    <nav aria-label="Main navigation">
+      <a href="/settings.html">Settings</a>
+      <a href="/chat.html">AI Chat</a>
+    </nav>
+  </header>
+  <main id="main-content" tabindex="-1">
+    <div class="page-heading">
+      <div class="page-heading-text">
+        <p class="eyebrow">Administration</p>
+        <h1>AI Chat Settings</h1>
+        <p id="intro">Save an API key and model for each provider, then choose which one the chat uses.</p>
+      </div>
+    </div>
+    <p id="active" aria-live="polite"></p>
+    <p id="message" role="status" aria-live="polite"></p>
+    <section id="provider-section" hidden>
+      <form id="provider-form" autocomplete="off">
+        <div class="form-grid">
+          <label>Provider <select id="provider"></select></label>
+          <label>Model ID <input id="model" required maxlength="200" spellcheck="false"></label>
+          <label>API key <input id="api-key" type="password" maxlength="2048" autocomplete="new-password" spellcheck="false"></label>
+        </div>
+        <p id="key-status"></p>
+        <div class="form-buttons">
+          <button type="submit" class="primary">Save configuration</button>
+          <button type="button" id="activate">Make active</button>
+          <button type="button" id="disable">Disable chat</button>
+        </div>
+      </form>
+    </section>
+  </main>
+</body>
+</html>

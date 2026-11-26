@@ -1,0 +1,621 @@
+{
+  "source": "https://www.rbi.org.in/scripts/banklinks.aspx",
+  "checked_on": "2026-11-12",
+  "banks": [
+    {
+      "name": "Axis Bank Ltd.",
+      "category": "Private Sector Banks",
+      "website_url": "https://www.axis.bank.in/"
+    },
+    {
+      "name": "Bandhan Bank Ltd.",
+      "category": "Private Sector Banks",
+      "website_url": "https://www.bandhan.bank.in/"
+    },
+    {
+      "name": "CSB Bank Limited",
+      "category": "Private Sector Banks",
+      "website_url": "https://www.csb.bank.in/"
+    },
+    {
+      "name": "City Union Bank Ltd.",
+      "category": "Private Sector Banks",
+      "website_url": "https://cityunionbank.bank.in/"
+    },
+    {
+      "name": "DCB Bank Ltd.",
+      "category": "Private Sector Banks",
+      "website_url": "https://www.dcb.bank.in/"
+    },
+    {
+      "name": "Dhanlaxmi Bank Ltd.",
+      "category": "Private Sector Banks",
+      "website_url": "https://www.dhan.bank.in/"
+    },
+    {
+      "name": "Federal Bank Ltd.",
+      "category": "Private Sector Banks",
+      "website_url": "https://www.federal.bank.in/"
+    },
+    {
+      "name": "HDFC Bank Ltd",
+      "category": "Private Sector Banks",
+      "website_url": "https://www.hdfc.bank.in/"
+    },
+    {
+      "name": "ICICI Bank Ltd.",
+      "category": "Private Sector Banks",
+      "website_url": "https://www.icici.bank.in/"
+    },
+    {
+      "name": "IndusInd Bank Ltd",
+      "category": "Private Sector Banks",
+      "website_url": "https://www.indusind.bank.in/"
+    },
+    {
+      "name": "IDFC FIRST Bank Limited",
+      "category": "Private Sector Banks",
+      "website_url": "https://www.idfcfirst.bank.in/"
+    },
+    {
+      "name": "Jammu & Kashmir Bank Ltd.",
+      "category": "Private Sector Banks",
+      "website_url": "https://jkb.bank.in"
+    },
+    {
+      "name": "Karnataka Bank Ltd.",
+      "category": "Private Sector Banks",
+      "website_url": "https://www.karnatakabank.bank.in/"
+    },
+    {
+      "name": "Karur Vysya Bank Ltd.",
+      "category": "Private Sector Banks",
+      "website_url": "https://www.kvb.bank.in"
+    },
+    {
+      "name": "Kotak Mahindra Bank Ltd",
+      "category": "Private Sector Banks",
+      "website_url": "https://www.kotak.bank.in/en/home.html"
+    },
+    {
+      "name": "Nainital bank Ltd.",
+      "category": "Private Sector Banks",
+      "website_url": "https://www.nainitalbank.bank.in/english/home.aspx"
+    },
+    {
+      "name": "RBL Bank Ltd.",
+      "category": "Private Sector Banks",
+      "website_url": "https://www.rbl.bank.in/"
+    },
+    {
+      "name": "South Indian Bank Ltd.",
+      "category": "Private Sector Banks",
+      "website_url": "https://www.southindianbank.bank.in/"
+    },
+    {
+      "name": "Tamilnad Mercantile Bank Ltd.",
+      "category": "Private Sector Banks",
+      "website_url": "https://www.tmb.bank.in/"
+    },
+    {
+      "name": "YES Bank Ltd.",
+      "category": "Private Sector Banks",
+      "website_url": "https://www.yes.bank.in/"
+    },
+    {
+      "name": "IDBI Bank Limited",
+      "category": "Private Sector Banks",
+      "website_url": "https://www.idbi.bank.in/"
+    },
+    {
+      "name": "Coastal Local Area Bank Ltd",
+      "category": "Local Area Banks (LAB)",
+      "website_url": "https://coastal.bank.in"
+    },
+    {
+      "name": "Krishna Bhima Samruddhi LAB Ltd",
+      "category": "Local Area Banks (LAB)",
+      "website_url": "https://www.kbsbank.bank.in/"
+    },
+    {
+      "name": "Au Small Finance Bank Ltd.",
+      "category": "Small Finance Banks (SFB)",
+      "website_url": "https://www.au.bank.in/"
+    },
+    {
+      "name": "Capital Small Finance Bank Ltd",
+      "category": "Small Finance Banks (SFB)",
+      "website_url": "https://www.capital.bank.in"
+    },
+    {
+      "name": "Equitas Small Finance Bank Ltd",
+      "category": "Small Finance Banks (SFB)",
+      "website_url": "https://equitas.bank.in/"
+    },
+    {
+      "name": "ESAF Small Finance Bank Ltd.",
+      "category": "Small Finance Banks (SFB)",
+      "website_url": "https://www.esaf.bank.in/"
+    },
+    {
+      "name": "Suryoday Small Finance Bank Ltd.",
+      "category": "Small Finance Banks (SFB)",
+      "website_url": "https://suryoday.bank.in/"
+    },
+    {
+      "name": "Ujjivan Small Finance Bank Ltd.",
+      "category": "Small Finance Banks (SFB)",
+      "website_url": "https://www.ujjivansfb.bank.in/"
+    },
+    {
+      "name": "Utkarsh Small Finance Bank Ltd.",
+      "category": "Small Finance Banks (SFB)",
+      "website_url": "https://www.utkarsh.bank.in/"
+    },
+    {
+      "name": "North East Small finance Bank Ltd",
+      "category": "Small Finance Banks (SFB)",
+      "website_url": "https://slice.bank.in/"
+    },
+    {
+      "name": "Jana Small Finance Bank Ltd",
+      "category": "Small Finance Banks (SFB)",
+      "website_url": "https://www.jana.bank.in/"
+    },
+    {
+      "name": "Shivalik Small Finance Bank Ltd",
+      "category": "Small Finance Banks (SFB)",
+      "website_url": "https://shivalik.bank.in/"
+    },
+    {
+      "name": "Unity Small Finance Bank Ltd",
+      "category": "Small Finance Banks (SFB)",
+      "website_url": "https://unity.bank.in/"
+    },
+    {
+      "name": "Airtel Payments Bank Ltd",
+      "category": "Payments Banks (PB)",
+      "website_url": "https://www.airtelpayments.bank.in"
+    },
+    {
+      "name": "India Post Payments Bank Ltd",
+      "category": "Payments Banks (PB)",
+      "website_url": "https://ippbonline.bank.in/"
+    },
+    {
+      "name": "FINO Payments Bank Ltd",
+      "category": "Payments Banks (PB)",
+      "website_url": "https://fino.bank.in/"
+    },
+    {
+      "name": "Paytm Payments Bank Ltd",
+      "category": "Payments Banks (PB)",
+      "website_url": "https://www.paytm.bank.in/"
+    },
+    {
+      "name": "Jio Payments Bank Ltd",
+      "category": "Payments Banks (PB)",
+      "website_url": "https://www.jiopayments.bank.in/"
+    },
+    {
+      "name": "NSDL Payments Bank Limited",
+      "category": "Payments Banks (PB)",
+      "website_url": "https://nsdlpayments.bank.in/"
+    },
+    {
+      "name": "Bank of Baroda",
+      "category": "Public Sector Banks",
+      "website_url": "https://bankofbaroda.bank.in/"
+    },
+    {
+      "name": "Bank of India",
+      "category": "Public Sector Banks",
+      "website_url": "https://bankofindia.bank.in/"
+    },
+    {
+      "name": "Bank of Maharashtra",
+      "category": "Public Sector Banks",
+      "website_url": "https://bankofmaharashtra.bank.in/"
+    },
+    {
+      "name": "Canara Bank",
+      "category": "Public Sector Banks",
+      "website_url": "https://www.canarabank.bank.in/"
+    },
+    {
+      "name": "Central Bank of India",
+      "category": "Public Sector Banks",
+      "website_url": "https://centralbank.bank.in"
+    },
+    {
+      "name": "Indian Bank",
+      "category": "Public Sector Banks",
+      "website_url": "https://indianbank.bank.in/"
+    },
+    {
+      "name": "Indian Overseas Bank",
+      "category": "Public Sector Banks",
+      "website_url": "https://www.iob.bank.in/"
+    },
+    {
+      "name": "Punjab & Sind Bank",
+      "category": "Public Sector Banks",
+      "website_url": "https://punjabandsind.bank.in/"
+    },
+    {
+      "name": "Punjab National Bank",
+      "category": "Public Sector Banks",
+      "website_url": "https://pnb.bank.in/"
+    },
+    {
+      "name": "State Bank of India",
+      "category": "Public Sector Banks",
+      "website_url": "https://sbi.bank.in/"
+    },
+    {
+      "name": "UCO Bank",
+      "category": "Public Sector Banks",
+      "website_url": "https://www.uco.bank.in/"
+    },
+    {
+      "name": "Union Bank of India",
+      "category": "Public Sector Banks",
+      "website_url": "https://www.unionbankonline.bank.in/"
+    },
+    {
+      "name": "Andhra Pradesh Grameena Bank",
+      "category": "Regional Rural Banks",
+      "website_url": "https://www.apgb.bank.in/"
+    },
+    {
+      "name": "Assam Gramin Bank",
+      "category": "Regional Rural Banks",
+      "website_url": "https://agvb.bank.in/"
+    },
+    {
+      "name": "Arunachal Pradesh Rural Bank",
+      "category": "Regional Rural Banks",
+      "website_url": "http://www.aprb.bank.in/"
+    },
+    {
+      "name": "Bihar Gramin Bank",
+      "category": "Regional Rural Banks",
+      "website_url": "http://www.bgb.bank.in/"
+    },
+    {
+      "name": "Chhattisgarh Gramin Bank",
+      "category": "Regional Rural Banks",
+      "website_url": "http://www.cgb.bank.in/"
+    },
+    {
+      "name": "Gujarat Gramin Bank",
+      "category": "Regional Rural Banks",
+      "website_url": "http://www.ggb.bank.in/"
+    },
+    {
+      "name": "Haryana Gramin Bank",
+      "category": "Regional Rural Banks",
+      "website_url": "http://www.shgb.bank.in/"
+    },
+    {
+      "name": "Himachal Pradesh Gramin Bank",
+      "category": "Regional Rural Banks",
+      "website_url": "http://www.hpgb.bank.in/"
+    },
+    {
+      "name": "Jharkhand Gramin Bank",
+      "category": "Regional Rural Banks",
+      "website_url": "http://www.jrgbank.bank.in/"
+    },
+    {
+      "name": "Jammu and Kashmir Grameen Bank",
+      "category": "Regional Rural Banks",
+      "website_url": "https://www.jkgrameen.bank.in/"
+    },
+    {
+      "name": "Karnataka Grameena Bank",
+      "category": "Regional Rural Banks",
+      "website_url": "http://www.karnatakagb.bank.in/"
+    },
+    {
+      "name": "Kerala Grameena Bank",
+      "category": "Regional Rural Banks",
+      "website_url": "http://www.kgb.bank.in/"
+    },
+    {
+      "name": "Maharashtra Gramin Bank",
+      "category": "Regional Rural Banks",
+      "website_url": "https://www.mahagramin.bank.in/"
+    },
+    {
+      "name": "Madhya Pradesh Gramin Bank",
+      "category": "Regional Rural Banks",
+      "website_url": "http://www.mpgb.bank.in/"
+    },
+    {
+      "name": "Manipur Rural Bank",
+      "category": "Regional Rural Banks",
+      "website_url": "http://www.manipurrural.bank.in/"
+    },
+    {
+      "name": "Meghalaya Rural Bank",
+      "category": "Regional Rural Banks",
+      "website_url": "http://www.meghalayaruralbank.bank.in/"
+    },
+    {
+      "name": "Mizoram Rural Bank",
+      "category": "Regional Rural Banks",
+      "website_url": "http://www.mrb.bank.in/"
+    },
+    {
+      "name": "Nagaland Rural Bank",
+      "category": "Regional Rural Banks",
+      "website_url": "http://www.nrb.bank.in/"
+    },
+    {
+      "name": "Odisha Grameen Bank",
+      "category": "Regional Rural Banks",
+      "website_url": "http://www.odishabank.bank.in/"
+    },
+    {
+      "name": "Punjab Gramin Bank",
+      "category": "Regional Rural Banks",
+      "website_url": "http://www.pgb.bank.in/"
+    },
+    {
+      "name": "Puducherry Grama Bank",
+      "category": "Regional Rural Banks",
+      "website_url": "http://www.pygb.bank.in/"
+    },
+    {
+      "name": "Rajasthan Gramin Bank",
+      "category": "Regional Rural Banks",
+      "website_url": "http://www.rgb.bank.in/"
+    },
+    {
+      "name": "Tamil Nadu Grama Bank",
+      "category": "Regional Rural Banks",
+      "website_url": "http://www.tngb.bank.in/"
+    },
+    {
+      "name": "Telangana Grameena Bank",
+      "category": "Regional Rural Banks",
+      "website_url": "http://www.tgb.bank.in/"
+    },
+    {
+      "name": "Tripura Gramin Bank",
+      "category": "Regional Rural Banks",
+      "website_url": "http://www.tripuragramin.bank.in/"
+    },
+    {
+      "name": "Uttar Pradesh Gramin Bank",
+      "category": "Regional Rural Banks",
+      "website_url": "https://upgb.bank.in/"
+    },
+    {
+      "name": "Uttarakhand Gramin Bank",
+      "category": "Regional Rural Banks",
+      "website_url": "https://ukgb.bank.in/"
+    },
+    {
+      "name": "West Bengal Gramin Bank",
+      "category": "Regional Rural Banks",
+      "website_url": "https://www.wbgb.bank.in/"
+    },
+    {
+      "name": "AB Bank Ltd.",
+      "category": "foreign banks",
+      "website_url": "http://abbl.com/mumbai-branch/"
+    },
+    {
+      "name": "American Express Banking Corporation",
+      "category": "foreign banks",
+      "website_url": "https://www.americanexpress.com/in/"
+    },
+    {
+      "name": "Australia and New Zealand Banking Group Ltd.",
+      "category": "foreign banks",
+      "website_url": "http://www.anz.com/india/en/Corporate/"
+    },
+    {
+      "name": "Barclays Bank Plc.",
+      "category": "foreign banks",
+      "website_url": "https://www.barclays.bank.in/"
+    },
+    {
+      "name": "Bank of America",
+      "category": "foreign banks",
+      "website_url": "http://bofa-india.com/"
+    },
+    {
+      "name": "Bank of Bahrain and Kuwait B.S.C.",
+      "category": "foreign banks",
+      "website_url": "https://bbkindia.bank.in/"
+    },
+    {
+      "name": "Bank of Ceylon",
+      "category": "foreign banks",
+      "website_url": "https://www.boc.lk/"
+    },
+    {
+      "name": "Bank of China Limited",
+      "category": "foreign banks",
+      "website_url": "https://www.bankofchina.com/in/en/aboutus/"
+    },
+    {
+      "name": "Bank of Nova Scotia",
+      "category": "foreign banks",
+      "website_url": "http://www.scotiabank.com/global/en/0,,6176,00.html"
+    },
+    {
+      "name": "BNP Paribas",
+      "category": "foreign banks",
+      "website_url": "https://www.bnpparibas.bank.in/en/"
+    },
+    {
+      "name": "Citibank N.A.",
+      "category": "foreign banks",
+      "website_url": "https://www.citigroup.com/global"
+    },
+    {
+      "name": "Cooperatieve Rabobank U.A./ Coöperatieve Centrale Raiffeisen-Boerenleenbank B.A.",
+      "category": "foreign banks",
+      "website_url": "https://www.rabobank.com/en/locate-us/asia-pacific/india/cooperatieve-rabobank-ua.html"
+    },
+    {
+      "name": "Credit Agricole Corporate and Investment Bank",
+      "category": "foreign banks",
+      "website_url": "https://www.ca-cib.com/en"
+    },
+    {
+      "name": "CTBC Bank Co., Ltd.",
+      "category": "foreign banks",
+      "website_url": "https://www.ctbcbank.bank.in/content/dam/cbminisite/IN/index.html"
+    },
+    {
+      "name": "DBS Bank India Limited",
+      "category": "foreign banks",
+      "website_url": "https://www.dbs.bank.in/in/index/default.page"
+    },
+    {
+      "name": "Deutsche Bank A.G.",
+      "category": "foreign banks",
+      "website_url": "https://www.deutsche.bank.in/"
+    },
+    {
+      "name": "Doha Bank Q.P.S.C",
+      "category": "foreign banks",
+      "website_url": "http://dohabank.co.in/"
+    },
+    {
+      "name": "Emirates NBD Bank P.J.S.C",
+      "category": "foreign banks",
+      "website_url": "https://www.emiratesnbd.bank.in/en"
+    },
+    {
+      "name": "First Abu Dhabi Bank PJSC",
+      "category": "foreign banks",
+      "website_url": "https://www.bankfab.com/en-in"
+    },
+    {
+      "name": "FirstRand Bank Limited",
+      "category": "foreign banks",
+      "website_url": "https://www.firstrand.co.in/"
+    },
+    {
+      "name": "Hong Kong and Shanghai Banking Corporation Limited",
+      "category": "foreign banks",
+      "website_url": "https://www.hsbc.bank.in/"
+    },
+    {
+      "name": "Industrial and Commercial Bank of China",
+      "category": "foreign banks",
+      "website_url": "http://www.icbcindia.com/"
+    },
+    {
+      "name": "Industrial Bank of Korea",
+      "category": "foreign banks",
+      "website_url": "https://in.globalibk.com/iview/03/CMIBMAN0000"
+    },
+    {
+      "name": "J.P. Morgan Chase Bank N.A.",
+      "category": "foreign banks",
+      "website_url": "https://www.jpmorgan.com/IN/en/about-us"
+    },
+    {
+      "name": "JSC VTB Bank",
+      "category": "foreign banks",
+      "website_url": "https://vtb.bank.in/"
+    },
+    {
+      "name": "KEB Hana Bank",
+      "category": "foreign banks",
+      "website_url": "https://global.1qbank.com/lounge/chennai/et/main.html"
+    },
+    {
+      "name": "Kookmin Bank",
+      "category": "foreign banks",
+      "website_url": "https://kbstar.bank.in/ind/main"
+    },
+    {
+      "name": "Mashreq bank P.S.C",
+      "category": "foreign banks",
+      "website_url": "https://mashreq.bank.in/en/corporate/"
+    },
+    {
+      "name": "Mizuho Bank Ltd.",
+      "category": "foreign banks",
+      "website_url": "https://www.mizuhogroup.com/bank"
+    },
+    {
+      "name": "MUFG Bank, Ltd.",
+      "category": "foreign banks",
+      "website_url": "http://www.bk.mufg.jp/global/globalnetwork/asiaoceania/mumbai.html"
+    },
+    {
+      "name": "Nong Hyup Bank",
+      "category": "foreign banks",
+      "website_url": "https://nonghyup.bank.in/index.jsp"
+    },
+    {
+      "name": "NatWest Markets Plc",
+      "category": "foreign banks",
+      "website_url": "https://www.natwestmarkets.bank.in/index.html"
+    },
+    {
+      "name": "PT Bank Maybank Indonesia TBK",
+      "category": "foreign banks",
+      "website_url": "https://www.maybank.co.in/"
+    },
+    {
+      "name": "Qatar National Bank (Q.P.S.C.)",
+      "category": "foreign banks",
+      "website_url": "https://qnb.bank.in/sites/qnb/qnbindia/page/en/en-home.html"
+    },
+    {
+      "name": "Sberbank",
+      "category": "foreign banks",
+      "website_url": "http://www.sberbank.co.in/"
+    },
+    {
+      "name": "SBM Bank (India) Limited",
+      "category": "foreign banks",
+      "website_url": "https://www.sbm.bank.in/"
+    },
+    {
+      "name": "Shinhan Bank",
+      "category": "foreign banks",
+      "website_url": "https://in.shinhanglobal.com/"
+    },
+    {
+      "name": "Societe Generale",
+      "category": "foreign banks",
+      "website_url": "https://www.societegenerale.asia/en/country-details/country/india-2/"
+    },
+    {
+      "name": "Sonali Bank Ltd.",
+      "category": "foreign banks",
+      "website_url": "http://www.sonalibank.in/"
+    },
+    {
+      "name": "Standard Chartered Bank",
+      "category": "foreign banks",
+      "website_url": "https://www.sc.bank.in/"
+    },
+    {
+      "name": "Sumitomo Mitsui Banking Corporation",
+      "category": "foreign banks",
+      "website_url": "http://www.smbc.co.jp/global/india/"
+    },
+    {
+      "name": "United Overseas Bank Limited",
+      "category": "foreign banks",
+      "website_url": "https://uob.bank.in/"
+    },
+    {
+      "name": "Woori Bank",
+      "category": "foreign banks",
+      "website_url": "https://go.wooribank.com/in/ib/main/IbMain.do"
+    }
+  ]
+}

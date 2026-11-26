@@ -1,0 +1,11 @@
+const router=require('express').Router(),ctrl=require('../controllers/announcementsController');
+const protect=require('../middleware/authMiddleware');
+const {staffOrAbove,hrOrAbove}=require('../middleware/authMiddleware');
+const audit=require('../middleware/auditMiddleware');
+router.get('/',protect,ctrl.getAll);
+router.get('/:id',protect,ctrl.getOne);
+router.post('/',protect,hrOrAbove,audit('CREATE_ANNOUNCEMENT','announcements'),ctrl.create);
+router.put('/:id',protect,hrOrAbove,audit('UPDATE_ANNOUNCEMENT','announcements'),ctrl.update);
+router.post('/:id/read',protect,ctrl.markRead);
+router.delete('/:id',protect,hrOrAbove,audit('ARCHIVE_ANNOUNCEMENT','announcements'),ctrl.archive);
+module.exports=router;

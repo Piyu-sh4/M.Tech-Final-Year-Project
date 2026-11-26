@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Audit Log – Workforce Intelligence v7.0</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+:root{--blue:#1B4F8A;--cyan:#2E86C1;--bg:#f0f4f8}
+*{box-sizing:border-box}
+body{background:var(--bg);color:#1e293b;font-family:'Segoe UI',Arial,sans-serif;margin:0}
+.page-wrap{max-width:1300px;margin:0 auto;padding:24px 16px 60px}
+.card{background:#fff;border-radius:14px;padding:24px;box-shadow:0 2px 12px rgba(0,0,0,.08);margin-bottom:18px}
+.page-title{font-size:1.3rem;font-weight:900;color:var(--blue);margin:0 0 18px}
+
+/* ── Stats strip ── */
+.stats-strip{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;margin-bottom:18px}
+.stat-box{background:#fff;border-radius:12px;padding:14px 18px;box-shadow:0 1px 8px rgba(0,0,0,.07);border-left:4px solid var(--cyan)}
+.stat-num{font-size:1.5rem;font-weight:900;color:var(--blue)}
+.stat-lbl{font-size:.72rem;color:#64748b;font-weight:600;text-transform:uppercase;letter-spacing:.05em}
+
+/* ── Filters ── */
+.filter-card{background:#fff;border-radius:14px;padding:18px 22px;box-shadow:0 2px 12px rgba(0,0,0,.08);margin-bottom:16px}
+.filter-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:10px;align-items:end;margin-bottom:10px}
+.filter-grid label{font-size:.72rem;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:4px}
+.filter-grid input,.filter-grid select{width:100%;padding:8px 12px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:.84rem}
+.filter-grid input:focus,.filter-grid select:focus{border-color:var(--cyan);outline:none}
+.filter-actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.btn-filter{background:var(--blue);color:#fff;border:none;padding:9px 22px;border-radius:8px;font-size:.84rem;font-weight:700;cursor:pointer}
+.btn-filter:hover{background:var(--cyan)}
+.btn-reset{background:#f1f5f9;color:#64748b;border:1.5px solid #e2e8f0;padding:9px 18px;border-radius:8px;font-size:.84rem;font-weight:700;cursor:pointer}
+.btn-export{background:#15803d;color:#fff;border:none;padding:9px 18px;border-radius:8px;font-size:.84rem;font-weight:700;cursor:pointer;margin-left:auto}
+.result-count{font-size:.8rem;color:#64748b;margin-left:4px;align-self:center}
+
+/* ── Table ── */
+.table-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:.82rem}
+th{background:linear-gradient(135deg,var(--blue),var(--cyan));color:#fff;padding:11px 14px;text-align:left;font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.04em;white-space:nowrap}
+th:first-child{border-radius:8px 0 0 0}
+th:last-child{border-radius:0 8px 0 0}
+td{padding:10px 14px;border-bottom:1px solid #f1f5f9;vertical-align:top}
+tr:hover td{background:#f8fafc}
+.action-pill{display:inline-block;padding:3px 10px;border-radius:20px;font-size:.72rem;font-weight:700;white-space:nowrap}
+.pill-create{background:#dcfce7;color:#15803d}
+.pill-update{background:#dbeafe;color:#1d4ed8}
+.pill-delete{background:#fee2e2;color:#b91c1c}
+.pill-approve{background:#d1fae5;color:#065f46}
+.pill-reject{background:#fce7f3;color:#9d174d}
+.pill-login{background:#ede9fe;color:#6d28d9}
+.pill-suspend{background:#fef9c3;color:#854d0e}
+.pill-default{background:#e2e8f0;color:#475569}
+.details-pre{background:#f8fafc;border-radius:6px;padding:8px;font-size:.7rem;max-width:280px;overflow:auto;white-space:pre-wrap;word-break:break-all;max-height:120px;border:1px solid #e2e8f0}
+
+/* ── Pagination ── */
+.pagination{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;margin-top:18px}
+.pg-btn{padding:7px 14px;border-radius:8px;border:1.5px solid #e2e8f0;background:#fff;font-size:.82rem;font-weight:700;cursor:pointer;color:#475569;transition:all .2s}
+.pg-btn.active{background:var(--blue);color:#fff;border-color:var(--blue)}
+.pg-btn:hover:not(.active){background:#f1f5f9;border-color:var(--cyan)}
+.pg-info{font-size:.8rem;color:#64748b;text-align:center;margin-top:8px}
+
+/* ── Empty state ── */
+.empty-state{text-align:center;padding:40px;color:#94a3b8;font-size:.9rem}
+.empty-state .icon{font-size:2.5rem;margin-bottom:8px}
+</style>
+</head>
+<body>
+<nav class="navbar">
+  <div class="nav-brand">⚡ Workforce Intelligence</div>
+  <div class="nav-links">
+    <a href="admin-dashboard.html" style="color:#fff">← Dashboard</a>
+    <a href="login.html" onclick="localStorage.clear()" style="color:#fff;margin-left:16px">Logout</a>
+  </div>
+</nav>
+
+<div class="page-wrap">
+  <h2 class="page-title">🔍 Audit Log</h2>
+
+  <!-- Stats -->
+  <div class="stats-strip">
+    <div class="stat-box"><div class="stat-num" id="statTotal">—</div><div class="stat-lbl">Total Logs</div></div>
+    <div class="stat-box" style="border-color:#dc2626"><div class="stat-num" id="statToday">—</div><div class="stat-lbl">Today</div></div>
+    <div class="stat-box" style="border-color:#d97706"><div class="stat-num" id="statDeletes">—</div><div class="stat-lbl">Deletes</div></div>
+    <div class="stat-box" style="border-color:#7c3aed"><div class="stat-num" id="statLogins">—</div><div class="stat-lbl">Logins</div></div>
+  </div>
+
+  <!-- Filters -->
+  <div class="filter-card">
+    <div class="filter-grid">
+      <div>
+        <label>Entity Type</label>
+        <select id="fEntity">
+          <option value="">All Entities</option>
+          <option>users</option>
+          <option>leave_requests</option>
+          <option>salary_records</option>
+          <option>salary_advances</option>
+          <option>departments</option>
+          <option>user_permissions</option>
+          <option>expense_claims</option>
+          <option>cab_bookings</option>
+          <option>profile_updates</option>
+          <option>bank_details</option>
+          <option>tasks</option>
+          <option>meetings</option>
+        </select>
+      </div>
+      <div>
+        <label>Action</label>
+        <select id="fAction">
+          <option value="">All Actions</option>
+          <option>CREATE</option>
+          <option>UPDATE</option>
+          <option>DELETE</option>
+          <option>APPROVE_USER</option>
+          <option>REJECT_USER</option>
+          <option>SUSPEND_USER</option>
+          <option>LOGIN</option>
+          <option>RESET_PASSWORD</option>
+          <option>UPDATE_USER</option>
+          <option>UPDATE_PERMISSIONS</option>
+          <option>CREATE_DEPT</option>
+          <option>UPDATE_DEPT</option>
+        </select>
+      </div>
+      <div>
+        <label>From Date</label>
+        <input type="date" id="fFrom">
+      </div>
+      <div>
+        <label>To Date</label>
+        <input type="date" id="fTo">
+      </div>
+      <div>
+        <label>Actor (User ID)</label>
+        <input type="number" id="fActor" placeholder="User ID">
+      </div>
+      <div>
+        <label>Search / Actor Name</label>
+        <input type="text" id="fSearch" placeholder="Name or action keyword…" oninput="renderTable()">
+      </div>
+      <div>
+        <label>Per Page</label>
+        <select id="fLimit">
+          <option value="50">50</option>
+          <option value="100" selected>100</option>
+          <option value="200">200</option>
+          <option value="500">500</option>
+        </select>
+      </div>
+    </div>
+    <div class="filter-actions">
+      <button class="btn-filter" onclick="loadLogs()">🔍 Apply Filter</button>
+      <button class="btn-reset" onclick="resetFilters()">✕ Reset</button>
+      <span class="result-count" id="resultCount"></span>
+      <button class="btn-export" onclick="exportCSV()">⬇️ Export CSV</button>
+    </div>
+  </div>
+
+  <!-- Table -->
+  <div class="card">
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th onclick="sortBy('created_at')" style="cursor:pointer">Time ⇅</th>
+            <th>Actor</th>
+            <th onclick="sortBy('action')" style="cursor:pointer">Action ⇅</th>
+            <th onclick="sortBy('entity_type')" style="cursor:pointer">Entity ⇅</th>
+            <th>Record ID</th>
+            <th>IP Address</th>
+            <th>Details</th>
+          </tr>
+        </thead>
+        <tbody id="logBody">
+          <tr><td colspan="7" class="empty-state"><div class="icon">⏳</div>Loading…</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="pagination" id="pagination"></div>
+    <div class="pg-info" id="pgInfo"></div>
+  </div>
+</div>
+
+<script>
+const API   = 'http://localhost:5000/api';
+const token = localStorage.getItem('token');
+const user  = JSON.parse(localStorage.getItem('user')||'{}');
+if(!token || user.role_id!==1){ alert('Admin access required'); location.href='login.html'; }
+
+function ap(url){ return fetch(API+url,{headers:{'Authorization':'Bearer '+token}}).then(r=>r.json()); }
+
+let _allLogs = [];
+let _page    = 1;
+const PAGE_SIZE = 20;
+let _sortField = 'created_at';
+let _sortDir   = -1;
+
+/* ── Action pill color ── */
+function pillClass(action){
+  if(!action) return 'pill-default';
+  const a=action.toUpperCase();
+  if(a.includes('CREATE')||a==='INSERT') return 'pill-create';
+  if(a.includes('UPDATE')||a.includes('EDIT')) return 'pill-update';
+  if(a.includes('DELETE')||a.includes('REMOVE')) return 'pill-delete';
+  if(a.includes('APPROVE')) return 'pill-approve';
+  if(a.includes('REJECT')) return 'pill-reject';
+  if(a.includes('LOGIN')) return 'pill-login';
+  if(a.includes('SUSPEND')) return 'pill-suspend';
+  return 'pill-default';
+}
+
+/* ── Load from API ── */
+async function loadLogs(){
+  document.getElementById('logBody').innerHTML='<tr><td colspan="7" class="empty-state"><div class="icon">⏳</div>Loading…</td></tr>';
+  const entity= document.getElementById('fEntity').value;
+  const action= document.getElementById('fAction').value;
+  const from  = document.getElementById('fFrom').value;
+  const to    = document.getElementById('fTo').value;
+  const actor = document.getElementById('fActor').value;
+  const limit = document.getElementById('fLimit').value;
+
+  let url=`/admin/audit-logs?limit=${limit}`;
+  if(entity) url+=`&entity_type=${entity}`;
+  if(from)   url+=`&from_date=${from}`;
+  if(to)     url+=`&to_date=${to}`;
+  if(actor)  url+=`&actor_id=${actor}`;
+
+  try{
+    _allLogs = await ap(url);
+    // Client-side action filter (not supported by backend directly)
+    if(action) _allLogs = _allLogs.filter(function(l){ return (l.action||'').toUpperCase().includes(action); });
+    _page = 1;
+    updateStats();
+    renderTable();
+  } catch(e){
+    document.getElementById('logBody').innerHTML='<tr><td colspan="7" class="empty-state" style="color:#dc2626">Failed to load audit logs.</td></tr>';
+  }
+}
+
+function updateStats(){
+  const today = new Date().toDateString();
+  document.getElementById('statTotal').textContent   = _allLogs.length;
+  document.getElementById('statToday').textContent   = _allLogs.filter(function(l){ return new Date(l.created_at).toDateString()===today; }).length;
+  document.getElementById('statDeletes').textContent = _allLogs.filter(function(l){ return (l.action||'').toUpperCase().includes('DELETE'); }).length;
+  document.getElementById('statLogins').textContent  = _allLogs.filter(function(l){ return (l.action||'').toUpperCase().includes('LOGIN'); }).length;
+}
+
+function renderTable(){
+  const q = (document.getElementById('fSearch').value||'').toLowerCase();
+  let filtered = q ? _allLogs.filter(function(l){
+    return (l.actor_name||'').toLowerCase().includes(q) ||
+           (l.action||'').toLowerCase().includes(q) ||
+           (l.entity_type||'').toLowerCase().includes(q);
+  }) : _allLogs;
+
+  // Sort
+  filtered = filtered.slice().sort(function(a,b){
+    const va = a[_sortField]||'';
+    const vb = b[_sortField]||'';
+    return va < vb ? _sortDir : va > vb ? -_sortDir : 0;
+  });
+
+  const total = filtered.length;
+  document.getElementById('resultCount').textContent = total + ' records';
+
+  const start = (_page-1)*PAGE_SIZE;
+  const page  = filtered.slice(start, start+PAGE_SIZE);
+
+  const tb = document.getElementById('logBody');
+  if(!page.length){
+    tb.innerHTML='<tr><td colspan="7"><div class="empty-state"><div class="icon">🔍</div>No audit logs match your filters.</div></td></tr>';
+  } else {
+    tb.innerHTML = page.map(function(l){
+      let details='';
+      try{
+        const nv = JSON.parse(l.new_values||'{}');
+        const dobj = nv.body||nv;
+        // Mask sensitive bank fields
+        const masked = JSON.parse(JSON.stringify(dobj));
+        if(masked.account_number) masked.account_number='••••'+String(masked.account_number).slice(-4);
+        if(masked.password||masked.password_hash||masked.new_password) masked.password_hash='[redacted]';
+        details = JSON.stringify(masked,null,2);
+      }catch(e){ details=''; }
+      const dt = new Date(l.created_at);
+      return '<tr>'+
+        '<td style="white-space:nowrap;font-size:.78rem">'+
+          '<div style="font-weight:700;color:#1e293b">'+dt.toLocaleDateString('en-IN',{day:'2-digit',month:'short'})+'</div>'+
+          '<div style="color:#64748b">'+dt.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit',second:'2-digit'})+'</div>'+
+        '</td>'+
+        '<td>'+
+          '<div style="font-weight:700;font-size:.82rem">'+(l.actor_name||'System')+'</div>'+
+          '<div style="font-size:.7rem;color:#94a3b8">#'+(l.actor_id||'—')+'</div>'+
+        '</td>'+
+        '<td><span class="action-pill '+pillClass(l.action)+'">'+escHtml(l.action||'—')+'</span></td>'+
+        '<td style="font-size:.8rem;color:#475569">'+escHtml(l.entity_type||'—')+'</td>'+
+        '<td style="font-size:.8rem;color:#64748b">'+escHtml(l.entity_id||'—')+'</td>'+
+        '<td style="font-size:.72rem;color:#94a3b8;white-space:nowrap">'+(l.ip_address||'—')+'</td>'+
+        '<td>'+(details?'<details><summary style="cursor:pointer;color:'+
+          '#1B4F8A;font-size:.75rem;font-weight:700">View</summary>'+
+          '<pre class="details-pre">'+details.replace(/</g,'&lt;')+'</pre></details>':
+          '<span style="color:#cbd5e1;font-size:.75rem">—</span>')+
+        '</td>'+
+      '</tr>';
+    }).join('');
+  }
+
+  // Pagination
+  const totalPages = Math.ceil(total/PAGE_SIZE);
+  const pg = document.getElementById('pagination');
+  if(totalPages<=1){ pg.innerHTML=''; document.getElementById('pgInfo').textContent=''; return; }
+  let html='';
+  if(_page>1) html+='<button class="pg-btn" onclick="goPage('+(_page-1)+')">← Prev</button>';
+  const from2=Math.max(1,_page-3), to2=Math.min(totalPages,_page+3);
+  for(let i=from2;i<=to2;i++) html+='<button class="pg-btn'+(i===_page?' active':'')+'" onclick="goPage('+i+')">'+i+'</button>';
+  if(_page<totalPages) html+='<button class="pg-btn" onclick="goPage('+(_page+1)+')">Next →</button>';
+  pg.innerHTML=html;
+  document.getElementById('pgInfo').textContent='Page '+_page+' of '+totalPages+' ('+total+' records)';
+}
+
+function goPage(p){ _page=p; renderTable(); window.scrollTo(0,0); }
+function sortBy(field){ _sortField=field; _sortDir*=-1; _page=1; renderTable(); }
+function escHtml(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+function resetFilters(){
+  ['fEntity','fAction','fFrom','fTo','fActor','fSearch'].forEach(function(id){
+    const el=document.getElementById(id);
+    if(el) el.value='';
+  });
+  document.getElementById('fLimit').value='100';
+  loadLogs();
+}
+
+/* ── CSV Export ── */
+function exportCSV(){
+  if(!_allLogs.length){ alert('No data to export.'); return; }
+  const q = (document.getElementById('fSearch').value||'').toLowerCase();
+  const rows = q ? _allLogs.filter(function(l){
+    return (l.actor_name||'').toLowerCase().includes(q)||(l.action||'').toLowerCase().includes(q)||(l.entity_type||'').toLowerCase().includes(q);
+  }) : _allLogs;
+
+  const header = ['Time','Actor','Actor ID','Action','Entity','Record ID','IP Address'];
+  const lines  = [header.join(',')];
+  rows.forEach(function(l){
+    lines.push([
+      '"'+new Date(l.created_at).toLocaleString('en-IN')+'"',
+      '"'+(l.actor_name||'System')+'"',
+      l.actor_id||'',
+      '"'+(l.action||'')+'"',
+      '"'+(l.entity_type||'')+'"',
+      l.entity_id||'',
+      '"'+(l.ip_address||'')+'"'
+    ].join(','));
+  });
+  const blob = new Blob([lines.join('\n')], {type:'text/csv'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'audit_log_'+new Date().toISOString().slice(0,10)+'.csv';
+  a.click();
+}
+
+loadLogs();
+</script>
+</body>
+</html>

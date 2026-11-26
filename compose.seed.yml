@@ -1,0 +1,30 @@
+# Used only by scripts/snapshot-db.sh with a new project name per invocation.
+services:
+  db:
+    image: mysql:8.0
+    command: --default-authentication-plugin=mysql_native_password --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    environment:
+      MYSQL_DATABASE: workforce_intelligence
+      MYSQL_USER: seed_user
+      MYSQL_PASSWORD: seed-local
+      MYSQL_ROOT_PASSWORD: seed-local-root
+    tmpfs:
+      - /var/lib/mysql
+    volumes:
+      - ./database/init/02_master.sql:/docker-entrypoint-initdb.d/02_master.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "MYSQL_PWD=seed-local mysql --protocol=TCP -h 127.0.0.1 -u seed_user workforce_intelligence -Nse 'SELECT id FROM wfi_bootstrap WHERE id=1' | grep -qx 1"]
+      interval: 3s
+      timeout: 4s
+      retries: 60
+  seed:
+    build: .
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DB_HOST: db
+      DB_USER: seed_user
+      DB_PASSWORD: seed-local
+      DB_NAME: workforce_intelligence
+    command: ["node", "-e", "require('./backend/services/demoBootstrap').bootstrap().then(()=>require('./backend/services/chatProviders').ensureSchema()).then(()=>process.exit(0)).catch(e=>{console.error(e);process.exit(1)})"]

@@ -1,0 +1,16 @@
+const r = require('express').Router(), c = require('../controllers/recruitmentController');
+const p = require('../middleware/authMiddleware');
+const { staffOrAbove, hrOrAbove } = require('../middleware/authMiddleware');
+r.get('/requisitions',               p, staffOrAbove, c.getRequisitions);
+r.post('/requisitions',              p, staffOrAbove, c.createRequisition);
+r.patch('/requisitions/:id/status',  p, hrOrAbove,    c.updateRequisitionStatus);
+r.post('/ats-score',                 p,               c.scoreResumeText);
+r.get('/resume-templates',           p,               c.getResumeTemplates);
+r.get('/resume-template/:job_id',    p,               c.getTemplateForJob);
+r.get('/prep-notes',                 p,               c.getPrepNotes);
+r.get('/joining-letters',            p, staffOrAbove, c.getJoiningLetters);
+r.post('/joining-letters',           p, hrOrAbove,    c.generateJoiningLetter);
+r.post('/joining-letters/:id/ack',   p,               c.acknowledgeJoiningLetter);
+r.post('/mark-joined',               p, hrOrAbove,    c.markJoined);
+r.get('/funnel',                     p, staffOrAbove, c.getHiringFunnel);
+module.exports = r;

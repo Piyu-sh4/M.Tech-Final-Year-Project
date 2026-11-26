@@ -1,0 +1,11 @@
+**
+!package.json
+!package-lock.json
+!backend/
+!backend/**
+!frontend/
+!frontend/**
+!tests/
+!tests/**
+backend/uploads/
+backend/state/

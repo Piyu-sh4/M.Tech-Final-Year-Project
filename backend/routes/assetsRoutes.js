@@ -1,0 +1,11 @@
+const router=require('express').Router(),ctrl=require('../controllers/assetsController');
+const protect=require('../middleware/authMiddleware');
+const {adminOnly,staffOrAbove}=require('../middleware/authMiddleware');
+const audit=require('../middleware/auditMiddleware');
+router.get('/stats',protect,staffOrAbove,ctrl.getStats);
+router.get('/my',protect,ctrl.getMyAssets);
+router.get('/',protect,staffOrAbove,ctrl.getAll);
+router.post('/',protect,adminOnly,audit('ADD_ASSET','assets'),ctrl.create);
+router.post('/:id/assign',protect,staffOrAbove,audit('ASSIGN_ASSET','asset_assignments'),ctrl.assign);
+router.patch('/:id/return',protect,staffOrAbove,audit('RETURN_ASSET','asset_assignments'),ctrl.returnAsset);
+module.exports=router;

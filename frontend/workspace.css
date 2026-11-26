@@ -1,0 +1,445 @@
+
+
+
+.wfi-skip {
+  position: fixed;
+  top: .5rem;
+  left: .5rem;
+  z-index: 12001;
+  transform: translateY(-150%);
+  padding: .75rem 1rem;
+  background: white;
+  color: #18264a;
+  border-radius: .5rem;
+  font-weight: 700;
+}
+.wfi-skip:focus { transform: none; }
+:is(button, a, input, select, textarea, summary, [tabindex]):focus-visible {
+  outline: 2px solid #536df1;
+  outline-offset: 3px;
+}
+[hidden] { display: none !important; }
+
+.wfi-workspace {
+  --bg: var(--wfi-canvas);
+  --card-bg: var(--wfi-surface);
+  --border: var(--wfi-line);
+  --radius: var(--wfi-radius);
+  --shadow: var(--wfi-shadow);
+  background: var(--wfi-canvas);
+  font-family: var(--wfi-font);
+}
+.wfi-workspace .wiq-wrap { min-width: 0; width: 100%; min-height: 100vh; }
+.wfi-workspace .wiq-main { min-width: 0; max-width: 100%; overflow-wrap: anywhere; }
+.wfi-workspace .wiq-main > .navbar {
+  flex-wrap: wrap;
+  gap: .6rem 1rem !important;
+  height: auto !important;
+  min-height: 60px;
+  padding: .55rem clamp(.75rem, 2.3vw, 1.7rem) !important;
+}
+.wfi-workspace .navbar .nav-brand {
+  color: var(--wfi-ink);
+  display: flex;
+  gap: .4rem;
+  align-items: center;
+  font-weight: 750;
+  min-width: 0;
+  white-space: normal !important;
+}
+.wfi-workspace .navbar .nav-info { flex-wrap: wrap; min-width: 0; gap: .45rem; }
+.wfi-workspace .navbar > * { min-width: 0; }
+.wfi-workspace .wiq-sidebar {
+  background: #121c32 !important;
+  color: #dce5fb;
+  border-right: 1px solid #283650;
+}
+.wfi-workspace .wiq-sidebar nav.wiq-nav {
+  position: static !important;
+  display: block !important;
+  height: auto !important;
+  background: transparent !important;
+  padding: .45rem .4rem .8rem !important;
+  box-shadow: none !important;
+}
+.wfi-workspace .wiq-sidebar .wiq-nav-item a {
+  display: flex !important;
+  align-items: center;
+  gap: .55rem;
+  min-height: 38px;
+  margin-inline: .2rem;
+  padding: .46rem .56rem;
+  border-radius: .55rem;
+  color: #dce5fb !important;
+  text-decoration: none !important;
+  line-height: 1.25;
+}
+.wfi-workspace .wiq-sidebar a:hover { background: #273957; }
+.wfi-workspace .wiq-sidebar a[aria-current="page"] { background: #32498c; color: #fff !important; }
+.wfi-workspace .wiq-sidebar .wfi-nav-first a {
+  background: #243663;
+  border: 1px solid #6579b1;
+  font-weight: 700;
+  margin: .25rem .2rem .7rem;
+}
+.wfi-workspace .wiq-sidebar .wiq-nav-group-label { color: #b7c6e6 !important; }
+.wfi-workspace .wiq-sidebar .wiq-nav-group-label[role="button"] { cursor: pointer; }
+.wfi-workspace .dashboard {
+  width: 100%;
+  max-width: 1400px !important;
+  padding-inline: clamp(.8rem, 2.4vw, 2rem);
+}
+.wfi-workspace .dashboard :is(.grid-2, .grid-3, .grid-4) > * { min-width: 0; }
+.wfi-workspace .card { border: 1px solid var(--wfi-line); border-radius: var(--wfi-radius); }
+.wfi-workspace :is(.tab-nav, .filter-bar, .form-row, .btn-row) { flex-wrap: wrap; }
+.wfi-workspace :is(input, textarea, select, button) { max-width: 100%; }
+.wfi-workspace :is(input, select, textarea) { min-width: 0; }
+.wfi-workspace :is(.modal-box, .modal-content) {
+  max-width: calc(100% - 1rem);
+  max-height: min(90vh, 90dvh);
+  overflow: auto;
+}
+
+.wfi-dashboard-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1.1rem;
+  margin: 0 0 1rem;
+  padding: clamp(1rem, 2.7vw, 2.1rem);
+  color: var(--wfi-ink);
+  border: 1px solid var(--wfi-line);
+  background: linear-gradient(120deg, var(--wfi-surface) 40%, var(--wfi-accent));
+  border-radius: 20px;
+}
+.wfi-dashboard-heading p { color: var(--wfi-muted); margin: .4rem 0 0; font-size: .92rem; }
+.wfi-dashboard-heading .wfi-kicker { margin: 0 0 .4rem; color: var(--wfi-muted); font-size: .72rem; font-weight: 750; letter-spacing: .12em; text-transform: uppercase; }
+.wfi-dashboard-heading h1 { color: var(--wfi-ink); margin: 0; font-size: clamp(1.65rem, 3.6vw, 2.7rem); line-height: 1.12; letter-spacing: -.04em; }
+.wfi-dashboard-heading a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: .6rem .9rem;
+  border-radius: .7rem;
+  background: var(--wfi-brand);
+  color: var(--wfi-on-brand);
+  text-decoration: none;
+  font-weight: 650;
+  font-size: .88rem;
+}
+.wfi-dashboard-heading a:hover { background: var(--wfi-brand-hover); }
+.wfi-workspace .stats-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 135px), 1fr));
+  gap: .7rem;
+}
+.wfi-workspace .stat-card { min-width: 0; border: 1px solid var(--wfi-line); padding: .9rem; border-radius: .85rem; text-align: left; }
+.wfi-workspace .stat-num { font-variant-numeric: tabular-nums; }
+.wfi-workspace .stat-label { white-space: normal; }
+.wfi-workspace .tab-nav { gap: .4rem; }
+.wfi-workspace .tab-nav button { min-height: 42px; }
+.wfi-workspace .tab-btn.active { box-shadow: inset 0 -2px 0 currentColor; }
+.wfi-table-scroll {
+  max-width: 100%;
+  min-width: 0;
+  overflow-x: auto;
+  overscroll-behavior-inline: contain;
+}
+.wfi-table-scroll > table { width: 100%; }
+.wfi-mobile-menu, .wfi-drawer-close, .wfi-drawer-backdrop, .wfi-chat-controls { display: none; }
+.wfi-policy :is(nav, .navbar) {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .65rem;
+  height: auto;
+}
+.wfi-policy :is(nav, .navbar) > div { display: flex; gap: .55rem; flex-wrap: wrap; min-width: 0; }
+.wfi-policy .container, .wfi-policy main { min-width: 0; max-width: 100%; overflow-wrap: anywhere; }
+.wfi-policy .cookie-table { min-width: 32rem; }
+
+@media (max-width: 1000px) {
+  .wfi-workspace .wiq-wrap { display: block !important; }
+  .wfi-workspace .wiq-main { width: auto !important; margin: 0 !important; }
+  .wfi-workspace .wiq-sidebar {
+    position: fixed !important;
+    z-index: 12000 !important;
+    inset: 0 auto 0 0 !important;
+    width: min(19rem, 86vw) !important;
+    min-width: 0 !important;
+    max-width: 100%;
+    height: 100dvh !important;
+    padding-bottom: max(1rem, env(safe-area-inset-bottom));
+    overflow: auto !important;
+    overscroll-behavior: contain;
+    transform: translateX(-105%) !important;
+    visibility: hidden;
+  }
+  .wfi-workspace.wfi-drawer-open { overflow: hidden; }
+  .wfi-workspace.wfi-drawer-open .wiq-sidebar {
+    transform: none !important;
+    visibility: visible;
+    box-shadow: 0 0 40px rgb(0 0 0 / 30%);
+  }
+  .wfi-workspace.wfi-drawer-open .wfi-drawer-backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 11999;
+    background: rgb(15 23 42 / 62%);
+    border: 0;
+  }
+  .wfi-workspace .wiq-mob-toggle { display: none !important; }
+  .wfi-mobile-menu, .wfi-drawer-close, .wfi-chat-controls {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: .4rem;
+    min-height: 44px;
+    padding: .4rem .7rem;
+    border-radius: .65rem;
+    font: 650 .86rem var(--wfi-font);
+    cursor: pointer;
+  }
+  .wfi-mobile-menu, .wfi-chat-controls { background: var(--wfi-accent); border: 1px solid var(--wfi-line); color: var(--wfi-ink); }
+  .wfi-drawer-close { margin: .65rem .75rem; color: #fff; border: 1px solid #6c80b3; background: #192a52; }
+  .wfi-workspace .navbar > div[style="flex:1"] { display: none; }
+  .wfi-workspace .navbar .nav-info { margin-inline-start: auto; flex-shrink: 1 !important; }
+  .wfi-workspace .navbar .nav-brand { flex-shrink: 1 !important; }
+  .wfi-workspace .settings-layout { display: block !important; }
+  .wfi-workspace .settings-sidebar {
+    display: flex !important;
+    position: static !important;
+    width: auto !important;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: .45rem;
+    padding: .75rem;
+  }
+  .wfi-workspace .settings-sidebar h3 { flex: 0 0 100%; }
+  .wfi-workspace .settings-sidebar .sidebar-link { width: auto; min-height: 44px; }
+  .wfi-workspace .settings-main { min-width: 0; padding: clamp(.75rem, 2vw, 1.5rem); }
+  body.wfi-workspace.chat-page .chat-layout {
+    display: flex !important;
+    flex-direction: column;
+    width: 100%;
+    height: auto !important;
+    min-height: 70dvh;
+  }
+  .wfi-chat-controls { align-self: flex-start; margin: .65rem .75rem; }
+  body.wfi-workspace.chat-page .chat-sidebar { display: none !important; }
+  body.wfi-workspace.chat-page .chat-layout.wfi-context-open .chat-sidebar {
+    display: block !important;
+    width: auto !important;
+    max-height: 48dvh;
+    margin: 0 .75rem .75rem;
+    border-radius: .8rem;
+    border: 1px solid var(--wfi-line);
+    overflow: auto;
+  }
+  .wfi-workspace .chat-main, .wfi-workspace .chat-messages { min-width: 0; }
+  .wfi-workspace .chat-main { min-height: 60dvh; }
+  .wfi-workspace .chat-messages { flex: 1 1 auto; min-height: 34dvh; }
+  .wfi-workspace .chat-input-area { padding-inline: .65rem; }
+  .wfi-workspace :is(#floatChatPanel, .float-chat-panel) { max-width: calc(100vw - 1rem); max-height: 75dvh; right: .5rem !important; }
+}
+
+@media (max-width: 630px) {
+  .wfi-workspace .navbar .nav-info { margin: 0; width: 100%; }
+  .wfi-workspace .navbar .nav-info :is(a, button) { min-height: 40px; display: inline-flex; align-items: center; }
+  .wfi-workspace .dashboard { padding-inline: .75rem; }
+  .wfi-workspace .stats-row { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
+  .wfi-workspace .dashboard :is(.grid-2, .grid-3, .grid-4, .grid2, .grid4) { grid-template-columns: minmax(0, 1fr) !important; }
+  .wfi-workspace .wiq-main :is(.dashboard, .settings-main, .modal-box, .modal-content) [style*="grid-template-columns"] {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+  .wfi-workspace :is(input:not([type=checkbox]):not([type=radio]), textarea, select) { font-size: max(1rem, 16px); }
+  .wfi-workspace :is(.dt-weather-bar, .clock-widget) { flex-wrap: wrap; }
+  .wfi-policy :is(nav, .navbar) > div { width: 100%; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .wfi-workspace .wiq-sidebar, .wfi-mobile-menu, .wfi-drawer-close { transition: none !important; }
+}
+@media print {
+  .wfi-skip, .wfi-mobile-menu, .wfi-drawer-close, .wfi-drawer-backdrop, .wfi-chat-controls { display: none !important; }
+  .wfi-table-scroll { overflow: visible; }
+}
+
+.wfi-login {
+  min-height: 100dvh;
+  margin: 0;
+  background: #f3f5fb;
+  color: #19233b;
+  font-family: var(--wfi-font);
+}
+.wfi-login .auth-shell {
+  min-height: 100dvh;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+}
+.wfi-login .auth-intro {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 2rem;
+  padding: clamp(1.5rem, 5vw, 5rem);
+  background: radial-gradient(ellipse at 80% 100%, #3852b8, transparent 60%), #142144;
+  color: #f1f4ff;
+}
+.wfi-login .auth-brand { color: inherit; display: flex; align-items: center; gap: .7rem; font-weight: 750; text-decoration: none; }
+.wfi-login .auth-mark {
+  display: grid;
+  place-items: center;
+  height: 2.5rem;
+  width: 2.5rem;
+  flex: 0 0 2.5rem;
+  border-radius: .75rem;
+  color: #fff;
+  background: #4762e7;
+  font-weight: 800;
+}
+.wfi-login .auth-intro h2 {
+  max-width: 13ch;
+  margin: .5rem 0 .9rem;
+  font-size: clamp(2rem, 4.2vw, 4.1rem);
+  letter-spacing: -.06em;
+  line-height: 1.04;
+}
+.wfi-login .auth-intro p { max-width: 40ch; color: #d2ddfc; line-height: 1.6; }
+.wfi-login .auth-intro .auth-kicker { font-size: .75rem; font-weight: 750; text-transform: uppercase; letter-spacing: .12em; }
+.wfi-login .auth-side { display: grid; place-items: center; padding: clamp(.8rem, 3vw, 2rem); }
+.wfi-login .sign-in-card {
+  box-sizing: border-box;
+  width: min(100%, 28rem);
+  padding: clamp(1rem, 3vw, 2rem);
+  background: #fff;
+  border: 1px solid var(--wfi-line);
+  border-radius: 1.2rem;
+  box-shadow: var(--wfi-shadow);
+}
+.wfi-login .sign-in-card h1 { color: #19233b; font-size: clamp(1.65rem, 3.2vw, 2.2rem); letter-spacing: -.04em; margin: 0; }
+.wfi-login .sign-in-card > p { color: #55637e; margin: .5rem 0 1rem; }
+.wfi-login .sign-in-card .form-group { margin: 0 0 .95rem; }
+.wfi-login .sign-in-card label { display: block; color: #24334f; font-weight: 650; margin-bottom: .3rem; }
+.wfi-login .sign-in-card input {
+  width: 100%;
+  min-width: 0;
+  min-height: 46px;
+  padding: .6rem .75rem;
+  background: #fff;
+  color: #19233b;
+  border: 1px solid #b9c5dc;
+  border-radius: .65rem;
+  font: 1rem var(--wfi-font);
+}
+.wfi-login .sign-in-card .btn-login {
+  min-height: 46px;
+  width: 100%;
+  padding: .7rem;
+  border: 0;
+  border-radius: .65rem;
+  color: var(--wfi-on-brand);
+  background: var(--wfi-brand);
+  font: 700 1rem var(--wfi-font);
+  cursor: pointer;
+}
+.wfi-login .sign-in-card .btn-login:hover { background: var(--wfi-brand-hover); }
+.wfi-login .sign-in-card .btn-login:disabled { opacity: .68; cursor: wait; }
+.wfi-login #msg { display: block; font-size: .86rem; margin-top: .7rem; color: #295b47; }
+.wfi-login #msg.error { color: #992638; }
+.wfi-login #msg:empty { display: none; }
+.wfi-login .sign-in-card .auth-link { text-align: left; margin: .9rem 0; color: #55637e; }
+.wfi-login .sign-in-card a { color: #3048ba; }
+.wfi-login .sign-in-card details { color: #435374; border-top: 1px solid var(--wfi-line); padding-top: .75rem; overflow-wrap: anywhere; font-size: .83rem; }
+.wfi-login .sign-in-card summary { cursor: pointer; font-weight: 700; }
+.wfi-login .sign-in-card details p { margin: .45rem 0; }
+@media (max-width: 760px) {
+  .wfi-login .auth-shell { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto 1fr; }
+  .wfi-login .auth-intro { padding: 1rem 1rem 1.2rem; gap: .6rem; }
+  .wfi-login .auth-intro h2 { max-width: none; font-size: clamp(1.4rem, 6vw, 2.3rem); margin: .35rem 0 .25rem; }
+  .wfi-login .auth-intro p { font-size: .85rem; }
+  .wfi-login .auth-intro .auth-kicker, .wfi-login .auth-intro .auth-footer { display: none; }
+  .wfi-login .auth-side { align-items: start; padding-block: 1rem; }
+}
+body.wfi-landing .features-grid { grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr)); }
+body.wfi-landing .mockup-screen, body.wfi-landing .mockup-main, body.wfi-landing .hero-visual { min-width: 0; max-width: 100%; }
+body.wfi-landing .mockup-screen > * { min-width: 0; }
+@media (max-width: 480px) {
+  body.wfi-landing .mockup-main { padding: .65rem; }
+  body.wfi-landing :is(.mockup-topbar, .hero-actions) { flex-wrap: wrap; }
+}
+
+.wfi-perquisite-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr));
+  gap: .75rem;
+  margin-bottom: .75rem;
+}
+.wfi-perquisite-grid > div { min-width: 0; }
+.wfi-perquisite-grid :is(input, select) { width: 100%; min-width: 0; }
+body.wfi-landing .policy-grid { grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr)); }
+@media (max-width: 630px) {
+  .wfi-policy .navbar {
+    flex-wrap: wrap !important;
+    padding: .55rem .75rem !important;
+    min-height: 52px;
+    height: auto !important;
+    max-width: 100%;
+  }
+  .wfi-policy .navbar :is(a, .nav-brand, .nav-logo-name, .nn, #nNm) { white-space: normal !important; }
+  .wfi-policy .navbar > div { margin-inline-start: 0 !important; }
+  .wfi-policy .main .ph { flex-wrap: wrap; }
+  .wfi-policy .main .ph > div { flex-wrap: wrap; min-width: 0; }
+  .wfi-workspace .tab-nav > .tab-btn { min-width: 0; max-width: 100%; white-space: normal !important; }
+  body.wfi-landing .mockup-kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  body.wfi-landing .policy-wrap { padding: 1rem; }
+}
+ .wfi-overview-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,180px),1fr)); gap:14px; }
+ .wfi-overview-grid a { display:grid; gap:8px; padding:20px; border-radius:14px; background:#f1f6fc; border:1px solid #dbe5f1; color:#24466e; text-decoration:none; }
+ .wfi-overview-grid strong { font-size:1.8rem; }
+ .wfi-overview-grid span { font-size:.88rem; }
+/* Compact two-row dashboard navigation on phones. Keep the brand and menu
+   independent of action widths so neither can collapse into broken words. */
+@media (max-width: 600px) {
+  .wfi-workspace .wiq-main > .navbar {
+    display:grid !important;
+    grid-template-columns:44px minmax(0,1fr);
+    gap:12px !important;
+    padding:12px 16px !important;
+    overflow:visible;
+    border-bottom:1px solid var(--wfi-line);
+    box-shadow:0 3px 14px rgb(25 35 59 / 5%);
+  }
+  .wfi-workspace .navbar .wfi-mobile-menu {
+    width:44px; height:44px; padding:0; flex-shrink:0;
+    font-size:0; white-space:nowrap; overflow:hidden;
+  }
+  .wfi-workspace .navbar .wfi-mobile-menu::before {content:'☰';font-size:22px;}
+  .wfi-workspace .navbar .nav-brand {
+    display:flex; flex-wrap:nowrap; white-space:nowrap !important;
+    overflow:hidden; font-size:14px !important; line-height:1.3;
+    word-break:normal; overflow-wrap:normal;
+  }
+  .wfi-workspace .navbar .nav-brand * {white-space:nowrap !important;word-break:normal;overflow-wrap:normal;}
+  .wfi-workspace .navbar .nav-info {
+    grid-column:1 / -1; width:100%; margin:0 !important;
+    display:flex !important; flex-wrap:wrap; gap:8px !important;
+  }
+  .wfi-workspace .navbar .nav-info > :is(a,button) {
+    flex:1 1 calc(50% - 8px); min-width:0; min-height:40px;
+    display:inline-flex !important; align-items:center; justify-content:center;
+    padding:8px !important; margin:0 !important; border-radius:10px !important;
+    font-size:12px !important; white-space:nowrap;
+  }
+  .wfi-workspace .navbar .nav-info > span {display:none !important;}
+}
+.wfi-shortcuts {display:flex;gap:8px;overflow-x:auto;max-width:100%;min-width:0;padding:10px 16px;background:var(--wfi-surface);border-bottom:1px solid var(--wfi-line);scrollbar-width:thin;}
+.wfi-shortcuts a {display:inline-flex;align-items:center;flex:0 0 auto;min-height:40px;padding:8px 12px;color:var(--wfi-ink);background:var(--wfi-canvas);border:1px solid var(--wfi-line);border-radius:10px;text-decoration:none;white-space:nowrap;font:600 13px var(--wfi-font);}
+.wfi-shortcuts a:hover {background:var(--wfi-accent);color:var(--wfi-brand);}
+.wfi-workspace .navbar .logo-version:empty {display:none !important;}
+@media (max-width:360px) {
+ .wfi-workspace .navbar .nav-brand,.wfi-workspace .navbar .nav-brand .logo-text {font-size:12px !important;}
+}
+
+.wfi-dashboard-actions { display:flex; flex-wrap:wrap; gap:8px; }
+.wfi-dashboard-actions [hidden] { display:none; }

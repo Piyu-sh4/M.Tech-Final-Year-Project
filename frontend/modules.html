@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Modules · Workforce Intelligence</title>
+  <link rel="stylesheet" href="/workspace.css">
+  <link rel="stylesheet" href="/modules.css">
+  <link rel="stylesheet" href="/finance.css">
+  <script src="/finance.js" defer></script>
+  <script src="/record-dialog.js" defer></script>
+  <script src="/training-assessment.js" defer></script>
+  <script src="/modules.js" defer></script>
+  <link rel="stylesheet" href="/navigation.css">
+  <script src="/navigation.js" defer></script>
+
+<script src="/appearance.js" defer></script>
+<script src="/vendor/passkey-browser.js" defer></script><script src="/passkeys.js" defer></script>
+
+<link rel="stylesheet" href="/preferences.css">
+<link rel="stylesheet" href="/theme.css">
+</head>
+<body class="wfi-module-page">
+  <a class="wfi-skip" href="#main-content">Skip to content</a>
+  <header class="workspace-header">
+    <a class="brand" href="/modules.html"><span class="brand-mark" aria-hidden="true">W</span><span>Workforce Intelligence</span></a>
+    <nav aria-label="Main navigation">
+      <a id="dashboard" href="/employee-dashboard.html">Dashboard</a>
+      <a id="modules-nav" href="/modules.html">Modules</a>
+      <a href="/tasks.html">Tasks</a>
+      <a href="/projects.html">Projects</a>
+      <a href="/helpdesk.html">Helpdesk</a>
+      <button type="button" id="history-back" aria-label="Go back">← Back</button>
+      <button type="button" id="history-forward" aria-label="Go forward">Forward →</button>
+    </nav>
+    <button id="signout" type="button">Sign out</button>
+  </header>
+  <main id="main-content" tabindex="-1">
+    <div class="page-heading wfi-page-lead">
+      <div class="page-heading-text">
+        <a class="back-link" id="back-to-modules" href="/modules.html" hidden>← All modules</a>
+        <p id="context" class="eyebrow">Workforce workspace</p>
+        <h1 id="title">Modules</h1>
+        <p id="intro"></p>
+      </div>
+      <div id="actions"></div>
+    </div>
+    <p id="message" role="status" aria-live="polite">Loading…</p>
+    <div id="workspace"></div>
+  </main>
+  <template id="directory-template">
+    <div class="directory-controls">
+      <div class="directory-search">
+        <label class="filter">Find a module <input id="find-module" type="search" placeholder="Search by module name"></label>
+        <button type="button" id="clear-module-filters" hidden>Clear filters</button>
+      </div>
+      <div id="module-categories" aria-label="Module categories"></div>
+    </div>
+    <p id="module-results" class="module-results" role="status"></p>
+    <div id="module-list"></div>
+  </template>
+  <template id="records-template">
+    <dialog id="record-form" aria-labelledby="record-form-heading"></dialog>
+    <section class="records-surface" aria-label="Records">
+      <div class="toolbar">
+        <label class="filter">Search records <input id="search" type="search" placeholder="Search this register"></label>
+        <div class="toolbar-actions">
+          <button id="refresh" type="button">Refresh</button>
+          <button id="export" type="button" disabled>Export CSV</button>
+          <button id="export-excel" type="button" disabled>Export Excel</button>
+        </div>
+      </div>
+      <div class="record-results">
+        <p id="count" aria-live="polite"></p>
+        <button type="button" id="clear-record-search" hidden>Clear search</button>
+      </div>
+      <div class="table-wrap"><table role="table"><thead role="rowgroup"></thead><tbody role="rowgroup"></tbody></table></div>
+      <nav class="pagination" aria-label="Record pages" hidden>
+        <button id="prev-page" type="button">Previous</button>
+        <span id="page-indicator" aria-live="polite"></span>
+        <button id="next-page" type="button">Next</button>
+      </nav>
+    </section>
+  </template>
+</body>
+</html>

@@ -1,0 +1,13 @@
+const r = require('express').Router(), c = require('../controllers/cabSafetyController');
+const p = require('../middleware/authMiddleware');
+const { staffOrAbove } = require('../middleware/authMiddleware');
+const { readBooking } = require('../middleware/cabAccess');
+r.get('/vehicle/:booking_id',       p, readBooking, c.getVehicleDetails);
+r.post('/assign-driver',            p, staffOrAbove, c.assignDriver);
+r.get('/driver/:driver_id/id-card', p, staffOrAbove, c.getDriverIdCard);
+r.get('/driver-cards',              p, staffOrAbove, c.getAllDriverIdCards);
+r.get('/tracking/:booking_id',      p, readBooking, c.getLiveTrackingDetails);
+r.get('/facilities',                p, c.getLocationFacilities);
+r.get('/helplines',                 p, c.getEmergencyHelplines);
+r.get('/panel/:booking_id',         p, readBooking, c.getBookingSafetyPanel);
+module.exports = r;

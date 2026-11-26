@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Leave Management – Workforce Intelligence v6.0</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+  body{background:#F0F4F8}
+  .page-wrap{max-width:1200px;margin:0 auto;padding:24px}
+  .card{background:#fff;border-radius:12px;padding:24px;margin-bottom:24px;box-shadow:0 2px 12px rgba(0,0,0,.08)}
+  .form-row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .form-group{margin-bottom:14px}
+  .form-group label{display:block;font-weight:600;color:#1B4F8A;margin-bottom:5px;font-size:13px}
+  .form-group input,.form-group select,.form-group textarea{width:100%;padding:9px 12px;border:1px solid #BDC3C7;border-radius:7px;font-size:14px;box-sizing:border-box}
+  .btn{padding:9px 22px;border:none;border-radius:7px;font-weight:600;cursor:pointer;font-size:14px}
+  .btn-primary{background:#1B4F8A;color:#fff}
+  .btn-success{background:#27AE60;color:#fff}
+  .btn-danger{background:#C0392B;color:#fff}
+  .btn-sm{padding:5px 14px;font-size:12px;border-radius:5px;border:none;font-weight:600;cursor:pointer}
+  table{width:100%;border-collapse:collapse;font-size:13px}
+  th{background:#1B4F8A;color:#fff;padding:10px 12px;text-align:left}
+  td{padding:9px 12px;border-bottom:1px solid #EEF2F7}
+  tr:hover td{background:#F8FAFB}
+  .badge{padding:3px 10px;border-radius:12px;font-size:11px;font-weight:700}
+  .badge.pending{background:#FEF9E7;color:#D4AC0D}
+  .badge.approved{background:#D5F5E3;color:#1E8449}
+  .badge.rejected{background:#FADBD8;color:#C0392B}
+  .badge.cancelled{background:#EEF2F7;color:#5D6D7E}
+  .tabs{display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap}
+  .tab{padding:9px 22px;border-radius:8px;border:2px solid #BDC3C7;background:#fff;color:#5D6D7E;font-weight:600;cursor:pointer;font-size:14px}
+  .tab.active{background:#1B4F8A;color:#fff;border-color:#1B4F8A}
+  #msg{padding:11px 16px;border-radius:8px;margin-bottom:16px;display:none}
+  #msg.success{background:#D5F5E3;color:#1E8449;display:block}
+  #msg.error{background:#FADBD8;color:#C0392B;display:block}
+  .days-count{font-size:22px;font-weight:700;color:#1B4F8A;text-align:center;padding:10px;background:#D6EAF8;border-radius:8px}
+  /* Leave Balance Cards */
+  .balance-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:12px;margin-bottom:20px}
+  .bal-card{background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:10px;padding:14px;text-align:center}
+  .bal-num{font-size:2rem;font-weight:800;color:#1B4F8A}
+  .bal-type{font-size:.78rem;font-weight:700;color:#64748b;margin-top:2px;text-transform:capitalize}
+  .bal-sub{font-size:.72rem;color:#94a3b8;margin-top:3px}
+  .bal-card.low .bal-num{color:#C0392B}
+  .bal-card.ok  .bal-num{color:#27AE60}
+  /* Holiday list */
+  .holiday-item{display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border:1px solid #e2e8f0;border-radius:8px;margin-bottom:8px;font-size:13px}
+  .holiday-item:nth-child(even){background:#f8fafc}
+  .hol-badge{padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;background:#D6EAF8;color:#1B4F8A}
+  .hol-badge.company{background:#D5F5E3;color:#1E8449}
+  .hol-badge.optional{background:#FEF9E7;color:#D4AC0D}
+</style>
+</head>
+<body>
+<nav class="navbar">
+  <div class="nav-brand">⚡ Workforce Intelligence</div>
+  <div class="nav-links">
+    <a href="salary.html" style="color:#fff">💰 Salary</a>
+    <a href="profile.html" style="color:#fff;margin-left:16px">👤 Profile</a>
+    <a href="javascript:history.back()" style="color:#fff;margin-left:16px">← Back</a>
+    <a href="login.html" onclick="localStorage.clear()" style="color:#fff;margin-left:16px">Logout</a>
+  </div>
+</nav>
+<div class="page-wrap">
+  <h2>🏖️ Leave Management</h2>
+
+  <!-- Leave Balance Cards (always visible) -->
+  <div id="balanceSection" class="card">
+    <h3 style="margin-top:0;color:#1B4F8A">📊 My Leave Balance — <span id="balYear"></span></h3>
+    <div class="balance-grid" id="balanceGrid"><p style="color:#94a3b8">Loading balances…</p></div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab('my')">📋 My Leaves</button>
+    <button class="tab" onclick="switchTab('request')">➕ Request Leave</button>
+    <button class="tab" onclick="switchTab('holidays')">🗓️ Holidays</button>
+    <button class="tab admin-only" onclick="switchTab('all')" style="display:none">👥 All Requests</button>
+    <button class="tab admin-only" onclick="switchTab('balances')" style="display:none">⚙️ Manage Balances</button>
+    <button class="tab admin-only" onclick="switchTab('addholiday')" style="display:none">➕ Add Holiday</button>
+  </div>
+
+  <div id="msg"></div>
+
+  <!-- MY LEAVES -->
+  <div id="tab-my" class="card">
+    <h3 style="margin-top:0;color:#1B4F8A">My Leave History</h3>
+    <table><thead><tr><th>Type</th><th>From</th><th>To</th><th>Days</th><th>Reason</th><th>Status</th><th>Reviewer</th><th>Action</th></tr></thead>
+    <tbody id="myLeaveTable"><tr><td colspan="8" style="text-align:center;color:#999">Loading…</td></tr></tbody></table>
+  </div>
+
+  <!-- REQUEST LEAVE -->
+  <div id="tab-request" class="card" style="display:none">
+    <h3 style="margin-top:0;color:#1B4F8A">Submit Leave Request</h3>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Leave Type</label>
+        <select id="leaveType" onchange="calcDays()">
+          <option value="sick">🤒 Sick Leave</option>
+          <option value="casual" selected>🌿 Casual Leave</option>
+          <option value="earned">✅ Earned Leave</option>
+          <option value="half_day">🌓 Half Day</option>
+          <option value="unpaid">💸 Unpaid Leave</option>
+          <option value="other">📌 Other</option>
+        </select>
+      </div>
+      <div id="daysCalc" class="days-count">— days</div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>From Date *</label>
+        <input type="date" id="fromDate" onchange="calcDays()">
+      </div>
+      <div class="form-group" id="toDateGroup">
+        <label>To Date *</label>
+        <input type="date" id="toDate" onchange="calcDays()">
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Reason</label>
+      <textarea id="leaveReason" rows="3" placeholder="Brief reason for leave..."></textarea>
+    </div>
+    <button class="btn btn-primary" onclick="submitLeave()">📤 Submit Request</button>
+  </div>
+
+  <!-- HOLIDAYS -->
+  <div id="tab-holidays" class="card" style="display:none">
+    <h3 style="margin-top:0;color:#1B4F8A">🗓️ Company Holiday Calendar — <span id="holYear"></span></h3>
+    <div id="holidayList"><p style="color:#94a3b8">Loading…</p></div>
+  </div>
+
+  <!-- ALL REQUESTS (Admin/Manager/HR) -->
+  <div id="tab-all" class="card" style="display:none">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:10px">
+      <h3 style="margin:0;color:#1B4F8A">All Leave Requests</h3>
+      <div style="display:flex;gap:10px">
+        <select id="filterStatus" onchange="loadAll()" style="padding:7px 12px;border:1px solid #BDC3C7;border-radius:7px;font-size:13px">
+          <option value="">All Status</option><option>pending</option><option>approved</option><option>rejected</option>
+        </select>
+        <button class="btn btn-primary btn-sm" onclick="loadAll()">🔄 Refresh</button>
+      </div>
+    </div>
+    <table><thead><tr><th>Employee</th><th>Dept</th><th>Type</th><th>From</th><th>To</th><th>Days</th><th>Reason</th><th>Status</th><th>Actions</th></tr></thead>
+    <tbody id="allLeaveTable"><tr><td colspan="9" style="text-align:center;color:#999">Loading…</td></tr></tbody></table>
+  </div>
+
+  <!-- MANAGE BALANCES (Admin) -->
+  <div id="tab-balances" class="card" style="display:none">
+    <h3 style="margin-top:0;color:#1B4F8A">⚙️ Update Employee Leave Balance</h3>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Employee ID</label>
+        <input type="number" id="balUserId" placeholder="User ID">
+      </div>
+      <div class="form-group">
+        <label>Year</label>
+        <input type="number" id="balYear2" placeholder="2025">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Leave Type</label>
+        <select id="balType">
+          <option>sick</option><option>casual</option><option>earned</option><option>unpaid</option><option>other</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Entitled Days</label>
+        <input type="number" id="balEntitled" placeholder="12">
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Carry Forward Days</label>
+      <input type="number" id="balCarry" placeholder="0">
+    </div>
+    <button class="btn btn-primary" onclick="saveBalance()">💾 Save Balance</button>
+  </div>
+
+  <!-- ADD HOLIDAY (Admin) -->
+  <div id="tab-addholiday" class="card" style="display:none">
+    <h3 style="margin-top:0;color:#1B4F8A">➕ Add Holiday</h3>
+    <div class="form-row">
+      <div class="form-group"><label>Holiday Name *</label><input type="text" id="holName" placeholder="e.g. Republic Day"></div>
+      <div class="form-group"><label>Date *</label><input type="date" id="holDate"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Type</label>
+        <select id="holType"><option>public</option><option>company</option><option>optional</option></select>
+      </div>
+      <div class="form-group"><label>Description</label><input type="text" id="holDesc" placeholder="Optional"></div>
+    </div>
+    <button class="btn btn-primary" onclick="addHoliday()">Add Holiday</button>
+  </div>
+</div>
+
+<script>
+const API   = 'http://localhost:5000/api';
+const token = localStorage.getItem('token');
+const user  = JSON.parse(localStorage.getItem('user') || '{}');
+if (!token) location.href = 'login.html';
+
+const isElevated = [1,3,4].includes(user.role_id);
+if (isElevated) document.querySelectorAll('.admin-only').forEach(e => e.style.display = '');
+document.getElementById('balYear').textContent  = new Date().getFullYear();
+document.getElementById('holYear').textContent  = new Date().getFullYear();
+document.getElementById('fromDate').min = new Date().toISOString().slice(0,10);
+document.getElementById('toDate').min   = new Date().toISOString().slice(0,10);
+if (document.getElementById('balYear2')) document.getElementById('balYear2').value = new Date().getFullYear();
+
+function ap(url, opts={}) {
+  return fetch(API+url, { headers:{'Authorization':'Bearer '+token,'Content-Type':'application/json'}, ...opts }).then(r=>r.json());
+}
+function showMsg(txt, type) {
+  const m=document.getElementById('msg'); m.textContent=txt; m.className=type;
+  setTimeout(()=>{m.className='';m.textContent='';},4500);
+}
+function fmt(d){ return d?new Date(d).toLocaleDateString('en-IN'):'—'; }
+function badge(s){ return `<span class="badge ${s}">${s.charAt(0).toUpperCase()+s.slice(1)}</span>`; }
+
+function switchTab(tab) {
+  ['my','request','holidays','all','balances','addholiday'].forEach(t=>{
+    const el=document.getElementById('tab-'+t);
+    if(el) el.style.display = t===tab?'':'none';
+  });
+  document.querySelectorAll('.tab').forEach(el=>el.classList.remove('active'));
+  event.target.classList.add('active');
+  if(tab==='my')        loadMy();
+  if(tab==='all')       loadAll();
+  if(tab==='holidays')  loadHolidays();
+}
+
+function calcDays() {
+  const lt = document.getElementById('leaveType').value;
+  const tog = document.getElementById('toDateGroup');
+  if(lt==='half_day'){ tog.style.opacity='.4'; document.getElementById('daysCalc').textContent='0.5 day'; return; }
+  tog.style.opacity='1';
+  const f=document.getElementById('fromDate').value, t=document.getElementById('toDate').value;
+  if(f&&t){ const d=Math.max(1,Math.ceil((new Date(t)-new Date(f))/86400000)+1); document.getElementById('daysCalc').textContent=`${d} day${d>1?'s':''}`; }
+}
+
+async function loadBalance() {
+  const yr=new Date().getFullYear();
+  try {
+    const data = await ap(`/admin/leave-balances/my?year=${yr}`);
+    const grid = document.getElementById('balanceGrid');
+    if(!data.length){ grid.innerHTML='<p style="color:#94a3b8">No balance data. Contact HR.</p>'; return; }
+    grid.innerHTML = data.map(b=>`
+      <div class="bal-card ${b.remaining<=2?'low':'ok'}">
+        <div class="bal-num">${parseFloat(b.remaining||0)}</div>
+        <div class="bal-type">${b.leave_type}</div>
+        <div class="bal-sub">of ${b.entitled} entitled</div>
+        ${b.pending>0?`<div class="bal-sub" style="color:#D4AC0D">${b.pending} pending</div>`:''}
+        ${b.carry_forward>0?`<div class="bal-sub" style="color:#1B4F8A">${b.carry_forward} c/f</div>`:''}
+      </div>`).join('');
+  } catch(e) { console.error(e); }
+}
+
+async function loadMy() {
+  const rows = await ap('/admin/leave/my');
+  const tb=document.getElementById('myLeaveTable');
+  if(!rows.length){ tb.innerHTML='<tr><td colspan="8" style="text-align:center;color:#999">No leave requests yet.</td></tr>'; return; }
+  tb.innerHTML = rows.map(r=>`
+    <tr>
+      <td><strong>${r.leave_type}</strong></td>
+      <td>${fmt(r.from_date)}</td><td>${fmt(r.to_date)}</td>
+      <td style="text-align:center">${r.days}</td>
+      <td>${r.reason||'—'}</td>
+      <td>${badge(r.status)}${r.reject_reason?`<br><small style="color:#C0392B">${r.reject_reason}</small>`:''}</td>
+      <td>${r.reviewer_name||'—'}</td>
+      <td>${r.status==='pending'?`<button class="btn btn-danger btn-sm" onclick="cancelLeave(${r.leave_id})">Cancel</button>`:'—'}</td>
+    </tr>`).join('');
+}
+
+async function submitLeave() {
+  const lt=document.getElementById('leaveType').value;
+  const body={
+    leave_type:lt,
+    from_date:document.getElementById('fromDate').value,
+    to_date:lt==='half_day'?document.getElementById('fromDate').value:document.getElementById('toDate').value,
+    reason:document.getElementById('leaveReason').value
+  };
+  if(!body.from_date){ showMsg('From date is required.','error'); return; }
+  const r=await ap('/admin/leave',{method:'POST',body:JSON.stringify(body)});
+  showMsg(r.message||'Error', r.leave_id?'success':'error');
+  if(r.leave_id){ loadBalance(); switchTab('my'); }
+}
+
+async function cancelLeave(id) {
+  if(!confirm('Cancel this leave request?')) return;
+  const r=await ap(`/admin/leave/${id}`,{method:'DELETE'});
+  showMsg(r.message, r.message.toLowerCase().includes('cancel')?'success':'error');
+  loadMy(); loadBalance();
+}
+
+async function loadAll() {
+  const status=document.getElementById('filterStatus').value;
+  const rows=await ap(`/admin/leave${status?'?status='+status:''}`);
+  const tb=document.getElementById('allLeaveTable');
+  if(!rows.length){ tb.innerHTML='<tr><td colspan="9" style="text-align:center;color:#999">No requests found.</td></tr>'; return; }
+  tb.innerHTML=rows.map(r=>`
+    <tr>
+      <td><strong>${r.full_name}</strong><br><small style="color:#999">${r.email}</small></td>
+      <td>${r.dept_name||'—'}</td><td>${r.leave_type}</td>
+      <td>${fmt(r.from_date)}</td><td>${fmt(r.to_date)}</td>
+      <td style="text-align:center">${r.days}</td>
+      <td>${r.reason||'—'}</td>
+      <td>${badge(r.status)}</td>
+      <td>${r.status==='pending'?`
+        <button class="btn btn-success btn-sm" onclick="reviewLeave(${r.leave_id},'approve')">✅ Approve</button>
+        <button class="btn btn-danger btn-sm" onclick="reviewLeave(${r.leave_id},'reject')" style="margin-top:3px">❌ Reject</button>`:'—'}
+      </td>
+    </tr>`).join('');
+}
+
+async function reviewLeave(id, action) {
+  let body={};
+  if(action==='reject'){ const r=prompt('Rejection reason (optional):'); if(r!==null) body={reject_reason:r}; else return; }
+  const r=await ap(`/admin/leave/${id}/${action}`,{method:'PATCH',body:JSON.stringify(body)});
+  showMsg(r.message,'success'); loadAll();
+}
+
+async function loadHolidays() {
+  const yr=new Date().getFullYear();
+  const data=await ap(`/admin/holidays?year=${yr}`);
+  const el=document.getElementById('holidayList');
+  if(!data.length){ el.innerHTML='<p style="color:#94a3b8">No holidays found for this year.</p>'; return; }
+  el.innerHTML=data.map(h=>`
+    <div class="holiday-item">
+      <div>
+        <strong>${h.name}</strong>
+        ${h.description?`<br><small style="color:#64748b">${h.description}</small>`:''}
+      </div>
+      <div style="display:flex;align-items:center;gap:10px">
+        <span>${new Date(h.holiday_date).toLocaleDateString('en-IN',{weekday:'short',day:'numeric',month:'short'})}</span>
+        <span class="hol-badge ${h.holiday_type}">${h.holiday_type}</span>
+        ${isElevated?`<button class="btn btn-danger btn-sm" onclick="deleteHoliday(${h.holiday_id})">🗑️</button>`:''}
+      </div>
+    </div>`).join('');
+}
+
+async function addHoliday() {
+  const body={name:document.getElementById('holName').value,holiday_date:document.getElementById('holDate').value,holiday_type:document.getElementById('holType').value,description:document.getElementById('holDesc').value};
+  if(!body.name||!body.holiday_date){ showMsg('Name and date required','error'); return; }
+  const r=await ap('/admin/holidays',{method:'POST',body:JSON.stringify(body)});
+  showMsg(r.message,'success'); loadHolidays();
+}
+
+async function deleteHoliday(id) {
+  if(!confirm('Delete this holiday?')) return;
+  await ap(`/admin/holidays/${id}`,{method:'DELETE'});
+  loadHolidays();
+}
+
+async function saveBalance() {
+  const body={user_id:document.getElementById('balUserId').value,year:document.getElementById('balYear2').value,leave_type:document.getElementById('balType').value,entitled:document.getElementById('balEntitled').value,carry_forward:document.getElementById('balCarry').value||0};
+  if(!body.user_id||!body.year){ showMsg('User ID and Year required','error'); return; }
+  const r=await ap('/admin/leave-balances',{method:'PUT',body:JSON.stringify(body)});
+  showMsg(r.message,'success');
+}
+
+loadBalance(); loadMy();
+</script>
+<footer class="site-footer"><div class="footer-inner"><a href="index.html" class="footer-brand">⚡ Workforce Intelligence Platform</a><p class="footer-copy">&copy; 2025 Workforce Intelligence Platform v6.0</p></div></footer>
+</body></html>

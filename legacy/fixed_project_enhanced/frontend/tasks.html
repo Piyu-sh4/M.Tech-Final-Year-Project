@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tasks – Workforce Intelligence</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+  body{background:#F0F4F8}
+  .page-wrap{max-width:1200px;margin:0 auto;padding:24px}
+  .filters{background:#fff;border-radius:10px;padding:16px 20px;margin-bottom:20px;display:flex;gap:12px;flex-wrap:wrap;align-items:center;box-shadow:0 1px 8px rgba(0,0,0,.07)}
+  .filters input,.filters select{padding:8px 12px;border:1px solid #BDC3C7;border-radius:7px;font-size:13px}
+  .filters input{width:200px}
+  .btn{padding:8px 18px;border:none;border-radius:7px;font-weight:600;cursor:pointer;font-size:13px}
+  .btn-primary{background:#1B4F8A;color:#fff}
+  .btn-danger{background:#C0392B;color:#fff}
+  .btn-sm{padding:4px 12px;font-size:12px}
+  table{width:100%;border-collapse:collapse;background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,.08)}
+  th{background:#1B4F8A;color:#fff;padding:11px 14px;text-align:left;font-size:13px}
+  td{padding:10px 14px;border-bottom:1px solid #EEF2F7;font-size:13px;vertical-align:top}
+  tr:hover td{background:#F8FAFB}
+  .badge{padding:3px 10px;border-radius:10px;font-size:11px;font-weight:700}
+  .p-high{background:#FADBD8;color:#C0392B}
+  .p-medium{background:#FEF9E7;color:#D4AC0D}
+  .p-low{background:#D5F5E3;color:#1E8449}
+  .s-Pending{background:#EEF2F7;color:#5D6D7E}
+  .s-In\ Progress{background:#D6EAF8;color:#1B4F8A}
+  .s-Completed{background:#D5F5E3;color:#1E8449}
+  .s-Overdue{background:#FADBD8;color:#C0392B}
+  /* Modal */
+  .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;z-index:1000;align-items:center;justify-content:center}
+  .modal-overlay.open{display:flex}
+  .modal{background:#fff;border-radius:14px;padding:28px;width:560px;max-width:95vw;max-height:85vh;overflow-y:auto}
+  .modal h3{margin:0 0 18px;color:#1B4F8A}
+  .form-group{margin-bottom:14px}
+  .form-group label{display:block;font-weight:600;color:#1B4F8A;margin-bottom:5px;font-size:13px}
+  .form-group input,.form-group select,.form-group textarea{width:100%;padding:9px 12px;border:1px solid #BDC3C7;border-radius:7px;font-size:13px;box-sizing:border-box}
+  .comment-item{padding:10px;border-left:3px solid #2E86C1;background:#F8FAFB;border-radius:0 7px 7px 0;margin-bottom:8px}
+  .comment-author{font-weight:700;color:#1B4F8A;font-size:12px}
+  .comment-text{font-size:13px;margin:3px 0}
+  .comment-time{font-size:11px;color:#7F8C8D}
+</style>
+</head>
+<body>
+<nav class="navbar">
+  <div class="nav-brand">⚡ Workforce Intelligence</div>
+  <div class="nav-links">
+    <a href="notifications.html" style="color:#fff;">🔔 Alerts</a>
+    <a href="profile.html" style="color:#fff;margin-left:16px;">👤 Profile</a>
+    <a href="javascript:history.back()" style="color:#fff;margin-left:16px;">← Back</a>
+    <a href="login.html" onclick="localStorage.clear()" style="color:#fff;margin-left:16px;">Logout</a>
+  </div>
+</nav>
+<div class="page-wrap">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+    <h2 style="margin:0;color:#1B4F8A;">📋 Task Manager</h2>
+    <button class="btn btn-primary" onclick="openCreate()">➕ New Task</button>
+  </div>
+
+  <!-- Filters -->
+  <div class="filters">
+    <input type="text" id="fQ" placeholder="🔍 Search title / description" onkeyup="delayLoad()">
+    <select id="fStatus" onchange="loadTasks()">
+      <option value="">All Status</option>
+      <option>Pending</option><option>In Progress</option><option>Completed</option><option>Overdue</option>
+    </select>
+    <select id="fPriority" onchange="loadTasks()">
+      <option value="">All Priority</option>
+      <option>High</option><option>Medium</option><option>Low</option>
+    </select>
+    <input type="date" id="fFrom" title="Due from" onchange="loadTasks()">
+    <input type="date" id="fTo"   title="Due to"   onchange="loadTasks()">
+    <button class="btn btn-primary" onclick="loadTasks()">🔍 Search</button>
+    <button class="btn" style="background:#EEF2F7;color:#5D6D7E" onclick="clearFilters()">✕ Clear</button>
+  </div>
+
+  <table>
+    <thead><tr><th>#</th><th>Title</th><th>Assigned To</th><th>Priority</th><th>Status</th><th>Due</th><th>Actions</th></tr></thead>
+    <tbody id="taskTable"><tr><td colspan="7" style="text-align:center;padding:24px;color:#999;">Loading...</td></tr></tbody>
+  </table>
+</div>
+
+<!-- Task Detail / Comment Modal -->
+<div class="modal-overlay" id="detailModal">
+  <div class="modal">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+      <h3 id="dtTitle" style="margin:0;color:#1B4F8A;">Task Detail</h3>
+      <button onclick="closeModal('detailModal')" style="background:none;border:none;font-size:20px;cursor:pointer;">✕</button>
+    </div>
+    <div id="dtBody"></div>
+    <hr style="margin:18px 0;border:none;border-top:1px solid #EEF2F7;">
+    <h4 style="color:#1B4F8A;margin:0 0 12px;">💬 Comments</h4>
+    <div id="commentList" style="margin-bottom:14px;max-height:200px;overflow-y:auto;"></div>
+    <div style="display:flex;gap:8px;">
+      <input type="text" id="commentInput" placeholder="Write a comment..." style="flex:1;padding:9px 12px;border:1px solid #BDC3C7;border-radius:7px;font-size:13px;" onkeydown="if(event.key==='Enter')addComment()">
+      <button class="btn btn-primary" onclick="addComment()">Send</button>
+    </div>
+  </div>
+</div>
+
+<!-- Create Task Modal -->
+<div class="modal-overlay" id="createModal">
+  <div class="modal">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+      <h3 style="margin:0;color:#1B4F8A;">➕ Create Task</h3>
+      <button onclick="closeModal('createModal')" style="background:none;border:none;font-size:20px;cursor:pointer;">✕</button>
+    </div>
+    <div id="createMsg" style="display:none;padding:10px;border-radius:7px;margin-bottom:12px;"></div>
+    <div class="form-group"><label>Title *</label><input type="text" id="ctTitle"></div>
+    <div class="form-group"><label>Description</label><textarea id="ctDesc" rows="3"></textarea></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+      <div class="form-group"><label>Assign To *</label><select id="ctAssignTo"></select></div>
+      <div class="form-group"><label>Priority</label>
+        <select id="ctPriority"><option>Medium</option><option>High</option><option>Low</option></select>
+      </div>
+      <div class="form-group"><label>Due Date</label><input type="date" id="ctDue"></div>
+      <div class="form-group"><label>Timer Hours</label>
+        <select id="ctTimer"><option value="">No timer</option><option value="24">24h</option><option value="48">48h</option><option value="72">72h</option></select>
+      </div>
+    </div>
+    <button class="btn btn-primary" onclick="createTask()" style="width:100%;margin-top:8px;">✅ Create Task</button>
+  </div>
+</div>
+
+<script>
+const API='http://localhost:5000/api', token=localStorage.getItem('token');
+const user=JSON.parse(localStorage.getItem('user')||'{}');
+if(!token) location.href='login.html';
+const isAdmin = user.role_id===1;
+let currentTaskId=null, searchTimer=null;
+
+async function apiFetch(url,opts={}){
+  const r=await fetch(url,{headers:{'Authorization':`Bearer ${token}`,'Content-Type':'application/json'},...opts});
+  return r.json();
+}
+
+function delayLoad(){clearTimeout(searchTimer);searchTimer=setTimeout(loadTasks,400);}
+function clearFilters(){['fQ','fStatus','fPriority','fFrom','fTo'].forEach(id=>document.getElementById(id).value='');loadTasks();}
+
+async function loadTasks(){
+  const params=new URLSearchParams();
+  const q=document.getElementById('fQ').value.trim();
+  const s=document.getElementById('fStatus').value;
+  const p=document.getElementById('fPriority').value;
+  const f=document.getElementById('fFrom').value;
+  const t=document.getElementById('fTo').value;
+  if(q)params.set('q',q);if(s)params.set('status',s);if(p)params.set('priority',p);
+  if(f)params.set('from_date',f);if(t)params.set('to_date',t);
+  const url=isAdmin?`${API}/tasks?${params}`:`${API}/tasks/my`;
+  const rows=await apiFetch(url);
+  const tb=document.getElementById('taskTable');
+  if(!Array.isArray(rows)||!rows.length){tb.innerHTML='<tr><td colspan="7" style="text-align:center;padding:24px;color:#999;">No tasks found.</td></tr>';return;}
+  tb.innerHTML=rows.map(r=>`
+    <tr>
+      <td style="color:#7F8C8D;font-size:12px;">#${r.task_id}</td>
+      <td><strong style="color:#2C3E50;cursor:pointer;" onclick="viewTask(${r.task_id})">${r.title}</strong>
+        ${r.timer_deadline?`<br><span style="font-size:11px;color:#E67E22;">⏱ ${new Date(r.timer_deadline).toLocaleString()}</span>`:''}
+      </td>
+      <td>${r.assigned_to_name||'—'}</td>
+      <td><span class="badge p-${r.priority}">${r.priority}</span></td>
+      <td><span class="badge s-${r.status}">${r.status}</span></td>
+      <td>${r.due_date?new Date(r.due_date).toLocaleDateString():'—'}</td>
+      <td style="white-space:nowrap;">
+        <button class="btn btn-primary btn-sm" onclick="viewTask(${r.task_id})">👁 View</button>
+        ${isAdmin?`<button class="btn btn-danger btn-sm" onclick="deleteTask(${r.task_id},'${r.title.replace(/'/g,'&#39;')}')" style="margin-left:5px;">🗑 Del</button>`:''}
+      </td>
+    </tr>`).join('');
+}
+
+async function viewTask(id){
+  currentTaskId=id;
+  const t=await apiFetch(`${API}/tasks/${id}`);
+  document.getElementById('dtTitle').textContent=t.title;
+  document.getElementById('dtBody').innerHTML=`
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;">
+      <div><b>Status:</b> <span class="badge s-${t.status}">${t.status}</span></div>
+      <div><b>Priority:</b> <span class="badge p-${t.priority}">${t.priority}</span></div>
+      <div><b>Assigned By:</b> ${t.assigned_by_name||'—'}</div>
+      <div><b>Assigned To:</b> ${t.assigned_to_name||'—'}</div>
+      <div><b>Due Date:</b> ${t.due_date?new Date(t.due_date).toLocaleDateString():'—'}</div>
+      <div><b>Timer:</b> ${t.timer_deadline?new Date(t.timer_deadline).toLocaleString():'—'}</div>
+    </div>
+    ${t.description?`<p style="color:#5D6D7E;font-size:13px;">${t.description}</p>`:''}
+    ${t.written_note?`<p style="background:#FEF9E7;padding:10px;border-radius:7px;font-size:13px;">${t.written_note}</p>`:''}`;
+  loadComments(id);
+  document.getElementById('detailModal').classList.add('open');
+}
+
+async function loadComments(id){
+  const rows=await apiFetch(`${API}/tasks/${id}/comments`);
+  const el=document.getElementById('commentList');
+  if(!rows.length){el.innerHTML='<p style="color:#99A0B0;font-size:13px;">No comments yet.</p>';return;}
+  el.innerHTML=rows.map(c=>`
+    <div class="comment-item">
+      <div class="comment-author">${c.full_name} ${c.role_id===1?'👑':''}</div>
+      <div class="comment-text">${c.comment}</div>
+      <div class="comment-time">${new Date(c.created_at).toLocaleString()}
+        ${(c.user_id===user.user_id||isAdmin)?`<button onclick="deleteComment(${c.comment_id})" style="background:none;border:none;color:#C0392B;cursor:pointer;font-size:11px;margin-left:8px;">🗑 delete</button>`:''}
+      </div>
+    </div>`).join('');
+  el.scrollTop=el.scrollHeight;
+}
+
+async function addComment(){
+  const text=document.getElementById('commentInput').value.trim();
+  if(!text||!currentTaskId) return;
+  await apiFetch(`${API}/tasks/${currentTaskId}/comments`,{method:'POST',body:JSON.stringify({comment:text})});
+  document.getElementById('commentInput').value='';
+  loadComments(currentTaskId);
+}
+
+async function deleteComment(cid){
+  if(!confirm('Delete comment?')) return;
+  await apiFetch(`${API}/tasks/${currentTaskId}/comments/${cid}`,{method:'DELETE'});
+  loadComments(currentTaskId);
+}
+
+async function deleteTask(id,title){
+  if(!confirm(`Delete task "${title}"? This cannot be undone.`)) return;
+  const r=await apiFetch(`${API}/tasks/${id}`,{method:'DELETE'});
+  alert(r.message);
+  loadTasks();
+}
+
+function closeModal(id){document.getElementById(id).classList.remove('open');}
+
+async function openCreate(){
+  const users=await apiFetch(`${API}/admin/users`);
+  const sel=document.getElementById('ctAssignTo');
+  sel.innerHTML=users.filter(u=>u.status==='active').map(u=>`<option value="${u.user_id}">${u.full_name}</option>`).join('');
+  document.getElementById('createModal').classList.add('open');
+}
+
+async function createTask(){
+  const body={
+    title:document.getElementById('ctTitle').value.trim(),
+    description:document.getElementById('ctDesc').value.trim(),
+    assigned_to:parseInt(document.getElementById('ctAssignTo').value),
+    priority:document.getElementById('ctPriority').value,
+    due_date:document.getElementById('ctDue').value||null,
+    timer_hours:document.getElementById('ctTimer').value||null
+  };
+  if(!body.title){alert('Title is required');return;}
+  const r=await apiFetch(`${API}/tasks`,{method:'POST',body:JSON.stringify(body)});
+  const msg=document.getElementById('createMsg');
+  msg.style.display='block';
+  msg.style.background=r.task_id?'#D5F5E3':'#FADBD8';
+  msg.style.color=r.task_id?'#1E8449':'#C0392B';
+  msg.textContent=r.message;
+  if(r.task_id){setTimeout(()=>{closeModal('createModal');loadTasks();},1200);}
+}
+
+loadTasks();
+</script>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <a href="index.html" class="footer-brand">⚡ Workforce Intelligence Platform</a>
+      <nav class="footer-links">
+        <a href="employee-dashboard.html">Dashboard</a>
+        <a href="tasks.html">Tasks</a>
+        <a href="analytics.html">Analytics</a>
+        <a href="reports.html">Reports</a>
+        <a href="salary.html">Salary</a>
+        <a href="leave.html">Leave</a>
+        <a href="leaderboard.html">Leaderboard</a>
+        <a href="chat.html">AI Chat</a>
+        <a href="notifications.html">Notifications</a>
+        <a href="profile.html">Profile</a>
+      </nav>
+      <p class="footer-copy">&copy; 2025 Workforce Intelligence Platform v6.0 — AI-Powered HR, Payroll & Workforce Management</p>
+    </div>
+  </footer>
+</body>
+</html>

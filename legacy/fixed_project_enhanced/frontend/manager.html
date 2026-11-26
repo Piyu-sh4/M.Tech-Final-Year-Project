@@ -1,0 +1,828 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Manager Dashboard – Workforce Intelligence</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="chat.css">
+  <style>
+    /* ── DateTime/Weather Widget ── */
+    .dt-weather-bar{display:flex;align-items:center;gap:16px;background:linear-gradient(135deg,#1e3a8a,#2563eb);border-radius:16px;padding:14px 22px;margin-bottom:20px;flex-wrap:wrap;justify-content:space-between;box-shadow:0 4px 20px rgba(37,99,235,.3)}
+    .dt-left{display:flex;flex-direction:column}
+    .dt-time{font-size:2rem;font-weight:900;color:#fff;letter-spacing:1px;line-height:1}
+    .dt-date{font-size:.88rem;color:#93c5fd;margin-top:4px;font-weight:600}
+    .dt-right{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+    .weather-block{display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.12);border-radius:12px;padding:10px 16px}
+    .weather-icon{font-size:2rem}
+    .weather-info{display:flex;flex-direction:column}
+    .weather-temp{font-size:1.5rem;font-weight:800;color:#fff}
+    .weather-desc{font-size:.78rem;color:#bfdbfe;text-transform:capitalize}
+    .weather-city{font-size:.75rem;color:#93c5fd;margin-top:2px}
+    .weather-loading{color:#93c5fd;font-size:.85rem;animation:pulse 1.5s infinite}
+    @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+
+    /* ── Tabs ── */
+    .tab-nav{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:20px;background:#f1f5f9;padding:8px;border-radius:14px}
+    .tab-btn{padding:8px 16px;border:none;border-radius:10px;cursor:pointer;font-size:.85rem;font-weight:600;background:transparent;color:#64748b;transition:all .2s}
+    .tab-btn.active{background:#fff;color:#2563eb;box-shadow:0 2px 8px rgba(37,99,235,.15)}
+    .tab-btn:hover:not(.active){background:#e2e8f0;color:#334155}
+    .tab-panel{display:none}.tab-panel.active{display:block}
+
+    /* ── Tables ── */
+    .user-table{width:100%;border-collapse:collapse;font-size:.84rem}
+    .user-table th{background:#f8fafc;padding:10px 12px;text-align:left;font-weight:700;color:#475569;border-bottom:2px solid #e2e8f0}
+    .user-table td{padding:10px 12px;border-bottom:1px solid #f1f5f9;vertical-align:middle}
+    .user-table tr:hover td{background:#f8fafc}
+    .pill{display:inline-block;padding:3px 10px;border-radius:999px;font-size:.75rem;font-weight:700}
+    .pill-active{background:#dcfce7;color:#15803d}
+    .pill-pending{background:#fef9c3;color:#854d0e}
+    .pill-overdue{background:#fee2e2;color:#991b1b}
+
+    /* ── Cards ── */
+    .kpi-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:14px;margin-bottom:20px}
+    .kpi-card{background:#fff;border:1.5px solid #e2e8f0;border-radius:14px;padding:18px;text-align:center;transition:border-color .2s}
+    .kpi-card:hover{border-color:#2563eb}
+    .kpi-num{font-size:2rem;font-weight:900;line-height:1}
+    .kpi-label{font-size:.78rem;color:#64748b;font-weight:600;margin-top:4px;text-transform:uppercase;letter-spacing:.04em}
+    .action-btn{padding:4px 10px;border:none;border-radius:6px;cursor:pointer;font-size:.78rem;font-weight:600;margin:2px}
+    .btn-approve{background:#dcfce7;color:#15803d}
+    .btn-reject{background:#fee2e2;color:#991b1b}
+    .btn-view{background:#dbeafe;color:#1d4ed8}
+    .member-card{display:flex;align-items:center;gap:14px;padding:14px;border:1.5px solid #e2e8f0;border-radius:12px;margin-bottom:8px;transition:border-color .2s}
+    .member-card:hover{border-color:#2563eb}
+    .avatar{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1rem;font-weight:800;color:#fff;flex-shrink:0}
+    @media(max-width:600px){.kpi-grid{grid-template-columns:1fr 1fr}.tab-btn{font-size:.75rem;padding:6px 8px}.dt-time{font-size:1.5rem}}
+  </style>
+</head>
+<body>
+  <nav class="navbar">
+    <div class="nav-brand">⚡ Workforce Intelligence</div>
+    <div class="nav-info">
+      <a href="analytics.html" class="btn btn-sm btn-outline">📊 Analytics</a>
+      <a href="reports.html"   class="btn btn-sm btn-outline">📈 Reports</a>
+      <a href="chat.html"      class="btn btn-sm" style="background:linear-gradient(135deg,#6ee7f7,#a78bfa);color:#000">🤖 AI Chat</a>
+      <span id="mgrName" class="nav-user"></span>
+      <span class="badge" style="background:#7c3aed;color:#fff">Manager</span>
+      <button onclick="logout()" class="btn btn-sm btn-outline">Logout</button>
+    </div>
+    <a href="tasks.html"         style="color:#fff;margin-left:12px;">📋 Tasks</a>
+    <a href="leave.html"         style="color:#fff;margin-left:12px;">🏖️ Leave</a>
+    <a href="attendance.html"    style="color:#fff;margin-left:12px;">📅 Attendance</a>
+    <a href="salary.html"        style="color:#fff;margin-left:12px;">💰 Salary</a>
+    <a href="leaderboard.html"   style="color:#fff;margin-left:12px;">🏆 Board</a>
+    <a href="meetings.html" style="color:#fff;margin-left:12px">📹 Meetings</a>
+    <a href="notifications.html" style="color:#fff;margin-left:12px;">🔔 Alerts</a>
+    <a href="profile.html"       style="color:#fff;margin-left:12px;">👤 Profile</a>
+  </nav>
+
+  <div class="dashboard">
+
+    <!-- ═══ DATE / TIME / WEATHER BAR ═══ -->
+    <div class="dt-weather-bar">
+      <div class="dt-left">
+        <div class="dt-time" id="liveTime">--:--:--</div>
+        <div class="dt-date" id="liveDate">Loading…</div>
+      </div>
+      <div class="dt-right">
+        <div class="weather-block" id="weatherBlock">
+          <span class="weather-loading">⛅ Loading weather…</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ KPI CARDS ═══ -->
+    <div class="kpi-grid">
+      <div class="kpi-card"><div class="kpi-num" id="kpiTeam" style="color:#2563eb">–</div><div class="kpi-label">Team Members</div></div>
+      <div class="kpi-card"><div class="kpi-num" id="kpiTasks" style="color:#7c3aed">–</div><div class="kpi-label">Active Tasks</div></div>
+      <div class="kpi-card"><div class="kpi-num" id="kpiOverdue" style="color:#dc2626">–</div><div class="kpi-label">Overdue</div></div>
+      <div class="kpi-card"><div class="kpi-num" id="kpiCompleted" style="color:#16a34a">–</div><div class="kpi-label">Completed</div></div>
+      <div class="kpi-card"><div class="kpi-num" id="kpiPresent" style="color:#0891b2">–</div><div class="kpi-label">Present Today</div></div>
+      <div class="kpi-card"><div class="kpi-num" id="kpiLeave" style="color:#d97706">–</div><div class="kpi-label">Pending Leaves</div></div>
+      <div class="kpi-card"><div class="kpi-num" id="kpiExtReq" style="color:#db2777">–</div><div class="kpi-label">Ext. Requests</div></div>
+    </div>
+
+    <!-- ═══ TABS ═══ -->
+    <div class="tab-nav">
+      <button class="tab-btn active" onclick="switchTab(this,'team')">👥 My Team</button>
+      <button class="tab-btn" onclick="switchTab(this,'tasks')">📋 Tasks</button>
+      <button class="tab-btn" onclick="switchTab(this,'attendance')">📅 Attendance</button>
+      <button class="tab-btn" onclick="switchTab(this,'leaves')">🏖️ Leave Approvals</button>
+      <button class="tab-btn" onclick="switchTab(this,'extensions')">⏳ Extensions</button>
+      <button class="tab-btn" onclick="switchTab(this,'cab_mgr')">🚌 Cab Approvals</button>
+      <button class="tab-btn" onclick="switchTab(this,'mgr_meetings')">📹 Meetings</button>
+    </div>
+
+    <!-- ═══ TEAM TAB ═══ -->
+    <div id="tab-team" class="tab-panel active">
+      <div class="card">
+        <div class="card-header">
+          <h3>👥 My Team Members</h3>
+          <button onclick="loadTeam()" class="btn btn-sm">Refresh</button>
+        </div>
+        <div id="teamDeptInfo" style="margin-bottom:14px"></div>
+        <div id="teamList"><p class="empty-msg">Loading team…</p></div>
+      </div>
+    </div>
+
+    <!-- ═══ TASKS TAB ═══ -->
+    <div id="tab-tasks" class="tab-panel">
+      <div class="grid-2">
+        <div class="card">
+          <h3>📋 Assign Task to Team Member</h3>
+          <div class="form-group"><label>Title</label><input id="mTaskTitle" placeholder="Task title"></div>
+          <div class="form-group"><label>Description</label><textarea id="mTaskDesc" rows="2" placeholder="Description…"></textarea></div>
+          <div class="grid-2" style="gap:10px">
+            <div class="form-group"><label>Assign To (User ID)</label><input id="mTaskTo" type="number" placeholder="User ID"></div>
+            <div class="form-group"><label>Priority</label>
+              <select id="mTaskPriority"><option value="Low">Low</option><option value="Medium" selected>Medium</option><option value="High">High</option></select>
+            </div>
+          </div>
+          <div class="form-group"><label>Due Date</label><input id="mTaskDue" type="date"></div>
+          <button onclick="createManagerTask()" class="btn btn-full">Assign Task</button>
+          <p id="mTaskMsg" class="msg"></p>
+        </div>
+        <div class="card">
+          <h3>🔔 Overdue Alerts</h3>
+          <div id="mAlertList" class="scroll-list"><p class="empty-msg">Loading…</p></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <h3>📑 Team Tasks</h3>
+          <button onclick="loadTeamTasks()" class="btn btn-sm">Refresh</button>
+        </div>
+        <div style="overflow-x:auto">
+          <table class="user-table">
+            <thead><tr><th>ID</th><th>Title</th><th>Assigned To</th><th>Priority</th><th>Status</th><th>Due Date</th></tr></thead>
+            <tbody id="teamTaskBody"><tr><td colspan="6" style="text-align:center;color:#94a3b8;padding:20px">Loading…</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ ATTENDANCE TAB ═══ -->
+    <div id="tab-attendance" class="tab-panel">
+      <div class="card">
+        <div class="card-header">
+          <h3>📅 Today's Team Attendance</h3>
+          <button onclick="loadTeamAttendance()" class="btn btn-sm">Refresh</button>
+        </div>
+        <div style="overflow-x:auto">
+          <table class="user-table">
+            <thead><tr><th>Employee</th><th>Clock In</th><th>Clock Out</th><th>Status</th><th>Hours</th></tr></thead>
+            <tbody id="attTodayBody"><tr><td colspan="5" style="text-align:center;color:#94a3b8;padding:20px">Loading…</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="card" style="margin-top:16px">
+        <h3>📊 Monthly Attendance Summary</h3>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px">
+          <select id="attMonth" style="padding:8px 12px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:.85rem">
+            <option value="1">January</option><option value="2">February</option><option value="3">March</option><option value="4">April</option><option value="5">May</option><option value="6">June</option><option value="7">July</option><option value="8">August</option><option value="9">September</option><option value="10">October</option><option value="11">November</option><option value="12">December</option>
+          </select>
+          <input id="attYear" type="number" value="2025" style="padding:8px 12px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:.85rem;width:90px">
+          <button onclick="loadAttSummary()" class="btn btn-sm">Load Summary</button>
+        </div>
+        <div id="attSummaryBody" class="scroll-list" style="max-height:300px"><p class="empty-msg">Select month and load</p></div>
+      </div>
+    </div>
+
+    <!-- ═══ LEAVES TAB ═══ -->
+    <div id="tab-leaves" class="tab-panel">
+      <div class="card">
+        <div class="card-header">
+          <h3>🏖️ Pending Leave Requests</h3>
+          <button onclick="loadLeaveRequests()" class="btn btn-sm">Refresh</button>
+        </div>
+        <div id="leaveRequestList"><p class="empty-msg">Loading…</p></div>
+      </div>
+    </div>
+
+    <!-- ═══ EXTENSIONS TAB ═══ -->
+    <div id="tab-extensions" class="tab-panel">
+      <div class="card">
+        <div class="card-header">
+          <h3>⏳ Task Extension Requests</h3>
+          <button onclick="loadExtensions()" class="btn btn-sm">Refresh</button>
+        </div>
+        <div id="extensionRequestList"><p class="empty-msg">Loading…</p></div>
+      </div>
+    </div>
+
+  
+    <!-- ═══ CAB APPROVAL TAB (MANAGER) ═══ -->
+    <div id="tab-cab_mgr" class="tab-panel">
+      <div class="card">
+        <div class="card-header">
+          <h3>🚌 Cab Booking Approvals</h3>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <select id="mgrCabStatus" onchange="loadManagerCabApprovals()" style="padding:6px 10px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:.82rem">
+              <option value="pending" selected>Pending</option>
+              <option value="approved">Approved</option>
+              <option value="rejected">Rejected</option>
+              <option value="">All</option>
+            </select>
+            <input type="date" id="mgrCabDate" onchange="loadManagerCabApprovals()" style="padding:6px 10px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:.82rem">
+            <button onclick="loadManagerCabApprovals()" class="btn btn-sm">Refresh</button>
+          </div>
+        </div>
+        <div style="margin-bottom:12px;display:flex;gap:8px;flex-wrap:wrap"><a href="cab-tracking.html" class="btn btn-sm" style="background:#f0fdf4;color:#15803d;text-decoration:none">🗺️ Live Tracking</a><a href="cab-driver-panel.html" class="btn btn-sm" style="background:linear-gradient(135deg,#7c3aed,#2563eb);color:#fff;text-decoration:none">🧑‍✈️ Driver Panel</a></div>
+        <div id="mgrCabStats" style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px"></div>
+        <div id="mgrCabList"><p class="empty-msg">Loading…</p></div>
+      </div>
+    </div>
+
+
+    <!-- ═══ MEETINGS TAB (MANAGER) ═══ -->
+    <div id="tab-mgr_meetings" class="tab-panel">
+      <div class="card">
+        <div class="card-header">
+          <h3>📹 My Meetings</h3>
+          <a href="meetings.html" class="btn btn-sm" style="background:linear-gradient(135deg,#1a56db,#0891b2);text-decoration:none;color:#fff">Open Meeting Room →</a>
+        </div>
+        <div id="mgrMeetingList"><p class="empty-msg">Loading…</p></div>
+      </div>
+    </div>
+
+</div><!-- /.dashboard -->
+
+  <script src="app.js"></script>
+  <script src="chat.js"></script>
+  <script>
+  /* ══════════════════════════════════════════════════════════
+     MANAGER DASHBOARD SCRIPT
+  ══════════════════════════════════════════════════════════ */
+
+  var _myDeptId = null;
+  var MONTHS = ['','Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  var COLORS  = ['#2563eb','#7c3aed','#db2777','#ea580c','#16a34a','#0891b2','#9333ea'];
+
+  /* ── Tab switching ─────────────────────────────────────── */
+  function switchTab(btn, name) {
+    document.querySelectorAll('.tab-btn').forEach(function(b){ b.classList.remove('active'); });
+    document.querySelectorAll('.tab-panel').forEach(function(p){ p.classList.remove('active'); });
+    btn.classList.add('active');
+    document.getElementById('tab-'+name).classList.add('active');
+    if(name === 'team')       loadTeam();
+    if(name === 'tasks')      { loadTeamTasks(); loadAlerts(); }
+    if(name === 'attendance') { loadTeamAttendance(); var d=document.getElementById('attMonth'); if(d)d.value=new Date().getMonth()+1; }
+    if(name === 'leaves')     loadLeaveRequests();
+    if(name === 'extensions') loadExtensions();
+    if(name === 'cab_mgr') loadManagerCabApprovals();
+    if(name === 'mgr_meetings') loadManagerMeetings();
+  }
+
+  /* ── Live Clock ────────────────────────────────────────── */
+  function updateClock() {
+    var now  = new Date();
+    var time = now.toLocaleTimeString('en-IN', { hour:'2-digit', minute:'2-digit', second:'2-digit', hour12:true });
+    var date = now.toLocaleDateString('en-IN', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
+    var te = document.getElementById('liveTime'); if(te) te.textContent = time;
+    var de = document.getElementById('liveDate'); if(de) de.textContent = date;
+  }
+  updateClock();
+  setInterval(updateClock, 1000);
+
+  /* ── Weather Widget ────────────────────────────────────── */
+  function weatherIcon(code) {
+    if(code >= 200 && code < 300) return '⛈️';
+    if(code >= 300 && code < 400) return '🌧️';
+    if(code >= 500 && code < 600) return '🌧️';
+    if(code >= 600 && code < 700) return '❄️';
+    if(code >= 700 && code < 800) return '🌫️';
+    if(code === 800)              return '☀️';
+    if(code === 801)              return '🌤️';
+    if(code >= 802)               return '☁️';
+    return '🌡️';
+  }
+  function loadWeather() {
+    var block = document.getElementById('weatherBlock');
+    if(!block) return;
+    if(!navigator.geolocation) {
+      loadWeatherByCity('Patna', block);
+      return;
+    }
+    navigator.geolocation.getCurrentPosition(
+      function(pos) {
+        fetch('https://api.open-meteo.com/v1/forecast?latitude='+pos.coords.latitude+'&longitude='+pos.coords.longitude+'&current_weather=true&hourly=relativehumidity_2m&timezone=auto')
+          .then(function(r){ return r.json(); })
+          .then(function(d) {
+            var w  = d.current_weather;
+            var temp = Math.round(w.temperature);
+            var icon = w.weathercode <= 1 ? '☀️' : w.weathercode <= 3 ? '⛅' : w.weathercode <= 67 ? '🌧️' : '☁️';
+            // Get city name via reverse geocoding (open-meteo doesn't give city, use lat/lon label)
+            fetch('https://nominatim.openstreetmap.org/reverse?lat='+pos.coords.latitude+'&lon='+pos.coords.longitude+'&format=json')
+              .then(function(r){ return r.json(); })
+              .then(function(geo) {
+                var city = (geo.address && (geo.address.city || geo.address.town || geo.address.county)) || 'Your Location';
+                block.innerHTML =
+                  '<span class="weather-icon">'+icon+'</span>' +
+                  '<div class="weather-info">' +
+                    '<span class="weather-temp">'+temp+'°C</span>' +
+                    '<span class="weather-desc">Wind: '+w.windspeed+' km/h</span>' +
+                    '<span class="weather-city">📍 '+escHtml(city)+'</span>' +
+                  '</div>';
+              }).catch(function(){ showWeatherFallback(block, icon, temp, 'Your Location'); });
+          }).catch(function(){ loadWeatherByCity('Patna', block); });
+      },
+      function() { loadWeatherByCity('Patna', block); },
+      { timeout: 5000 }
+    );
+  }
+  function loadWeatherByCity(city, block) {
+    // Open-Meteo geocoding for city coordinates
+    fetch('https://geocoding-api.open-meteo.com/v1/search?name='+encodeURIComponent(city)+'&count=1')
+      .then(function(r){ return r.json(); })
+      .then(function(geo) {
+        if(!geo.results || !geo.results.length) throw new Error('No results');
+        var loc = geo.results[0];
+        return fetch('https://api.open-meteo.com/v1/forecast?latitude='+loc.latitude+'&longitude='+loc.longitude+'&current_weather=true&timezone=auto')
+          .then(function(r){ return r.json(); })
+          .then(function(d) {
+            var w    = d.current_weather;
+            var temp = Math.round(w.temperature);
+            var icon = w.weathercode <= 1 ? '☀️' : w.weathercode <= 3 ? '⛅' : w.weathercode <= 67 ? '🌧️' : '☁️';
+            showWeatherFallback(block, icon, temp, loc.name);
+          });
+      })
+      .catch(function() {
+        block.innerHTML = '<span style="color:#93c5fd;font-size:.85rem">⛅ Weather unavailable</span>';
+      });
+  }
+  function showWeatherFallback(block, icon, temp, city) {
+    block.innerHTML =
+      '<span class="weather-icon">'+icon+'</span>' +
+      '<div class="weather-info">' +
+        '<span class="weather-temp">'+temp+'°C</span>' +
+        '<span class="weather-city">📍 '+escHtml(city)+'</span>' +
+      '</div>';
+  }
+
+  /* ── Load KPIs ─────────────────────────────────────────── */
+  async function loadKPIs() {
+    try {
+      var r = await fetch(API+'/tasks', { headers: authHeaders() });
+      var tasks = await r.json();
+      var active    = tasks.filter(function(t){ return t.status !== 'Completed'; }).length;
+      var overdue   = tasks.filter(function(t){ return t.status === 'Overdue'; }).length;
+      var completed = tasks.filter(function(t){ return t.status === 'Completed'; }).length;
+      var extPending = tasks.filter(function(t){ return t.extension_status === 'pending'; }).length;
+      setInner('kpiTasks',    active);
+      setInner('kpiOverdue',  overdue);
+      setInner('kpiCompleted',completed);
+      setInner('kpiExtReq',   extPending);
+    } catch(e){}
+
+    try {
+      var rr = await fetch(API+'/admin/attendance?date_from='+new Date().toISOString().slice(0,10), { headers: authHeaders() });
+      var att = await rr.json();
+      var present = att.filter(function(a){ return a.status === 'present' || a.clock_in; }).length;
+      setInner('kpiPresent', present);
+    } catch(e){}
+
+    try {
+      var rl = await fetch(API+'/admin/leaves?status=pending', { headers: authHeaders() });
+      var leaves = await rl.json();
+      setInner('kpiLeave', leaves.length || 0);
+    } catch(e){ setInner('kpiLeave', '—'); }
+  }
+
+  /* ── Team ──────────────────────────────────────────────── */
+  async function loadTeam() {
+    var tl = document.getElementById('teamList');
+    var di = document.getElementById('teamDeptInfo');
+    try {
+      var me = await (await fetch(API+'/auth/me', { headers: authHeaders() })).json();
+      _myDeptId = me.department_id;
+      setInner('kpiTeam', '–');
+
+      if(!_myDeptId) {
+        tl.innerHTML = '<p class="empty-msg">You are not assigned to a department. Ask admin to assign you.</p>';
+        return;
+      }
+
+      // Dept info
+      var depts = await (await fetch(API+'/admin/departments', { headers: authHeaders() })).json();
+      var dept  = depts.find(function(d){ return d.dept_id === _myDeptId; });
+      if(dept) {
+        di.innerHTML =
+          '<div style="background:linear-gradient(135deg,#f0f4ff,#f5f3ff);border-radius:12px;padding:14px 18px;margin-bottom:14px">'+
+          '<b style="font-size:1.1rem">🏢 '+escHtml(dept.dept_name)+'</b>'+
+          (dept.description ? '<div style="font-size:.85rem;color:#64748b;margin-top:4px">'+escHtml(dept.description)+'</div>' : '')+
+          '</div>';
+      }
+
+      var members = await (await fetch(API+'/admin/departments/'+_myDeptId+'/members', { headers: authHeaders() })).json();
+      setInner('kpiTeam', members.length);
+      if(!members.length) { tl.innerHTML = '<p class="empty-msg">No team members found.</p>'; return; }
+
+      var u = getUser();
+      tl.innerHTML = members.map(function(m, i){
+        var initials = (m.full_name||'?').split(' ').map(function(w){ return w[0]; }).join('').slice(0,2).toUpperCase();
+        var isMe = (m.user_id == u.user_id);
+        return '<div class="member-card"'+(isMe?' style="border-color:#7c3aed;background:#faf5ff"':'')+'>'+
+          '<div class="avatar" style="background:'+COLORS[i%COLORS.length]+'">'+escHtml(initials)+'</div>'+
+          '<div style="flex:1">'+
+            '<b>'+escHtml(m.full_name)+(isMe?' <span style="font-size:.75rem;background:#ede9fe;color:#6d28d9;padding:2px 8px;border-radius:999px">You</span>':'')+'</b>'+
+            '<div style="font-size:.8rem;color:#64748b">'+escHtml(m.role_name)+'</div>'+
+          '</div>'+
+          '<div style="text-align:right;font-size:.82rem;color:#94a3b8">'+
+            '<div>Level '+m.access_level+'</div>'+
+            '<div>'+m.total_points+' pts</div>'+
+          '</div>'+
+        '</div>';
+      }).join('');
+    } catch(e) { tl.innerHTML = '<p class="empty-msg">Could not load team.</p>'; }
+  }
+
+  /* ── Tasks ─────────────────────────────────────────────── */
+  async function loadTeamTasks() {
+    var tbody = document.getElementById('teamTaskBody');
+    try {
+      var r = await fetch(API+'/tasks', { headers: authHeaders() });
+      var tasks = await r.json();
+      if(!tasks.length) { tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:#94a3b8;padding:20px">No tasks found</td></tr>'; return; }
+      tbody.innerHTML = tasks.map(function(t){
+        var st = t.status || 'Pending';
+        var stClass = st === 'Completed' ? 'pill-active' : st === 'Overdue' ? 'pill-overdue' : 'pill-pending';
+        return '<tr>'+
+          '<td>#'+t.task_id+'</td>'+
+          '<td><b>'+escHtml(t.title)+'</b></td>'+
+          '<td>'+escHtml(t.assignee_name || ('ID #'+t.assigned_to))+'</td>'+
+          '<td>'+priorityTag(t.priority)+'</td>'+
+          '<td><span class="pill '+stClass+'">'+st+'</span></td>'+
+          '<td>'+formatDate(t.due_date)+'</td>'+
+        '</tr>';
+      }).join('');
+    } catch(e) { tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:#94a3b8;padding:20px">Could not load tasks</td></tr>'; }
+  }
+
+  async function createManagerTask() {
+    var title  = document.getElementById('mTaskTitle').value.trim();
+    var desc   = document.getElementById('mTaskDesc').value.trim();
+    var to     = document.getElementById('mTaskTo').value;
+    var prio   = document.getElementById('mTaskPriority').value;
+    var due    = document.getElementById('mTaskDue').value;
+    if(!title || !to) return showMsg('mTaskMsg', 'Title and Assign To are required.', true);
+    try {
+      var r = await fetch(API+'/tasks', { method:'POST', headers: authHeaders(), body: JSON.stringify({ title, description:desc, assigned_to:to, priority:prio, due_date:due||null }) });
+      var d = await r.json();
+      showMsg('mTaskMsg', d.message, !r.ok);
+      if(r.ok) { document.getElementById('mTaskTitle').value=''; document.getElementById('mTaskDesc').value=''; document.getElementById('mTaskTo').value=''; loadTeamTasks(); loadKPIs(); }
+    } catch(e) { showMsg('mTaskMsg', 'Failed.', true); }
+  }
+
+  /* ── Alerts ────────────────────────────────────────────── */
+  async function loadAlerts() {
+    var c = document.getElementById('mAlertList');
+    try {
+      var r = await fetch(API+'/tasks', { headers: authHeaders() });
+      var tasks = await r.json();
+      var overdue = tasks.filter(function(t){ return t.status === 'Overdue'; });
+      if(!overdue.length) { c.innerHTML = '<p class="empty-msg">No overdue tasks 🎉</p>'; return; }
+      c.innerHTML = overdue.map(function(t){
+        return '<div class="alert-item">'+
+          '<b>⚠️ '+escHtml(t.title)+'</b>'+
+          '<div class="meta">Assigned to: '+escHtml(t.assignee_name||'#'+t.assigned_to)+' | Due: '+formatDate(t.due_date)+'</div>'+
+        '</div>';
+      }).join('');
+    } catch(e) { c.innerHTML = '<p class="empty-msg">Could not load alerts.</p>'; }
+  }
+
+  /* ── Attendance ────────────────────────────────────────── */
+  async function loadTeamAttendance() {
+    var tbody = document.getElementById('attTodayBody');
+    var today = new Date().toISOString().slice(0,10);
+    try {
+      var r = await fetch(API+'/admin/attendance?date_from='+today+'&date_to='+today, { headers: authHeaders() });
+      var rows = await r.json();
+      if(!rows.length) { tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:#94a3b8;padding:20px">No attendance data for today</td></tr>'; return; }
+      var icons = {present:'🟢',absent:'🔴',late:'🟡',half_day:'🔵',leave:'⚪'};
+      tbody.innerHTML = rows.map(function(a){
+        var ci = a.clock_in  ? String(a.clock_in).slice(11,16)  : '—';
+        var co = a.clock_out ? String(a.clock_out).slice(11,16) : '—';
+        var hrs = '—';
+        if(a.clock_in && a.clock_out) {
+          var diff = (new Date(a.clock_out) - new Date(a.clock_in)) / 3600000;
+          hrs = diff.toFixed(1)+'h';
+        }
+        return '<tr>'+
+          '<td><b>'+escHtml(a.full_name)+'</b></td>'+
+          '<td>'+ci+'</td><td>'+co+'</td>'+
+          '<td>'+(icons[a.status]||'')+'&nbsp;'+escHtml(a.status)+'</td>'+
+          '<td>'+hrs+'</td>'+
+        '</tr>';
+      }).join('');
+    } catch(e) { tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:#94a3b8;padding:20px">Could not load</td></tr>'; }
+  }
+
+  async function loadAttSummary() {
+    var m = document.getElementById('attMonth').value;
+    var y = document.getElementById('attYear').value;
+    var c = document.getElementById('attSummaryBody');
+    try {
+      var r = await fetch(API+'/admin/attendance/summary?month='+m+'&year='+y, { headers: authHeaders() });
+      var rows = await r.json();
+      if(!rows.length) { c.innerHTML = '<p class="empty-msg">No data for this period.</p>'; return; }
+      c.innerHTML = rows.map(function(rx){
+        return '<div style="display:flex;justify-content:space-between;align-items:center;padding:10px;border:1px solid #e2e8f0;border-radius:10px;margin-bottom:6px;font-size:.82rem">'+
+          '<div><b>'+escHtml(rx.full_name)+'</b></div>'+
+          '<div style="display:flex;gap:8px">'+
+            '<span style="color:#15803d">P:'+rx.days_present+'</span>'+
+            '<span style="color:#991b1b">A:'+rx.days_absent+'</span>'+
+            '<span style="color:#854d0e">L:'+rx.days_late+'</span>'+
+            '<span style="color:#6d28d9">H:'+rx.days_half+'</span>'+
+          '</div></div>';
+      }).join('');
+    } catch(e) { c.innerHTML = '<p class="empty-msg">Failed to load summary.</p>'; }
+  }
+
+  /* ── Leave Requests ────────────────────────────────────── */
+  async function loadLeaveRequests() {
+    var c = document.getElementById('leaveRequestList');
+    try {
+      var r = await fetch(API+'/admin/leaves?status=pending', { headers: authHeaders() });
+      var leaves = await r.json();
+      setInner('kpiLeave', leaves.length || 0);
+      if(!leaves.length) { c.innerHTML = '<p class="empty-msg">No pending leave requests 🎉</p>'; return; }
+      c.innerHTML = leaves.map(function(l){
+        return '<div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;padding:14px;border:1.5px solid #e2e8f0;border-radius:12px;margin-bottom:8px">'+
+          '<div>'+
+            '<b>'+escHtml(l.full_name || 'Employee #'+l.user_id)+'</b>'+
+            '<div style="font-size:.82rem;color:#64748b;margin-top:3px">'+
+              escHtml(l.leave_type)+' Leave &bull; '+formatDate(l.start_date)+' → '+formatDate(l.end_date)+
+            '</div>'+
+            (l.reason ? '<div style="font-size:.8rem;color:#94a3b8;margin-top:2px">Reason: '+escHtml(l.reason)+'</div>' : '')+
+          '</div>'+
+          '<div style="display:flex;gap:6px">'+
+            '<button class="action-btn btn-approve" onclick="reviewLeave('+l.leave_id+',\'approved\')">✅ Approve</button>'+
+            '<button class="action-btn btn-reject"  onclick="reviewLeave('+l.leave_id+',\'rejected\')">❌ Reject</button>'+
+          '</div>'+
+        '</div>';
+      }).join('');
+    } catch(e) { c.innerHTML = '<p class="empty-msg">Could not load leave requests.</p>'; }
+  }
+
+  async function reviewLeave(id, decision) {
+    try {
+      var r = await fetch(API+'/admin/leaves/'+id+'/review', { method:'PATCH', headers: authHeaders(), body: JSON.stringify({ status: decision }) });
+      var d = await r.json();
+      alert(d.message || decision);
+      loadLeaveRequests();
+    } catch(e) { alert('Failed to update leave.'); }
+  }
+
+  /* ── Extension Requests ────────────────────────────────── */
+  async function loadExtensions() {
+    var c = document.getElementById('extensionRequestList');
+    try {
+      var r = await fetch(API+'/tasks', { headers: authHeaders() });
+      var tasks = await r.json();
+      var pending = tasks.filter(function(t){ return t.extension_status === 'pending'; });
+      setInner('kpiExtReq', pending.length);
+      if(!pending.length) { c.innerHTML = '<p class="empty-msg">No pending extension requests 🎉</p>'; return; }
+      c.innerHTML = pending.map(function(t){
+        return '<div style="background:#fefce8;border:1.5px solid #fde047;border-radius:12px;padding:14px;margin-bottom:8px">'+
+          '<b>⏳ '+escHtml(t.title)+'</b>'+
+          '<div style="font-size:.82rem;color:#64748b;margin-top:4px">Task #'+t.task_id+' | +'+t.extension_hours+'h requested</div>'+
+          (t.extension_reason ? '<div style="font-size:.8rem;color:#92400e;margin-top:3px">Reason: '+escHtml(t.extension_reason)+'</div>' : '')+
+          '<div style="display:flex;gap:8px;margin-top:10px">'+
+            '<button class="btn btn-sm" style="background:#16a34a;padding:5px 14px" onclick="reviewExtension('+t.task_id+',\'approved\')">✅ Approve</button>'+
+            '<button class="btn btn-sm" style="background:#dc2626;padding:5px 14px" onclick="reviewExtension('+t.task_id+',\'rejected\')">❌ Reject</button>'+
+          '</div>'+
+        '</div>';
+      }).join('');
+    } catch(e) { c.innerHTML = '<p class="empty-msg">Could not load extension requests.</p>'; }
+  }
+
+  /* ── Init ──────────────────────────────────────────────── */
+
+  /* ── CAB APPROVAL (manager) ───────────────────────── */
+  async function loadManagerCabApprovals() {
+    var status = (document.getElementById('mgrCabStatus')||{}).value || '';
+    var date   = (document.getElementById('mgrCabDate')||{}).value   || '';
+    var c      = document.getElementById('mgrCabList');
+    var stats  = document.getElementById('mgrCabStats');
+    if(!c) return;
+    try {
+      var url = API+'/cab/all?'+(status?'status='+status:'')+(date?'&date='+date:'');
+      var r   = await fetch(url,{headers:authHeaders()});
+      var list= await r.json();
+      // Filter to own dept if dept_id available
+      if(_myDeptId){
+        // We can't filter by dept on cab API without joining — show all for now (manager sees all pending)
+      }
+      var pending  = list.filter(function(b){return b.status==='pending';}).length;
+      var approved = list.filter(function(b){return b.status==='approved';}).length;
+      var night    = list.filter(function(b){return b.night_cab;}).length;
+      if(stats){
+        stats.innerHTML =
+          '<div style="background:#fef9c3;border:1px solid #fde047;border-radius:10px;padding:10px 16px;text-align:center"><div style="font-size:1.3rem;font-weight:900;color:#854d0e">'+pending+'</div><div style="font-size:.72rem;color:#92400e">Pending</div></div>'+
+          '<div style="background:#dcfce7;border:1px solid #86efac;border-radius:10px;padding:10px 16px;text-align:center"><div style="font-size:1.3rem;font-weight:900;color:#15803d">'+approved+'</div><div style="font-size:.72rem;color:#166534">Approved</div></div>'+
+          '<div style="background:#ede9fe;border:1px solid #c4b5fd;border-radius:10px;padding:10px 16px;text-align:center"><div style="font-size:1.3rem;font-weight:900;color:#6d28d9">'+night+'</div><div style="font-size:.72rem;color:#7c3aed">Night Cabs</div></div>';
+      }
+      if(!list.length){ c.innerHTML='<p class="empty-msg">No bookings found.</p>'; return; }
+      var vIcon = function(t){return t==='Bus'?'🚌':t==='Car'?'🚗':'🏍️';};
+      c.innerHTML = list.map(function(b){
+        var isPending = b.status==='pending';
+        var bgMap={pending:'#fefce8',approved:'#f0fdf4',rejected:'#fff5f5',cancelled:'#f8fafc'};
+        var brMap={pending:'#fde047',approved:'#86efac',rejected:'#fca5a5',cancelled:'#e2e8f0'};
+        return '<div style="border:1.5px solid '+brMap[b.status]+';background:'+bgMap[b.status]+';border-radius:12px;padding:14px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:flex-start;gap:10px;flex-wrap:wrap">'+
+          '<div style="flex:1">'+
+            '<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">'+
+              '<b>'+escHtml(b.full_name)+'</b>'+
+              (b.night_cab?'<span style="background:linear-gradient(135deg,#1e3a8a,#7c3aed);color:#fff;font-size:.68rem;padding:2px 8px;border-radius:999px;font-weight:700">🌙 Night</span>':'')+
+              '<span style="font-size:.72rem;padding:3px 9px;border-radius:999px;font-weight:700;background:'+(isPending?'#fef9c3':'#f1f5f9')+';color:'+(isPending?'#854d0e':'#64748b')+'">'+b.status.toUpperCase()+'</span>'+
+            '</div>'+
+            '<div style="font-size:.78rem;color:#64748b;display:flex;flex-wrap:wrap;gap:8px">'+
+              '<span>'+vIcon(b.vehicle_type)+' '+escHtml(b.vehicle_label)+'</span>'+
+              '<span>📅 '+formatDate(b.booking_date)+'</span>'+
+              '<span>📍 '+escHtml(b.route_name)+'</span>'+
+              '<span>🕗 '+String(b.pickup_time).slice(0,5)+'</span>'+
+              (b.seat_number?'<span>💺 Seat #'+b.seat_number+'</span>':'')+
+              (b.shift_name?'<span>⏰ '+escHtml(b.shift_name)+'</span>':'')+
+            '</div>'+
+            (b.special_note?'<div style="font-size:.75rem;color:#475569;margin-top:4px;background:rgba(0,0,0,.04);padding:5px 10px;border-radius:6px">📝 '+escHtml(b.special_note)+'</div>':'')+
+            (b.reject_reason?'<div style="font-size:.75rem;color:#991b1b;margin-top:3px">❌ '+escHtml(b.reject_reason)+'</div>':'')+
+          '</div>'+
+          (isPending?
+            '<div style="display:flex;flex-direction:column;gap:6px;flex-shrink:0">'+
+              '<button class="action-btn btn-approve" onclick="mgrCabApprove('+b.booking_id+')">✅ Approve</button>'+
+              '<button class="action-btn btn-reject"  onclick="mgrCabReject('+b.booking_id+')">❌ Reject</button>'+
+            '</div>':'')+
+        '</div>';
+      }).join('');
+    } catch(e){ c.innerHTML='<p class="empty-msg">Could not load.</p>'; }
+  }
+  async function mgrCabApprove(id){
+    try{ var r=await fetch(API+'/cab/'+id+'/approve',{method:'PATCH',headers:authHeaders()}); var d=await r.json(); alert(d.message); loadManagerCabApprovals(); }catch(e){alert('Failed.');}
+  }
+  async function mgrCabReject(id){
+    var reason=prompt('Rejection reason (optional):')||'';
+    try{ var r=await fetch(API+'/cab/'+id+'/reject',{method:'PATCH',headers:authHeaders(),body:JSON.stringify({reason})}); var d=await r.json(); alert(d.message); loadManagerCabApprovals(); }catch(e){alert('Failed.');}
+  }
+
+
+  /* ── MANAGER MEETINGS ─────────────────────── */
+  async function loadManagerMeetings() {
+    var c2 = document.getElementById('mgrMeetingList');
+    if(!c2) return;
+    try {
+      var r = await fetch(API+'/meetings',{headers:authHeaders()});
+      var list = await r.json();
+      if(!list.length){ c2.innerHTML='<p class="empty-msg">No meetings scheduled.</p>'; return; }
+      var typeIcons={internal:'🏢',client:'🤝',standup:'⚡',review:'📊',interview:'👤',training:'📚',emergency:'🚨'};
+      c2.innerHTML = list.slice(0,15).map(function(m){
+        var dt = new Date(m.scheduled_at);
+        var isActive = m.status==='active';
+        return '<div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;padding:12px;border:1.5px solid '+(isActive?'#86efac':'#e2e8f0')+';border-radius:12px;margin-bottom:8px;background:'+(isActive?'#f0fdf4':'#fff')+'">'+
+          '<div>'+
+            '<div style="font-weight:700;font-size:.88rem;color:#1e293b">'+escHtml(m.title)+'</div>'+
+            '<div style="font-size:.75rem;color:#64748b;margin-top:3px">'+
+              (typeIcons[m.meeting_type]||'🏢')+' '+escHtml(m.meeting_type)+
+              ' &nbsp;·&nbsp; 📅 '+dt.toLocaleDateString('en-IN',{day:'numeric',month:'short'})+
+              ' '+dt.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit',hour12:true})+
+              ' &nbsp;·&nbsp; 👥 '+(m.participant_count||0)+
+            '</div>'+
+          '</div>'+
+          '<div style="display:flex;gap:6px;align-items:center">'+
+            '<span style="font-size:.7rem;font-weight:700;padding:3px 9px;border-radius:999px;background:'+(isActive?'#dcfce7':'#f1f5f9')+';color:'+(isActive?'#15803d':'#64748b')+'">'+m.status+'</span>'+
+            '<a href="meetings.html" class="btn btn-sm" style="background:'+(isActive?'#16a34a':'#2563eb')+';color:#fff;padding:5px 12px;text-decoration:none;font-size:.75rem">'+(isActive?'🟢 Join':'Enter')+'</a>'+
+            (m.report_generated?'<a href="meetings.html" class="btn btn-sm" style="background:#f0fdf4;color:#15803d;padding:5px 12px;text-decoration:none;font-size:.75rem">📋 Report</a>':'')+
+          '</div>'+
+        '</div>';
+      }).join('');
+    } catch(e){ c2.innerHTML='<p class="empty-msg">Could not load meetings.</p>'; }
+  }
+
+  document.addEventListener('DOMContentLoaded', function() {
+    var u = getUser();
+    if(!u){ window.location.href='login.html'; return; }
+    // Allow role 3 (Manager) and role 1 (Admin acting as manager)
+    if(u.role_id !== 3 && u.role_id !== 1) {
+      window.location.href = 'employee-dashboard.html'; return;
+    }
+    setInner('mgrName', '👤 '+u.full_name);
+
+    // Start clock & weather
+    loadWeather();
+
+    // Set default month/year in attendance
+    var now = new Date();
+    var am = document.getElementById('attMonth'); if(am) am.value = now.getMonth()+1;
+    var ay = document.getElementById('attYear');  if(ay) ay.value = now.getFullYear();
+
+    // Set default due date
+    var dd = document.getElementById('mTaskDue');
+    if(dd) { var d=new Date(); d.setDate(d.getDate()+7); dd.value=d.toISOString().slice(0,10); }
+
+    // Load all data
+    loadTeam();
+    loadKPIs();
+  });
+  
+  /* ── LIVE: Travel complete notification ─── */
+  (function(){
+    var _travelSock = null;
+    function initTravelSocket(){
+      if(typeof io==='undefined') return;
+      var tok = getToken(); if(!tok) return;
+      try {
+        _travelSock = io(window.location.origin,{auth:{token:tok},transports:['websocket','polling']});
+        _travelSock.on('wip:cab_travel_complete', function(data){
+          showTravelCompleteAlert(data);
+          // Reload cab approvals if that tab is visible
+          var cabTab = document.getElementById('tab-cab_approval')||document.getElementById('tab-cab_mgr');
+          if(cabTab && cabTab.classList.contains('active')) {
+            if(typeof loadCabApprovals==='function') loadCabApprovals();
+            if(typeof loadManagerCabApprovals==='function') loadManagerCabApprovals();
+          }
+        });
+      } catch(e){}
+    }
+    function showTravelCompleteAlert(data){
+      var banner = document.createElement('div');
+      banner.style.cssText='position:fixed;top:70px;right:16px;z-index:9999;background:linear-gradient(135deg,#16a34a,#0891b2);color:#fff;border-radius:14px;padding:14px 18px;max-width:320px;box-shadow:0 8px 24px rgba(0,0,0,.25);cursor:pointer;animation:slideInRight .4s ease';
+      banner.innerHTML=
+        '<div style="font-weight:800;font-size:.9rem;margin-bottom:4px">🏁 Travel Complete</div>'+
+        '<div style="font-size:.78rem;opacity:.9;line-height:1.5">'+escHtml(data.message||'')+'</div>'+
+        (data.travel_km?'<div style="font-size:.72rem;margin-top:4px;opacity:.8">📏 '+data.travel_km+' km covered</div>':'')+
+        (data.passenger?'<div style="font-size:.72rem;opacity:.8">👤 '+escHtml(data.passenger)+'</div>':'')+
+        (data.driver?'<div style="font-size:.72rem;opacity:.8">🧑‍✈️ Driver: '+escHtml(data.driver)+'</div>':'')+
+        '<div style="font-size:.65rem;margin-top:5px;opacity:.6">'+new Date().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit',hour12:true})+'</div>';
+      if(!document.getElementById('slideRightStyle')){
+        var st=document.createElement('style');
+        st.id='slideRightStyle';
+        st.textContent='@keyframes slideInRight{from{opacity:0;transform:translateX(30px)}to{opacity:1;transform:translateX(0)}}';
+        document.head.appendChild(st);
+      }
+      banner.onclick=function(){ if(banner.parentNode) document.body.removeChild(banner); };
+      document.body.appendChild(banner);
+      setTimeout(function(){ if(banner.parentNode) document.body.removeChild(banner); }, 10000);
+    }
+    document.addEventListener('DOMContentLoaded', initTravelSocket);
+  })();
+
+  /* ── DRIVER NEW BOOKING NOTIFICATION ─── */
+  (function(){
+    function initDriverBookingSocket(){
+      if(typeof io==='undefined') return;
+      var tok=getToken(); if(!tok) return;
+      try{
+        var sock=io(window.location.origin,{auth:{token:tok},transports:['websocket','polling']});
+        sock.on('wip:cab_driver_new_booking',function(data){
+          showDriverBookingAlert(data);
+          // Refresh panels
+          if(typeof loadCabApprovals==='function') loadCabApprovals();
+          if(typeof loadManagerCabApprovals==='function') loadManagerCabApprovals();
+          if(typeof loadDriverBookings==='function' && window._currentDriverId) loadDriverBookings(window._currentDriverId);
+        });
+      }catch(e){}
+    }
+
+    function showDriverBookingAlert(data){
+      var banner=document.createElement('div');
+      banner.style.cssText=[
+        'position:fixed','top:68px','right:16px','z-index:9999',
+        'background:linear-gradient(135deg,#1e3a8a,#7c3aed)',
+        'color:#fff','border-radius:16px','padding:16px 20px',
+        'max-width:340px','box-shadow:0 8px 28px rgba(0,0,0,.3)',
+        'font-family:Segoe UI,Arial,sans-serif','cursor:pointer'
+      ].join(';');
+      banner.innerHTML=
+        '<div style="font-weight:900;font-size:.92rem;margin-bottom:6px">🚗 New Booking Assigned!</div>'+
+        '<div style="font-size:.8rem;opacity:.9;line-height:1.5">'+escHtml(data.message||'A booking has been assigned to a driver.')+'</div>'+
+        (data.driver_name?'<div style="font-size:.75rem;margin-top:6px;opacity:.8">🧑‍✈️ Driver: '+escHtml(data.driver_name)+'</div>':'')+
+        (data.passenger?'<div style="font-size:.75rem;opacity:.8">👤 Passenger: '+escHtml(data.passenger)+'</div>':'')+
+        (data.route?'<div style="font-size:.75rem;opacity:.8">📍 Route: '+escHtml(data.route)+'</div>':'')+
+        '<div style="font-size:.7rem;margin-top:4px;opacity:.6">'+new Date().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit',hour12:true})+'</div>';
+      banner.onclick=function(){banner.remove();};
+      document.body.appendChild(banner);
+      setTimeout(function(){if(banner.parentNode)banner.remove();},10000);
+    }
+
+    document.addEventListener('DOMContentLoaded',initDriverBookingSocket);
+  })();
+</script>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <a href="index.html" class="footer-brand">⚡ Workforce Intelligence Platform</a>
+      <nav class="footer-links">
+        <a href="manager.html">Manager Dashboard</a>
+        <a href="tasks.html">Tasks</a>
+        <a href="analytics.html">Analytics</a>
+        <a href="reports.html">Reports</a>
+        <a href="leave.html">Leave</a>
+        <a href="leaderboard.html">Leaderboard</a>
+        <a href="chat.html">AI Chat</a>
+        <a href="meetings.html" style="color:#fff;margin-left:12px">📹 Meetings</a>
+    <a href="notifications.html">Notifications</a>
+        <a href="profile.html">Profile</a>
+      </nav>
+      <p class="footer-copy">&copy; 2025 Workforce Intelligence Platform v7.0</p>
+    </div>
+  </footer>
+</body>
+</html>

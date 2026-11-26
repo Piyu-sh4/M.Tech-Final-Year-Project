@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Notifications – Workforce Intelligence v6.0</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+  body{background:#F0F4F8}
+  .page-wrap{max-width:760px;margin:0 auto;padding:24px}
+  .toolbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;flex-wrap:wrap;gap:10px}
+  .toolbar h2{margin:0;color:#1B4F8A;font-size:1.3rem}
+  .btn{padding:8px 18px;border:none;border-radius:8px;font-weight:600;cursor:pointer;font-size:13px}
+  .btn-primary{background:#1B4F8A;color:#fff}
+  .btn-secondary{background:#EEF2F7;color:#5D6D7E}
+  .filter-tabs{display:flex;gap:6px;margin-bottom:16px;flex-wrap:wrap}
+  .ftab{padding:6px 16px;border-radius:999px;border:1.5px solid #BDC3C7;background:#fff;color:#5D6D7E;font-size:12px;font-weight:600;cursor:pointer}
+  .ftab.active{background:#1B4F8A;color:#fff;border-color:#1B4F8A}
+  .notif-list{display:flex;flex-direction:column;gap:10px}
+  .notif-item{background:#fff;border-radius:12px;padding:16px 20px;box-shadow:0 2px 10px rgba(0,0,0,.07);display:flex;gap:14px;align-items:flex-start;border-left:4px solid #e2e8f0;transition:all .2s;position:relative}
+  .notif-item.unread{border-left-color:#1B4F8A;background:#f8faff}
+  .notif-item.type-leave_approved{border-left-color:#27AE60}
+  .notif-item.type-leave_rejected{border-left-color:#C0392B}
+  .notif-item.type-salary_paid{border-left-color:#D4AC0D}
+  .notif-item.type-task_assigned{border-left-color:#2E86C1}
+  .notif-item.type-overdue{border-left-color:#E74C3C}
+  .notif-item.type-achievement{border-left-color:#7c3aed}
+  .notif-icon{font-size:26px;flex-shrink:0;margin-top:2px}
+  .notif-body{flex:1}
+  .notif-msg{font-size:14px;color:#2C3E50;margin-bottom:5px;line-height:1.5}
+  .notif-time{font-size:11px;color:#7F8C8D}
+  .notif-actions{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap;align-items:center}
+  .ntag{padding:2px 10px;border-radius:10px;font-size:11px;font-weight:700}
+  .ntag.leave_approved,.ntag.salary_paid{background:#D5F5E3;color:#1E8449}
+  .ntag.leave_rejected,.ntag.overdue{background:#FADBD8;color:#C0392B}
+  .ntag.task_assigned{background:#D6EAF8;color:#1B4F8A}
+  .ntag.achievement{background:#F3E8FF;color:#7c3aed}
+  .ntag.general{background:#EEF2F7;color:#5D6D7E}
+  .ntag.salary_paid{background:#FEF9E7;color:#D4AC0D}
+  .unread-dot{width:10px;height:10px;background:#E74C3C;border-radius:50%;flex-shrink:0;margin-top:5px}
+  .notif-item.type-sos_alert{border-left-color:#dc2626;background:#fff1f1}
+  .ntag.sos_alert{background:#fee2e2;color:#b91c1c}
+  .read-btn{background:none;border:1px solid #BDC3C7;border-radius:6px;padding:2px 10px;font-size:11px;color:#5D6D7E;cursor:pointer}
+  .read-btn:hover{background:#EEF2F7}
+  .notif-count{background:#E74C3C;color:#fff;border-radius:999px;padding:2px 8px;font-size:11px;font-weight:700;margin-left:8px}
+  .create-alert-card{background:#fff;border-radius:12px;padding:20px;box-shadow:0 2px 10px rgba(0,0,0,.07);margin-bottom:20px;display:none}
+  .create-alert-card input,.create-alert-card select{width:100%;padding:9px 12px;border:1px solid #BDC3C7;border-radius:8px;font-size:13px;margin-bottom:10px;box-sizing:border-box}
+</style>
+</head>
+<body>
+<nav class="navbar">
+  <div class="nav-brand">⚡ Workforce Intelligence</div>
+  <div class="nav-links">
+    <a href="salary.html" style="color:#fff">💰 Salary</a>
+    <a href="leave.html" style="color:#fff;margin-left:16px">🏖️ Leave</a>
+    <a href="profile.html" style="color:#fff;margin-left:16px">👤 Profile</a>
+    <a href="javascript:history.back()" style="color:#fff;margin-left:16px">← Back</a>
+    <a href="login.html" onclick="localStorage.clear()" style="color:#fff;margin-left:16px">Logout</a>
+  </div>
+</nav>
+
+<div class="page-wrap">
+  <div class="toolbar">
+    <h2>🔔 Notifications <span class="notif-count" id="unreadCount" style="display:none"></span></h2>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button class="btn btn-secondary" onclick="load()">🔄 Refresh</button>
+      <button class="btn btn-secondary" id="broadcastBtn" style="display:none" onclick="toggleCreate()">📢 Broadcast</button>
+      <button class="btn btn-primary" onclick="markAllRead()">✅ Mark All Read</button>
+    </div>
+  </div>
+
+  <!-- Broadcast form (admin only) -->
+  <div class="create-alert-card" id="createCard">
+    <h4 style="margin:0 0 12px;color:#1B4F8A">📢 Send Broadcast Notification</h4>
+    <input type="text" id="alertMsg" placeholder="Notification message…">
+    <select id="alertType">
+      <option value="general">ℹ️ General</option>
+      <option value="task_assigned">📋 Task Assigned</option>
+      <option value="overdue">⚠️ Overdue Alert</option>
+      <option value="salary_paid">💰 Salary</option>
+    </select>
+    <div style="display:flex;gap:8px">
+      <button class="btn btn-primary" onclick="createAlert()">Send to All</button>
+      <button class="btn btn-secondary" onclick="toggleCreate()">Cancel</button>
+    </div>
+  </div>
+
+  <div class="filter-tabs">
+    <button class="ftab active" onclick="filterNotifs('all',this)">All</button>
+    <button class="ftab" onclick="filterNotifs('unread',this)">Unread</button>
+    <button class="ftab" onclick="filterNotifs('leave_approved',this)">✅ Leave</button>
+    <button class="ftab" onclick="filterNotifs('salary_paid',this)">💰 Salary</button>
+    <button class="ftab" onclick="filterNotifs('task_assigned',this)">📋 Tasks</button>
+    <button class="ftab" onclick="filterNotifs('overdue',this)">⚠️ Overdue</button>
+    <button class="ftab" id="sosFilterTab" style="display:none" onclick="filterNotifs('sos_alert',this)">🚨 SOS</button>
+  </div>
+
+  <div class="notif-list" id="list"><div class="empty">Loading…</div></div>
+</div>
+
+<script>
+var API   = 'http://localhost:5000/api';
+var token = localStorage.getItem('token');
+var user  = JSON.parse(localStorage.getItem('user') || '{}');
+if (!token) location.href = 'login.html';
+
+var allNotifs = [];
+var currentFilter = 'all';
+
+var ICONS = {
+  task_assigned: '📋', overdue: '⚠️', achievement: '🏆',
+  general: 'ℹ️', leave_approved: '✅', leave_rejected: '❌',
+  salary_paid: '💰', leave: '🏖️', sos_alert: '🚨', cab_booking: '🚗'
+};
+
+if ([1,3,4].includes(user.role_id)) {
+  document.getElementById('broadcastBtn').style.display = '';
+}
+// Show SOS tab for admin/manager
+if ([1,3].includes(user.role_id)) {
+  document.getElementById('sosFilterTab').style.display = '';
+}
+
+function toggleCreate() {
+  var c = document.getElementById('createCard');
+  c.style.display = c.style.display === 'block' ? 'none' : 'block';
+}
+
+function ap(url, opts) {
+  return fetch(API + url, Object.assign({ headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' } }, opts || {})).then(function(r){ return r.json(); });
+}
+
+async function load() {
+  var rows = await ap('/admin/alerts');
+  allNotifs = Array.isArray(rows) ? rows : [];
+  var unread = allNotifs.filter(function(r){ return !r.is_read; }).length;
+  var badge  = document.getElementById('unreadCount');
+  if (unread > 0) { badge.textContent = unread; badge.style.display = 'inline'; }
+  else { badge.style.display = 'none'; }
+  render();
+}
+
+function filterNotifs(type, btn) {
+  currentFilter = type;
+  document.querySelectorAll('.ftab').forEach(function(b){ b.classList.remove('active'); });
+  btn.classList.add('active');
+  render();
+}
+
+function render() {
+  var filtered = allNotifs;
+  if (currentFilter === 'unread')     filtered = allNotifs.filter(function(r){ return !r.is_read; });
+  else if (currentFilter !== 'all')   filtered = allNotifs.filter(function(r){ return r.alert_type === currentFilter; });
+
+  var el = document.getElementById('list');
+  if (!filtered.length) {
+    el.innerHTML = '<div class="empty">🎉 No notifications' + (currentFilter !== 'all' ? ' in this category' : '') + '!</div>';
+    return;
+  }
+
+  el.innerHTML = filtered.map(function(r) {
+    var icon = ICONS[r.alert_type] || '🔔';
+    var type = r.alert_type || 'general';
+    var unread = !r.is_read;
+    return '<div class="notif-item type-' + type + (unread ? ' unread' : '') + '" id="n' + r.alert_id + '">'
+      + '<div class="notif-icon">' + icon + '</div>'
+      + '<div class="notif-body">'
+        + '<div class="notif-msg">' + escHtml(r.alert_message) + '</div>'
+        + (r.task_title ? '<div style="font-size:12px;color:#5D6D7E">Task: <em>' + escHtml(r.task_title) + '</em></div>' : '')
+        + '<div class="notif-time">' + new Date(r.created_at).toLocaleString('en-IN') + '</div>'
+        + '<div class="notif-actions">'
+          + '<span class="ntag ' + type + '">' + type.replace(/_/g,' ') + '</span>'
+          + (unread ? '<button class="read-btn" onclick="markRead(' + r.alert_id + ')">Mark read</button>' : '<span style="font-size:11px;color:#27AE60;font-weight:600">✓ Read</span>')
+        + '</div>'
+      + '</div>'
+      + (unread ? '<div class="unread-dot"></div>' : '')
+    + '</div>';
+  }).join('');
+}
+
+function escHtml(s) {
+  return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+async function markRead(id) {
+  await ap('/admin/alerts/' + id + '/read', { method: 'PATCH' });
+  load();
+}
+
+async function markAllRead() {
+  await ap('/admin/alerts/read-all', { method: 'PATCH' });
+  load();
+}
+
+async function createAlert() {
+  var msg  = document.getElementById('alertMsg').value.trim();
+  var type = document.getElementById('alertType').value;
+  if (!msg) { alert('Message is required'); return; }
+  var r = await ap('/admin/alerts', { method: 'POST', body: JSON.stringify({ alert_message: msg, alert_type: type }) });
+  if (r.alert_id) { document.getElementById('alertMsg').value = ''; toggleCreate(); load(); }
+  else alert(r.message || 'Error sending alert');
+}
+
+load();
+setInterval(load, 30000); // auto-refresh every 30s
+</script>
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <a href="index.html" class="footer-brand">⚡ Workforce Intelligence Platform</a>
+    <nav class="footer-links">
+      <a href="employee-dashboard.html">Dashboard</a>
+      <a href="tasks.html">Tasks</a>
+      <a href="salary.html">Salary</a>
+      <a href="leave.html">Leave</a>
+      <a href="leaderboard.html">Leaderboard</a>
+      <a href="chat.html">AI Chat</a>
+      <a href="profile.html">Profile</a>
+    </nav>
+    <p class="footer-copy">&copy; 2025 Workforce Intelligence Platform v6.0</p>
+  </div>
+</footer>
+</body>
+</html>

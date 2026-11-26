@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Salary & Payroll – Workforce Intelligence</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .page-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;flex-wrap:wrap;gap:12px}
+    .tab-nav{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:20px;background:#f1f5f9;padding:8px;border-radius:14px}
+    .tab-btn{padding:8px 16px;border:none;border-radius:10px;cursor:pointer;font-size:.85rem;font-weight:600;background:transparent;color:#64748b;transition:all .2s}
+    .tab-btn.active{background:#fff;color:#2563eb;box-shadow:0 2px 8px rgba(37,99,235,.15)}
+    .tab-panel{display:none}.tab-panel.active{display:block}
+    .filter-row{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px;align-items:flex-end}
+    .filter-row select,.filter-row input{padding:8px 12px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:.85rem}
+    table{width:100%;border-collapse:collapse;font-size:.84rem}
+    th{background:#f8fafc;padding:10px 12px;text-align:left;font-weight:700;color:#475569;border-bottom:2px solid #e2e8f0}
+    td{padding:10px 12px;border-bottom:1px solid #f1f5f9;vertical-align:middle}
+    tr:hover td{background:#f8fafc}
+    .pill{display:inline-block;padding:3px 10px;border-radius:999px;font-size:.75rem;font-weight:700}
+    .pill-paid{background:#dcfce7;color:#15803d}.pill-pending{background:#fef9c3;color:#854d0e}
+    .action-btn{padding:5px 12px;border:none;border-radius:6px;cursor:pointer;font-size:.78rem;font-weight:600;margin:2px}
+    .btn-pay{background:#dcfce7;color:#15803d}.btn-view{background:#dbeafe;color:#1d4ed8}
+    .btn-del{background:#fee2e2;color:#991b1b}
+    .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:999;align-items:center;justify-content:center}
+    .modal-overlay.open{display:flex}
+    .modal-box{background:#fff;border-radius:18px;padding:28px;width:min(640px,95vw);max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.2)}
+    .modal-title{font-size:1.1rem;font-weight:800;margin-bottom:18px;color:#1e293b}
+    .modal-footer{display:flex;gap:8px;justify-content:flex-end;margin-top:20px}
+    .line-item-row{display:grid;grid-template-columns:1fr auto 80px;gap:8px;align-items:center;margin-bottom:6px}
+    .slip-header{text-align:center;padding:16px;background:linear-gradient(135deg,#1e293b,#334155);color:#fff;border-radius:12px;margin-bottom:16px}
+    .slip-section{margin-bottom:14px}
+    .slip-row{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #f1f5f9;font-size:.88rem}
+    .slip-total{font-weight:800;font-size:1rem;color:#2563eb}
+    .earn-col{color:#15803d}.deduct-col{color:#991b1b}
+    .balance-card{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;margin-bottom:20px}
+    .bal-item{background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:10px;padding:14px;text-align:center}
+    .bal-num{font-size:1.6rem;font-weight:800;color:#2563eb}.bal-lbl{font-size:.78rem;color:#64748b;margin-top:2px}
+    .advance-card{border:1.5px solid #e2e8f0;border-radius:12px;padding:16px;margin-bottom:10px}
+    @media print{.no-print{display:none!important}.modal-overlay{display:flex!important;position:static;background:none}.modal-box{box-shadow:none;padding:0}}
+  </style>
+</head>
+<body>
+<nav class="navbar">
+  <div class="nav-brand">💰 Salary & Payroll</div>
+  <div class="nav-info">
+    <a href="admin-dashboard.html" class="btn btn-sm btn-outline">← Dashboard</a>
+    <a href="leave.html" class="btn btn-sm btn-outline">🏖️ Leave</a>
+    <span id="navName" class="nav-user"></span>
+    <button onclick="logout()" class="btn btn-sm btn-outline">Logout</button>
+  </div>
+</nav>
+
+<div class="dashboard">
+  <div class="page-header">
+    <h2 id="pageTitle">Payroll Management</h2>
+    <div class="no-print" id="adminActions" style="display:none;gap:8px;flex-wrap:wrap">
+      <button class="btn btn-primary" onclick="openGenerate()">⚡ Generate Monthly</button>
+      <button class="btn btn-outline" onclick="exportSalary()">📥 Export CSV</button>
+    </div>
+  </div>
+
+  <div class="tab-nav no-print" id="tabNav">
+    <button class="tab-btn active" onclick="switchTab(this,'payslips')">📄 Pay Slips</button>
+    <button class="tab-btn admin-only" onclick="switchTab(this,'manage')" style="display:none">🗂️ Manage Payroll</button>
+    <button class="tab-btn admin-only" onclick="switchTab(this,'advances')" style="display:none">💳 Advances</button>
+    <button class="tab-btn admin-only" onclick="switchTab(this,'expenses')" style="display:none">🧾 Expenses</button>
+    <button class="tab-btn" onclick="switchTab(this,'myexpenses')">🧾 My Expenses</button>
+    <button class="tab-btn" onclick="switchTab(this,'leavebal')">📊 Leave Balance</button>
+  </div>
+
+  <!-- MY PAY SLIPS -->
+  <div id="tab-payslips" class="tab-panel active">
+    <div class="balance-card" id="mySlipStats"></div>
+    <table>
+      <thead><tr><th>Month/Year</th><th>Gross Salary</th><th>Deductions</th><th>Net Salary</th><th>Status</th><th>Paid On</th><th>Action</th></tr></thead>
+      <tbody id="mySlipBody"></tbody>
+    </table>
+  </div>
+
+  <!-- ADMIN MANAGE -->
+  <div id="tab-manage" class="tab-panel">
+    <div class="filter-row">
+      <select id="fMonth"><option value="">All Months</option></select>
+      <select id="fYear"><option value="">All Years</option></select>
+      <select id="fStatus"><option value="">All Status</option><option>pending</option><option>paid</option></select>
+      <input type="text" id="fSearch" placeholder="Search employee…" oninput="loadSalary()">
+      <button class="btn btn-primary btn-sm" onclick="loadSalary()">Filter</button>
+    </div>
+    <table>
+      <thead><tr><th>Employee</th><th>Designation</th><th>Month</th><th>Gross</th><th>Deductions</th><th>Net</th><th>Status</th><th>Actions</th></tr></thead>
+      <tbody id="salaryBody"></tbody>
+    </table>
+  </div>
+
+  <!-- ADVANCES -->
+  <div id="tab-advances" class="tab-panel">
+    <h4>Pending Advance Requests</h4>
+    <div id="advanceBody"></div>
+  </div>
+
+  <!-- ADMIN EXPENSES -->
+  <div id="tab-expenses" class="tab-panel">
+    <div class="filter-row">
+      <select id="expStatus" onchange="loadExpenses()"><option value="">All</option><option>pending</option><option>approved</option><option>rejected</option><option>paid</option></select>
+    </div>
+    <div id="expenseBody"></div>
+  </div>
+
+  <!-- MY EXPENSES -->
+  <div id="tab-myexpenses" class="tab-panel">
+    <button class="btn btn-primary btn-sm no-print" onclick="openExpenseClaim()" style="margin-bottom:16px">+ Submit Expense Claim</button>
+    <div id="myExpenseBody"></div>
+  </div>
+
+  <!-- LEAVE BALANCE -->
+  <div id="tab-leavebal" class="tab-panel">
+    <h4 id="balTitle">My Leave Balance — <span id="balYear"></span></h4>
+    <div id="balanceGrid"></div>
+  </div>
+</div>
+
+<!-- PAYSLIP MODAL -->
+<div class="modal-overlay" id="payslipModal">
+  <div class="modal-box" id="payslipContent">
+    <div class="no-print" style="text-align:right;margin-bottom:12px">
+      <button class="btn btn-primary btn-sm" onclick="window.print()">🖨️ Print / Save PDF</button>
+      <button class="btn btn-outline btn-sm" onclick="closeModal('payslipModal')">Close</button>
+    </div>
+    <div id="payslipBody"></div>
+  </div>
+</div>
+
+<!-- GENERATE MODAL -->
+<div class="modal-overlay" id="genModal">
+  <div class="modal-box">
+    <div class="modal-title">⚡ Generate Monthly Salary</div>
+    <p style="color:#64748b;font-size:.9rem;margin-bottom:16px">Auto-generates payroll for all active employees with itemized components (Basic, HRA, PF, ESI, PT, Leave Deductions).</p>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div><label class="form-label">Month</label><select id="genMonth" class="form-input"></select></div>
+      <div><label class="form-label">Year</label><select id="genYear" class="form-input"></select></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('genModal')">Cancel</button>
+      <button class="btn btn-primary" onclick="generateSalary()">Generate</button>
+    </div>
+  </div>
+</div>
+
+<!-- EXPENSE CLAIM MODAL -->
+<div class="modal-overlay" id="expModal">
+  <div class="modal-box">
+    <div class="modal-title">🧾 Submit Expense Claim</div>
+    <div class="form-group"><label class="form-label">Date</label><input type="date" id="expDate" class="form-input"></div>
+    <div class="form-group"><label class="form-label">Category</label>
+      <select id="expCat" class="form-input"><option>travel</option><option>food</option><option>medical</option><option>equipment</option><option>other</option></select>
+    </div>
+    <div class="form-group"><label class="form-label">Amount (₹)</label><input type="number" id="expAmt" class="form-input" placeholder="0"></div>
+    <div class="form-group"><label class="form-label">Description</label><textarea id="expDesc" class="form-input" rows="3"></textarea></div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('expModal')">Cancel</button>
+      <button class="btn btn-primary" onclick="submitExpense()">Submit</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const API = 'http://localhost:5000/api';
+const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+let token, isAdmin = false;
+
+function logout(){ localStorage.clear(); window.location.href='login.html'; }
+function closeModal(id){ document.getElementById(id).classList.remove('open'); }
+function switchTab(btn, id){
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('tab-'+id).classList.add('active');
+}
+function fmt(n){ return '₹'+(parseFloat(n)||0).toLocaleString('en-IN',{minimumFractionDigits:2}); }
+function h(s){ return String(s||'').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+async function apiFetch(path,opts={}){
+  const r = await fetch(API+path,{headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},...opts});
+  const d = await r.json();
+  if(!r.ok) throw new Error(d.message||'Request failed');
+  return d;
+}
+
+async function init(){
+  token = localStorage.getItem('token');
+  const user = JSON.parse(localStorage.getItem('user')||'{}');
+  if(!token){ window.location.href='login.html'; return; }
+  document.getElementById('navName').textContent = user.full_name||'';
+  isAdmin = user.role_id===1 || user.role_id===3 || user.role_id===4;
+
+  if(isAdmin){
+    document.querySelectorAll('.admin-only').forEach(el=>el.style.display='');
+    document.getElementById('adminActions').style.display='flex';
+    document.getElementById('pageTitle').textContent='Payroll Management';
+    initFilters();
+    loadSalary();
+    loadAdvances();
+    loadExpenses();
+  }
+  loadMySlips();
+  loadBalance();
+  loadMyExpenses();
+  document.getElementById('balYear').textContent=new Date().getFullYear();
+}
+
+function initFilters(){
+  const mSel=document.getElementById('fMonth');
+  const gSel=document.getElementById('genMonth');
+  MONTHS.forEach((m,i)=>{
+    mSel.innerHTML+=`<option value="${i+1}">${m}</option>`;
+    gSel.innerHTML+=`<option value="${i+1}">${m}</option>`;
+  });
+  const yr=new Date().getFullYear();
+  const ySel=document.getElementById('fYear');
+  const gySel=document.getElementById('genYear');
+  for(let y=yr;y>=yr-3;y--){
+    ySel.innerHTML+=`<option value="${y}">${y}</option>`;
+    gySel.innerHTML+=`<option value="${y}">${y}</option>`;
+  }
+  document.getElementById('fMonth').value=new Date().getMonth()+1;
+  document.getElementById('fYear').value=yr;
+  document.getElementById('genMonth').value=new Date().getMonth()+1;
+  document.getElementById('genYear').value=yr;
+}
+
+async function loadMySlips(){
+  try{
+    const data = await apiFetch('/admin/salary/my');
+    const yr=new Date().getFullYear();
+    const ytd=data.filter(s=>s.year===yr).reduce((a,s)=>a+parseFloat(s.net_salary||0),0);
+    const paid=data.filter(s=>s.payment_status==='paid').length;
+    document.getElementById('mySlipStats').innerHTML=`
+      <div class="bal-item"><div class="bal-num">${data.length}</div><div class="bal-lbl">Total Slips</div></div>
+      <div class="bal-item"><div class="bal-num" style="color:#15803d">${paid}</div><div class="bal-lbl">Paid</div></div>
+      <div class="bal-item"><div class="bal-num" style="color:#2563eb">${fmt(ytd)}</div><div class="bal-lbl">YTD Earnings</div></div>`;
+    const tb=document.getElementById('mySlipBody');
+    tb.innerHTML=data.length?data.map(s=>`
+      <tr>
+        <td><strong>${MONTHS[s.month-1]} ${s.year}</strong></td>
+        <td>${fmt(s.base_salary)}</td>
+        <td class="deduct-col">${fmt(s.deductions)}</td>
+        <td><strong>${fmt(s.net_salary)}</strong></td>
+        <td><span class="pill pill-${s.payment_status==='paid'?'paid':'pending'}">${s.payment_status}</span></td>
+        <td>${s.paid_on?new Date(s.paid_on).toLocaleDateString():'-'}</td>
+        <td><button class="action-btn btn-view" onclick='showPayslip(${JSON.stringify(s)})'>👁️ View</button></td>
+      </tr>`).join(''):'<tr><td colspan="7" style="text-align:center;color:#94a3b8;padding:24px">No salary records found</td></tr>';
+  }catch(e){ console.error(e); }
+}
+
+async function loadSalary(){
+  try{
+    const m=document.getElementById('fMonth').value;
+    const y=document.getElementById('fYear').value;
+    const q=document.getElementById('fSearch').value;
+    let url='/admin/salary?';
+    if(m) url+=`month=${m}&`;
+    if(y) url+=`year=${y}&`;
+    const data=await apiFetch(url);
+    const filtered=q?data.filter(s=>s.full_name.toLowerCase().includes(q.toLowerCase())):data;
+    const tb=document.getElementById('salaryBody');
+    tb.innerHTML=filtered.length?filtered.map(s=>`
+      <tr>
+        <td><strong>${h(s.full_name)}</strong><br><small style="color:#94a3b8">${h(s.email)}</small></td>
+        <td>${h(s.designation||'-')}</td>
+        <td>${MONTHS[s.month-1]} ${s.year}</td>
+        <td>${fmt(s.base_salary)}</td>
+        <td class="deduct-col">${fmt(s.deductions)}</td>
+        <td><strong>${fmt(s.net_salary)}</strong></td>
+        <td><span class="pill pill-${s.payment_status==='paid'?'paid':'pending'}">${s.payment_status}</span></td>
+        <td>
+          <button class="action-btn btn-view" onclick='showPayslip(${JSON.stringify(s)})'>👁️</button>
+          ${s.payment_status!=='paid'?`<button class="action-btn btn-pay" onclick="markPaid(${s.salary_id})">✅ Pay</button>`:''}
+          <button class="action-btn btn-del" onclick="deleteSalary(${s.salary_id})">🗑️</button>
+        </td>
+      </tr>`).join(''):'<tr><td colspan="8" style="text-align:center;color:#94a3b8;padding:24px">No records. Generate monthly salary first.</td></tr>';
+  }catch(e){ console.error(e); }
+}
+
+async function showPayslip(s){
+  // Fetch bank details for this employee
+  try {
+    const users = await apiFetch(`/auth/users`);
+    const emp = users.find(u => u.user_id === s.user_id);
+    if (emp) {
+      s.bank_name = emp.bank_name;
+      s.account_number = emp.account_number;
+      s.ifsc_code = emp.ifsc_code;
+      s.account_holder_name = emp.account_holder_name;
+      s.account_type = emp.account_type;
+    }
+  } catch(e) {} // bank details optional, proceed without
+  const items=s.line_items||[];
+  const earnings=items.filter(i=>i.component_type==='earning');
+  const deductions=items.filter(i=>i.component_type==='deduction');
+  const now=new Date();
+  document.getElementById('payslipBody').innerHTML=`
+    <div class="slip-header">
+      <div style="font-size:1.4rem;font-weight:900">Workforce Intelligence</div>
+      <div style="opacity:.8;font-size:.9rem;margin-top:4px">Pay Slip — ${MONTHS[s.month-1]} ${s.year}</div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;font-size:.88rem">
+      <div><strong>Employee:</strong> ${h(s.full_name)}<br>
+           <strong>Email:</strong> ${h(s.email||'')}<br>
+           <strong>Designation:</strong> ${h(s.designation||'—')}</div>
+      <div><strong>Department:</strong> ${h(s.dept_name||'—')}<br>
+           <strong>Pay Period:</strong> ${MONTHS[s.month-1]} ${s.year}<br>
+           <strong>Generated:</strong> ${now.toLocaleDateString('en-IN')}</div>
+    </div>
+    ${earnings.length?`
+    <div class="slip-section">
+      <div style="font-weight:700;margin-bottom:8px;color:#15803d">EARNINGS</div>
+      ${earnings.map(i=>`<div class="slip-row"><span>${h(i.component_name)}</span><span class="earn-col">${fmt(i.amount)}</span></div>`).join('')}
+    </div>`:
+    `<div class="slip-section"><div class="slip-row"><span>Gross Salary</span><span class="earn-col">${fmt(s.base_salary)}</span></div></div>`}
+    ${deductions.length?`
+    <div class="slip-section">
+      <div style="font-weight:700;margin-bottom:8px;color:#991b1b">DEDUCTIONS</div>
+      ${deductions.map(i=>`<div class="slip-row"><span>${h(i.component_name)}</span><span class="deduct-col">(${fmt(i.amount)})</span></div>`).join('')}
+    </div>`:''}
+    <div style="background:#f0fdf4;border-radius:10px;padding:14px;margin-top:16px">
+      <div class="slip-row slip-total"><span>NET SALARY</span><span>${fmt(s.net_salary)}</span></div>
+      <div class="slip-row" style="font-size:.82rem;color:#64748b"><span>Payment Status</span>
+        <span style="color:${s.payment_status==='paid'?'#15803d':'#854d0e'};font-weight:700">${s.payment_status.toUpperCase()}</span></div>
+      ${s.paid_on?`<div class="slip-row" style="font-size:.82rem;color:#64748b"><span>Paid On</span><span>${new Date(s.paid_on).toLocaleDateString('en-IN')}</span></div>`:''}
+      ${s.payment_method?`<div class="slip-row" style="font-size:.82rem;color:#64748b"><span>Payment Method</span><span>${h(s.payment_method)}</span></div>`:''}
+      ${s.transaction_ref?`<div class="slip-row" style="font-size:.82rem;color:#64748b"><span>Transaction Ref</span><span style="font-family:monospace">${h(s.transaction_ref)}</span></div>`:''}
+    </div>
+    ${(s.bank_name||s.account_number)?`
+    <div style="background:#eff6ff;border-radius:10px;padding:14px;margin-top:12px;border:1px solid #bfdbfe">
+      <div style="font-weight:700;font-size:.78rem;color:#1d4ed8;margin-bottom:8px;text-transform:uppercase;letter-spacing:.05em">🏦 Bank Transfer Details</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:.82rem">
+        ${s.account_holder_name?`<div><strong>Account Holder</strong><br>${h(s.account_holder_name)}</div>`:''}
+        ${s.bank_name?`<div><strong>Bank</strong><br>${h(s.bank_name)}</div>`:''}
+        ${s.account_number?`<div><strong>Account No.</strong><br><span style="font-family:monospace">••••${String(s.account_number).slice(-4)}</span></div>`:''}
+        ${s.ifsc_code?`<div><strong>IFSC</strong><br><span style="font-family:monospace">${h(s.ifsc_code)}</span></div>`:''}
+        ${s.account_type?`<div><strong>Account Type</strong><br>${h(s.account_type)}</div>`:''}
+      </div>
+    </div>`:''}
+    <p style="text-align:center;font-size:.75rem;color:#94a3b8;margin-top:16px">This is a computer-generated pay slip. No signature required.</p>`;
+  document.getElementById('payslipModal').classList.add('open');
+}
+
+async function markPaid(id){
+  // Show payment details modal
+  const method = prompt('Payment Method:\n1. NEFT\n2. IMPS\n3. RTGS\n4. Cash\n5. Cheque\n\nEnter method name:','NEFT');
+  if (!method) return;
+  const txRef = prompt('Transaction Reference / UTR Number (optional):','') || '';
+  if (!confirm(`Mark salary #${id} as PAID via ${method}?`)) return;
+  try {
+    await apiFetch(`/admin/salary/${id}/paid`, {method:'PATCH', body: JSON.stringify({payment_method: method, transaction_ref: txRef})});
+    alert('✅ Salary marked as paid!');
+    loadSalary();
+  } catch(e){ alert(e.message); }
+}
+
+async function deleteSalary(id){
+  if(!confirm('Delete this salary record?')) return;
+  try{ await apiFetch(`/admin/salary/${id}`,{method:'DELETE'}); loadSalary(); }
+  catch(e){ alert(e.message); }
+}
+
+function openGenerate(){ document.getElementById('genModal').classList.add('open'); }
+async function generateSalary(){
+  const month=document.getElementById('genMonth').value;
+  const year=document.getElementById('genYear').value;
+  try{
+    const d=await apiFetch('/admin/salary/generate',{method:'POST',body:JSON.stringify({month,year})});
+    alert(d.message); closeModal('genModal'); loadSalary();
+  }catch(e){ alert(e.message); }
+}
+
+async function exportSalary(){
+  const m=document.getElementById('fMonth').value;
+  const y=document.getElementById('fYear').value;
+  window.open(`${API}/admin/salary/export?month=${m}&year=${y}&_t=${token}`,'_blank');
+}
+
+async function loadBalance(){
+  try{
+    const yr=new Date().getFullYear();
+    const data=await apiFetch(`/admin/leave-balances/my?year=${yr}`);
+    const grid=document.getElementById('balanceGrid');
+    if(!data.length){ grid.innerHTML='<p style="color:#94a3b8">No leave balance data. Contact HR.</p>'; return; }
+    grid.innerHTML=`<div class="balance-card">${data.map(b=>`
+      <div class="bal-item">
+        <div class="bal-num">${b.remaining||0}</div>
+        <div class="bal-lbl">${b.leave_type.charAt(0).toUpperCase()+b.leave_type.slice(1)} Leave</div>
+        <div style="font-size:.75rem;color:#94a3b8;margin-top:4px">of ${b.entitled} days</div>
+        ${b.pending>0?`<div style="font-size:.72rem;color:#854d0e">${b.pending} pending</div>`:''}
+        ${b.carry_forward>0?`<div style="font-size:.72rem;color:#2563eb">${b.carry_forward} carried fwd</div>`:''}
+      </div>`).join('')}</div>`;
+  }catch(e){ console.error(e); }
+}
+
+async function loadAdvances(){
+  try{
+    const data=await apiFetch('/admin/salary-advances?status=pending');
+    const el=document.getElementById('advanceBody');
+    el.innerHTML=data.length?data.map(a=>`
+      <div class="advance-card">
+        <div style="display:flex;justify-content:space-between;align-items:start">
+          <div><strong>${h(a.full_name)}</strong> · ${fmt(a.amount)}<br>
+            <small style="color:#64748b">${h(a.reason||'No reason given')} · ${a.repay_months} month(s)</small></div>
+          <div>
+            <button class="action-btn btn-pay" onclick="reviewAdvance(${a.advance_id},'approved')">✅ Approve</button>
+            <button class="action-btn btn-del" onclick="reviewAdvance(${a.advance_id},'rejected')">❌ Reject</button>
+          </div>
+        </div>
+      </div>`).join(''):'<p style="color:#94a3b8">No pending advance requests</p>';
+  }catch(e){ console.error(e); }
+}
+
+async function reviewAdvance(id,status){
+  try{ await apiFetch(`/admin/salary-advances/${id}/review`,{method:'PATCH',body:JSON.stringify({status})}); loadAdvances(); }
+  catch(e){ alert(e.message); }
+}
+
+function openExpenseClaim(){
+  document.getElementById('expDate').value=new Date().toISOString().slice(0,10);
+  document.getElementById('expModal').classList.add('open');
+}
+
+async function submitExpense(){
+  const body={claim_date:document.getElementById('expDate').value,
+    category:document.getElementById('expCat').value,
+    amount:document.getElementById('expAmt').value,
+    description:document.getElementById('expDesc').value};
+  try{
+    await apiFetch('/admin/expense-claims',{method:'POST',body:JSON.stringify(body)});
+    alert('Expense claim submitted!'); closeModal('expModal'); loadMyExpenses();
+  }catch(e){ alert(e.message); }
+}
+
+async function loadExpenses(){
+  try{
+    const st=document.getElementById('expStatus').value;
+    const data=await apiFetch(`/admin/expense-claims?status=${st}`);
+    const el=document.getElementById('expenseBody');
+    el.innerHTML=data.length?data.map(c=>`
+      <div class="advance-card">
+        <div style="display:flex;justify-content:space-between;align-items:start">
+          <div><strong>${h(c.full_name)}</strong> · <span class="pill pill-${c.status==='paid'||c.status==='approved'?'paid':'pending'}">${c.status}</span><br>
+            ${h(c.category)} · ${fmt(c.amount)} · ${new Date(c.claim_date).toLocaleDateString('en-IN')}<br>
+            <small style="color:#64748b">${h(c.description||'')}</small></div>
+          ${c.status==='pending'?`<div>
+            <button class="action-btn btn-pay" onclick="reviewClaim(${c.claim_id},'approved')">✅</button>
+            <button class="action-btn btn-del" onclick="reviewClaim(${c.claim_id},'rejected')">❌</button>
+          </div>`:''}
+        </div>
+      </div>`).join(''):'<p style="color:#94a3b8">No expense claims</p>';
+  }catch(e){ console.error(e); }
+}
+
+async function reviewClaim(id,status){
+  try{ await apiFetch(`/admin/expense-claims/${id}/review`,{method:'PATCH',body:JSON.stringify({status})}); loadExpenses(); }
+  catch(e){ alert(e.message); }
+}
+
+async function loadMyExpenses(){
+  const user=JSON.parse(localStorage.getItem('user')||'{}');
+  try{
+    const data=await apiFetch(`/admin/expense-claims?user_id=${user.user_id}`);
+    const el=document.getElementById('myExpenseBody');
+    el.innerHTML=data.length?data.map(c=>`
+      <div class="advance-card">
+        <strong>${h(c.category)}</strong> · ${fmt(c.amount)} · <span class="pill pill-${c.status==='paid'||c.status==='approved'?'paid':'pending'}">${c.status}</span><br>
+        ${new Date(c.claim_date).toLocaleDateString('en-IN')} — ${h(c.description||'')}
+      </div>`).join(''):'<p style="color:#94a3b8">No expense claims submitted</p>';
+  }catch(e){ console.error(e); }
+}
+
+init();
+</script>
+</body>
+</html>

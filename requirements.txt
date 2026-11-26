@@ -1,0 +1,10 @@
+# requirements.txt — Attrition Model Microservice (4th Semester)
+# Install: pip install -r requirements.txt
+
+flask==3.0.3
+scikit-learn==1.5.2
+pandas==2.2.3
+numpy==1.26.4
+mysql-connector-python==9.0.0
+python-dotenv==1.0.1
+gunicorn==23.0.0

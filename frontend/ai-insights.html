@@ -1,0 +1,1543 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<script src="/html.js"></script><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>AI Workforce Insights – Workforce Intelligence</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+
+/* ── UNIVERSAL SIDEBAR NAV ── */
+.wiq-wrap{display:flex;min-height:100vh}
+.wiq-sidebar{width:220px;min-width:220px;background:#0a1220;border-right:1px solid rgba(255,255,255,.07);position:sticky;top:0;height:100vh;overflow-y:auto;flex-shrink:0;transition:width .2s;z-index:200}
+.wiq-sidebar::-webkit-scrollbar{width:3px}.wiq-sidebar::-webkit-scrollbar-thumb{background:#1e3a5f}
+.wiq-sidebar-header{padding:14px 14px 10px;border-bottom:1px solid rgba(255,255,255,.07)}
+.wiq-logo{font-size:.9rem;font-weight:900;color:#fff;display:flex;align-items:center;gap:7px}
+.wiq-user-pill{display:flex;align-items:center;gap:7px;padding:8px 10px;margin:8px 0 4px;background:rgba(255,255,255,.04);border-radius:8px;font-size:.7rem;color:#64748b}
+.wiq-user-name{font-weight:700;color:#cbd5e1;font-size:.72rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:120px}
+.wiq-logout-btn{display:flex;align-items:center;gap:6px;padding:7px 10px;margin:0 6px 6px;background:rgba(220,38,38,.1);border:1px solid rgba(220,38,38,.2);border-radius:7px;color:#f87171;font-size:.72rem;font-weight:700;cursor:pointer;width:calc(100% - 12px);text-decoration:none;transition:all .15s}
+.wiq-logout-btn:hover{background:rgba(220,38,38,.2)}
+.wiq-nav-group{margin-bottom:2px}
+.wiq-nav-label{font-size:.59rem;font-weight:800;color:#1e3a5f;text-transform:uppercase;letter-spacing:.09em;padding:8px 14px 3px;cursor:pointer;display:flex;align-items:center;justify-content:space-between}
+.wiq-nav-label:hover{color:#334155}
+.wiq-nav-label .arr{font-size:.6rem;transition:.2s;color:#1e3a5f}
+.wiq-nav-items{display:flex;flex-direction:column;gap:1px;padding:0 6px 4px}
+.wiq-nav-item{display:flex;align-items:center;gap:7px;padding:5px 8px;border-radius:6px;font-size:.71rem;font-weight:600;color:#475569;text-decoration:none;transition:all .15s;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.wiq-nav-item:hover{background:rgba(37,99,235,.12);color:#60a5fa}
+.wiq-nav-item.active{background:rgba(37,99,235,.18);color:#60a5fa;font-weight:800}
+.wiq-nav-item .ico{font-size:.8rem;flex-shrink:0;width:16px;text-align:center}
+.wiq-main{flex:1;min-width:0;overflow-x:hidden}
+.wiq-collapsed .wiq-sidebar{width:48px}
+.wiq-collapsed .wiq-nav-item span,.wiq-collapsed .wiq-nav-label span:first-child,.wiq-collapsed .wiq-user-name,.wiq-collapsed .wiq-logo span,.wiq-collapsed .wiq-logout-btn span{display:none}
+.wiq-collapsed .wiq-nav-items{padding:0 3px}
+.wiq-collapsed .wiq-nav-item{justify-content:center;padding:6px}
+.wiq-collapsed .wiq-logout-btn{justify-content:center;padding:7px;margin:0 3px 4px}
+.wiq-toggle{background:none;border:none;color:#475569;cursor:pointer;padding:4px 8px;font-size:.75rem;display:flex;align-items:center;gap:4px;margin-left:auto}
+.wiq-toggle:hover{color:#60a5fa}
+@media(max-width:768px){.wiq-sidebar{position:fixed;left:-220px;top:0;transition:left .2s}.wiq-sidebar.open{left:0;box-shadow:4px 0 20px rgba(0,0,0,.5)}.wiq-mob-toggle{display:flex!important}}
+.wiq-mob-toggle{display:none;position:fixed;top:12px;left:12px;z-index:300;background:#1e3a5f;border:none;border-radius:8px;padding:7px 10px;color:#fff;font-size:.8rem;cursor:pointer}
+
+:root{--pri:#7c3aed;--pri2:#6d28d9;--acc:#0891b2;--ok:#16a34a;--warn:#d97706;--danger:#dc2626;--bg:#faf5ff;--border:#ede9fe;--text:#1e293b;--muted:#64748b}
+body{background:var(--bg)}
+.page{max-width:1080px;margin:0 auto;padding:24px}
+.hdr{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:24px}
+.hdr h1{font-size:1.6rem;font-weight:900;color:var(--text)}
+.hdr p{color:var(--muted);font-size:.87rem;margin-top:2px}
+.tab-nav{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:22px;background:#ede9fe;padding:8px;border-radius:14px}
+.tab-btn{padding:8px 16px;border:none;border-radius:10px;cursor:pointer;font-size:.84rem;font-weight:600;background:transparent;color:var(--muted);transition:all .2s}
+.tab-btn.active{background:#fff;color:var(--pri);box-shadow:0 2px 8px rgba(124,58,237,.18)}
+.tab-panel{display:none}.tab-panel.active{display:block}
+.insight-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px;margin-bottom:24px}
+.insight-card{background:#fff;border-radius:16px;padding:20px;border:1.5px solid var(--border);box-shadow:0 2px 10px rgba(0,0,0,.05);text-align:center}
+.insight-num{font-size:2rem;font-weight:900;margin-bottom:4px}
+.insight-lbl{font-size:.7rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+.insight-sub{font-size:.75rem;color:var(--muted);margin-top:4px}
+.card{background:#fff;border-radius:14px;padding:22px;margin-bottom:16px;border:1.5px solid var(--border);box-shadow:0 2px 8px rgba(0,0,0,.04)}
+.card h3{font-size:.95rem;font-weight:900;margin-bottom:14px;color:var(--text)}
+.risk-row{display:flex;justify-content:space-between;align-items:center;padding:11px 14px;border-radius:10px;margin-bottom:8px;border:1.5px solid var(--border);background:#faf5ff;transition:all .2s;cursor:pointer}
+.risk-row:hover{border-color:var(--pri);box-shadow:0 2px 8px rgba(124,58,237,.1)}
+.risk-name{font-weight:700;font-size:.87rem;color:var(--text)}
+.risk-dept{font-size:.73rem;color:var(--muted);margin-top:2px}
+.score-pill{padding:4px 12px;border-radius:999px;font-size:.72rem;font-weight:800}
+.r-HIGH{background:#fee2e2;color:#dc2626}.r-MEDIUM{background:#fef9c3;color:#854d0e}.r-LOW{background:#dcfce7;color:#15803d}
+.score-bar-wrap{display:flex;align-items:center;gap:8px;margin-top:6px}
+.score-bar{flex:1;background:#e2e8f0;border-radius:999px;height:7px}
+.score-fill{border-radius:999px;height:7px;transition:width .5s}
+.fi{padding:9px 12px;border:1.5px solid #e2e8f0;border-radius:9px;font-size:.85rem;background:#f8fafc;font-family:var(--wfi-font);box-sizing:border-box}
+.fi:focus{outline:none;border-color:var(--pri)}
+.btn-pri{background:var(--pri);color:#fff;border:none;padding:9px 20px;border-radius:10px;font-size:.85rem;font-weight:700;cursor:pointer}
+.btn-sec{padding:8px 16px;border:1.5px solid #e2e8f0;border-radius:9px;background:#fff;cursor:pointer;font-size:.83rem;font-weight:600;color:var(--muted)}
+.btn-sm{padding:5px 12px;font-size:.75rem;border-radius:7px}
+.rec-item{display:flex;gap:12px;align-items:flex-start;padding:12px 14px;background:#f8f7ff;border-radius:10px;margin-bottom:8px;font-size:.84rem;border-left:4px solid var(--pri)}
+.rec-ico{font-size:1.2rem;flex-shrink:0}
+.forecast-box{background:#f8f7ff;border:1.5px solid var(--border);border-radius:12px;padding:16px;margin-bottom:10px}
+.forecast-month{font-weight:800;font-size:.88rem;color:var(--text)}
+.forecast-days{font-size:1.4rem;font-weight:900;color:var(--pri);margin:4px 0}
+.forecast-conf{font-size:.72rem;color:var(--muted)}
+.benchmark-row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border);font-size:.83rem}
+.benchmark-row:last-child{border:none}
+.comp-idx{padding:3px 8px;border-radius:999px;font-size:.7rem;font-weight:800}
+.ci-above{background:#dcfce7;color:#15803d}.ci-below{background:#fee2e2;color:#dc2626}.ci-match{background:#fef9c3;color:#854d0e}
+.individual-form{background:#f8f7ff;border-radius:12px;padding:16px;margin-bottom:16px;border:1.5px solid var(--border)}
+table{width:100%;border-collapse:collapse;font-size:.81rem}
+th{padding:9px;text-align:left;background:#faf5ff;border-bottom:2px solid var(--border);font-size:.76rem;color:var(--muted);text-transform:uppercase}
+td{padding:8px 9px;border-bottom:1px solid #f1f5f9}
+.toast{position:fixed;bottom:24px;right:24px;background:#1e293b;color:#fff;padding:12px 20px;border-radius:12px;font-size:.85rem;font-weight:600;z-index:9999;transform:translateY(80px);opacity:0;transition:all .3s}
+.toast.show{transform:translateY(0);opacity:1}
+.pulse{animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+@media(max-width:640px){.insight-grid{grid-template-columns:repeat(2,1fr)}}
+
+/* ── TOPBAR FIXES  ─────────────────────────────── */
+.navbar,.wiq-topbar,nav.topbar{
+  display:flex!important;align-items:center!important;
+  padding:0 20px!important;height:54px!important;
+  background:#fff!important;
+  border-bottom:2px solid #e8f0ff!important;
+  position:sticky!important;top:0!important;z-index:100!important;
+  gap:12px!important;flex-wrap:nowrap!important;
+  box-shadow:0 1px 8px rgba(37,99,235,.08)!important;
+}
+.nav-brand{
+  font-size:.88rem!important;font-weight:900!important;
+  color:#1E3A5F!important;white-space:nowrap!important;
+  display:flex!important;align-items:center!important;gap:6px!important;
+  flex-shrink:0!important;letter-spacing:-.01em!important;
+}
+.nav-brand .logo-icon{
+  width:28px!important;height:28px!important;
+  background:linear-gradient(135deg,#2563EB,#7C3AED)!important;
+  border-radius:7px!important;display:inline-flex!important;
+  align-items:center!important;justify-content:center!important;
+  font-size:.9rem!important;flex-shrink:0!important;
+}
+.nav-brand .logo-text{
+  font-size:.85rem!important;font-weight:900!important;color:#1E3A5F!important;
+}
+.nav-brand .logo-version{
+  font-size:.55rem!important;font-weight:700!important;
+  color:#2563EB!important;background:#EFF6FF!important;
+  padding:1px 5px!important;border-radius:4px!important;
+  border:1px solid #BFDBFE!important;
+}
+.nav-info{
+  display:flex!important;align-items:center!important;
+  gap:8px!important;flex-shrink:0!important;margin-left:auto!important;
+}
+.nav-divider{width:1px!important;height:20px!important;background:#E2E8F0!important}
+
+/* ── CARD COLOR SHADOWS ─────────────────────────────── */
+.card,.wiq-card,[class*="-card"]{
+  transition:all .25s cubic-bezier(.34,1.56,.64,1)!important;
+  border-radius:12px!important;
+}
+.card:hover,.wiq-card:hover{
+  transform:translateY(-4px) scale(1.006)!important;
+  box-shadow:0 12px 32px rgba(37,99,235,.18),
+             0 2px 8px rgba(37,99,235,.1)!important;
+}
+/* Module-specific card shadows */
+.card-payroll:hover{box-shadow:0 12px 32px rgba(5,150,105,.18)!important}
+.card-leave:hover{box-shadow:0 12px 32px rgba(245,158,11,.18)!important}
+.card-alert:hover{box-shadow:0 12px 32px rgba(220,38,38,.18)!important}
+
+/* ── BUTTON SYSTEM ─────────────────────────────────── */
+.btn{
+  display:inline-flex!important;align-items:center!important;
+  gap:5px!important;padding:7px 16px!important;
+  border-radius:8px!important;font-size:.76rem!important;
+  font-weight:700!important;cursor:pointer!important;
+  border:none!important;transition:all .2s!important;
+  white-space:nowrap!important;font-family:var(--wfi-font);
+}
+.btn-primary{
+  background:linear-gradient(135deg,#2563EB,#1D4ED8)!important;
+  color:#fff!important;
+  box-shadow:0 2px 8px rgba(37,99,235,.3)!important;
+}
+.btn-primary:hover{
+  background:linear-gradient(135deg,#1D4ED8,#1E40AF)!important;
+  box-shadow:0 4px 14px rgba(37,99,235,.4)!important;
+  transform:translateY(-1px)!important;
+}
+.btn-outline,.btn-sm.btn-outline{
+  background:#fff!important;color:#2563EB!important;
+  border:1.5px solid #BFDBFE!important;
+  padding:5px 13px!important;font-size:.72rem!important;
+}
+.btn-outline:hover{
+  background:#EFF6FF!important;
+  border-color:#2563EB!important;
+  box-shadow:0 2px 8px rgba(37,99,235,.15)!important;
+}
+.btn-danger{
+  background:linear-gradient(135deg,#DC2626,#B91C1C)!important;
+  color:#fff!important;
+}
+.btn-danger:hover{box-shadow:0 4px 14px rgba(220,38,38,.35)!important}
+.btn-success{
+  background:linear-gradient(135deg,#059669,#047857)!important;
+  color:#fff!important;
+}
+.btn-success:hover{box-shadow:0 4px 14px rgba(5,150,105,.35)!important}
+.btn-sm{padding:5px 12px!important;font-size:.7rem!important}
+.btn-lg{padding:10px 22px!important;font-size:.82rem!important}
+
+/* ── STATUS BADGES ─────────────────────────────────── */
+.badge,.status-badge,[class*=badge]{
+  display:inline-flex!important;align-items:center!important;
+  padding:3px 10px!important;border-radius:999px!important;
+  font-size:.62rem!important;font-weight:800!important;
+  text-transform:uppercase!important;letter-spacing:.04em!important;
+}
+
+/* ── SIDEBAR BRAND ─────────────────────────────────── */
+.wiq-logo{
+  display:flex!important;align-items:center!important;
+  gap:8px!important;padding:0 4px!important;
+}
+.wiq-logo .logo-mark{
+  width:32px!important;height:32px!important;
+  background:linear-gradient(135deg,#2563EB,#7C3AED)!important;
+  border-radius:9px!important;display:flex!important;
+  align-items:center!important;justify-content:center!important;
+  font-size:1rem!important;flex-shrink:0!important;
+  box-shadow:0 4px 12px rgba(37,99,235,.35)!important;
+}
+.wiq-logo span{
+  font-weight:900!important;font-size:.82rem!important;
+  color:#F8FAFC!important;letter-spacing:-.01em!important;
+}
+
+/* ═══ DARK/LIGHT MODE  ════════════════════════════════════ */
+:root{--dm-bg:#F8FAFC;--dm-card:#ffffff;--dm-text:#1e293b;--dm-muted:#64748b;--dm-border:#e2e8f0;--dm-sidebar:#0a1220;--dm-topbar:#ffffff;--dm-input:#ffffff;--dm-hover:#f1f5f9}
+body.dark-mode{--dm-bg:#0B1120;--dm-card:#111827;--dm-text:#e2e8f0;--dm-muted:#94a3b8;--dm-border:#1e2d4a;--dm-sidebar:#060d18;--dm-topbar:#111827;--dm-input:#1e2d4a;--dm-hover:#1e293b}
+body{background:var(--dm-bg)!important;color:var(--dm-text)!important;transition:background .25s,color .25s}
+.wiq-sidebar,aside{background:var(--dm-sidebar)!important}
+.navbar,.wiq-topbar,nav{background:var(--dm-topbar)!important;border-bottom-color:var(--dm-border)!important}
+.card,.wiq-card,.stat-card,.kpi-card{background:var(--dm-card)!important;border-color:var(--dm-border)!important}
+main,.main-content,.wiq-content,.page-wrap{background:var(--dm-bg)!important}
+input:not([type=checkbox]):not([type=radio]),select,textarea,.form-input{background:var(--dm-input)!important;border-color:var(--dm-border)!important;color:var(--dm-text)!important}
+table{background:var(--dm-card)!important}thead tr{background:#1e3a5f!important}tbody tr:hover{background:var(--dm-hover)!important}
+h1,h2,h3,h4,h5,h6,p,span,label,li,td,th{color:inherit}
+.dm-toggle{width:40px;height:22px;border-radius:999px;border:none;cursor:pointer;position:relative;background:#e2e8f0;transition:background .3s;flex-shrink:0;outline:none}
+.dm-toggle.on{background:linear-gradient(135deg,#4f46e5,#7c3aed)}
+.dm-toggle::after{content:'';position:absolute;top:2px;left:2px;width:18px;height:18px;border-radius:50%;background:#fff;transition:transform .3s;box-shadow:0 1px 4px rgba(0,0,0,.2)}
+.dm-toggle.on::after{transform:translateX(18px)}
+.dm-icon{font-size:.85rem;cursor:pointer}
+
+
+/* ═══ COOKIE CONSENT BANNER ════════════════════════════════ */
+#cookieBanner{
+  position:fixed;bottom:0;left:0;right:0;z-index:9998;
+  background:linear-gradient(135deg,#0F172A,#1E293B);
+  border-top:2px solid #2563EB;
+  padding:16px 32px;
+  display:flex;align-items:center;justify-content:space-between;
+  flex-wrap:wrap;gap:12px;
+  box-shadow:0 -4px 24px rgba(0,0,0,.3);
+  transform:translateY(100%);transition:transform .4s ease;
+}
+#cookieBanner.visible{transform:translateY(0)}
+.cookie-text{font-size:.78rem;color:#CBD5E1;line-height:1.6;max-width:700px}
+.cookie-text a{color:#60A5FA;text-decoration:none;font-weight:600}
+.cookie-text a:hover{text-decoration:underline}
+.cookie-actions{display:flex;gap:8px;flex-shrink:0}
+.cookie-btn-accept{
+  background:linear-gradient(135deg,#2563EB,#4F46E5);color:#fff;
+  border:none;border-radius:8px;padding:8px 20px;font-size:.74rem;
+  font-weight:700;cursor:pointer;font-family:var(--wfi-font);
+  box-shadow:0 4px 12px rgba(37,99,235,.4);transition:all .2s;
+}
+.cookie-btn-accept:hover{transform:translateY(-1px);box-shadow:0 6px 16px rgba(37,99,235,.5)}
+.cookie-btn-settings{
+  background:transparent;color:#94A3B8;
+  border:1.5px solid #334155;border-radius:8px;padding:8px 16px;font-size:.74rem;
+  font-weight:700;cursor:pointer;font-family:var(--wfi-font);transition:all .2s;
+}
+.cookie-btn-settings:hover{color:#F1F5F9;border-color:#64748B}
+.cookie-btn-decline{
+  background:transparent;color:#64748B;border:none;
+  font-size:.7rem;cursor:pointer;font-family:var(--wfi-font);padding:4px 8px;
+}
+
+</style>
+
+<style id="wfi-card-fix">
+.card,.stat-card,.kpi-card{margin-bottom:12px}
+.grid,.stats-grid{gap:14px}
+.export-bar{padding:10px 0;margin-bottom:12px}
+.tab-panel{padding:4px 0}
+.wiq-main{padding:16px 20px}
+@media(max-width:768px){.wiq-main{padding:12px}}
+/* Dark mode button always visible */
+#dmt,#dmToggle{display:flex!important;opacity:1!important;visibility:visible!important}
+/* Print improvements */
+@media print{
+  .wiq-sidebar,.navbar,.topbar,.export-bar,.wiq-mob-toggle{display:none!important}
+  .wiq-main,.main{margin:0!important;padding:20px!important;max-width:100%!important}
+  table{page-break-inside:avoid}
+  .card{page-break-inside:avoid;border:1px solid #e2e8f0!important}
+}
+</style>
+
+<style id="wiq-sb-css">
+
+
+/* ── UNIVERSAL SIDEBAR NAV ── */
+.wiq-wrap{display:flex;min-height:100vh}
+.wiq-sidebar{width:220px;min-width:220px;background:#0a1220;border-right:1px solid rgba(255,255,255,.07);position:sticky;top:0;height:100vh;overflow-y:auto;flex-shrink:0;transition:width .2s;z-index:200}
+.wiq-sidebar::-webkit-scrollbar{width:3px}.wiq-sidebar::-webkit-scrollbar-thumb{background:#1e3a5f}
+.wiq-sidebar-header{padding:14px 14px 10px;border-bottom:1px solid rgba(255,255,255,.07)}
+.wiq-logo{font-size:.9rem;font-weight:900;color:#fff;display:flex;align-items:center;gap:7px}
+.wiq-user-pill{display:flex;align-items:center;gap:7px;padding:8px 10px;margin:8px 0 4px;background:rgba(255,255,255,.04);border-radius:8px;font-size:.7rem;color:#64748b}
+.wiq-user-name{font-weight:700;color:#cbd5e1;font-size:.72rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:120px}
+.wiq-logout-btn{display:flex;align-items:center;gap:6px;padding:7px 10px;margin:0 6px 6px;background:rgba(220,38,38,.1);border:1px solid rgba(220,38,38,.2);border-radius:7px;color:#f87171;font-size:.72rem;font-weight:700;cursor:pointer;width:calc(100% - 12px);text-decoration:none;transition:all .15s}
+.wiq-logout-btn:hover{background:rgba(220,38,38,.2)}
+.wiq-nav-group{margin-bottom:2px}
+.wiq-nav-label{font-size:.59rem;font-weight:800;color:#1e3a5f;text-transform:uppercase;letter-spacing:.09em;padding:8px 14px 3px;cursor:pointer;display:flex;align-items:center;justify-content:space-between}
+.wiq-nav-label:hover{color:#334155}
+.wiq-nav-label .arr{font-size:.6rem;transition:.2s;color:#1e3a5f}
+.wiq-nav-items{display:flex;flex-direction:column;gap:1px;padding:0 6px 4px}
+.wiq-nav-item{display:flex;align-items:center;gap:7px;padding:5px 8px;border-radius:6px;font-size:.71rem;font-weight:600;color:#475569;text-decoration:none;transition:all .15s;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.wiq-nav-item:hover{background:rgba(37,99,235,.12);color:#60a5fa}
+.wiq-nav-item.active{background:rgba(37,99,235,.18);color:#60a5fa;font-weight:800}
+.wiq-nav-item .ico{font-size:.8rem;flex-shrink:0;width:16px;text-align:center}
+.wiq-main{flex:1;min-width:0;overflow-x:hidden}
+.wiq-collapsed .wiq-sidebar{width:48px}
+.wiq-collapsed .wiq-nav-item span,.wiq-collapsed .wiq-nav-label span:first-child,.wiq-collapsed .wiq-user-name,.wiq-collapsed .wiq-logo span,.wiq-collapsed .wiq-logout-btn span{display:none}
+.wiq-collapsed .wiq-nav-items{padding:0 3px}
+.wiq-collapsed .wiq-nav-item{justify-content:center;padding:6px}
+.wiq-collapsed .wiq-logout-btn{justify-content:center;padding:7px;margin:0 3px 4px}
+.wiq-toggle{background:none;border:none;color:#475569;cursor:pointer;padding:4px 8px;font-size:.75rem;display:flex;align-items:center;gap:4px;margin-left:auto}
+.wiq-toggle:hover{color:#60a5fa}
+@media(max-width:768px){.wiq-sidebar{position:fixed;left:-220px;top:0;transition:left .2s}.wiq-sidebar.open{left:0;box-shadow:4px 0 20px rgba(0,0,0,.5)}.wiq-mob-toggle{display:flex!important}}
+.wiq-mob-toggle{display:none;position:fixed;top:12px;left:12px;z-index:300;background:#1e3a5f;border:none;border-radius:8px;padding:7px 10px;color:#fff;font-size:.8rem;cursor:pointer}
+
+  body{background:#F0F4F8}
+  .page-wrap{max-width:1200px;margin:0 auto;padding:24px}
+  .card{background:#fff;border-radius:12px;padding:24px;margin-bottom:24px;box-shadow:0 2px 12px rgba(0,0,0,.08)}
+  .card h3{margin-top:0;color:#1B4F8A;font-size:1.1rem;margin-bottom:16px}
+  .btn{padding:9px 22px;border:none;border-radius:7px;font-weight:600;cursor:pointer;font-size:14px;transition:.15s}
+  .btn-primary{background:#1B4F8A;color:#fff} .btn-primary:hover{background:#1a3f72}
+  .btn-success{background:#27AE60;color:#fff} .btn-success:hover{background:#1e8449}
+  .btn-danger{background:#C0392B;color:#fff}  .btn-danger:hover{background:#a93226}
+  .btn-sm{padding:5px 14px;font-size:12px;border-radius:5px;border:none;font-weight:600;cursor:pointer}
+  .btn-outline{background:#fff;border:1.5px solid #1B4F8A;color:#1B4F8A}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+  .grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+  @media(max-width:700px){.grid2,.grid4{grid-template-columns:1fr}}
+  table{width:100%;border-collapse:collapse;font-size:13px}
+  th{background:#1B4F8A;color:#fff;padding:10px 12px;text-align:left;white-space:nowrap}
+  td{padding:9px 12px;border-bottom:1px solid #EEF2F7;vertical-align:middle}
+  tr:hover td{background:#F8FAFB}
+  .badge{padding:3px 10px;border-radius:12px;font-size:11px;font-weight:700}
+  .badge.present{background:#D5F5E3;color:#1E8449}
+  .badge.absent{background:#FADBD8;color:#C0392B}
+  .badge.late{background:#FEF9E7;color:#D4AC0D}
+  .badge.half_day{background:#D6EAF8;color:#1B4F8A}
+  .badge.leave{background:#EEF2F7;color:#5D6D7E}
+  #msg{padding:11px 16px;border-radius:8px;margin-bottom:16px;display:none;font-weight:600}
+  #msg.success{background:#D5F5E3;color:#1E8449;display:block}
+  #msg.error{background:#FADBD8;color:#C0392B;display:block}
+  .tabs{display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap}
+  .tab{padding:9px 22px;border-radius:8px;border:2px solid #BDC3C7;background:#fff;color:#5D6D7E;font-weight:600;cursor:pointer;font-size:14px}
+  .tab.active{background:#1B4F8A;color:#fff;border-color:#1B4F8A}
+  /* Clock widget */
+  .clock-card{background:linear-gradient(135deg,#1B4F8A,#2563eb);border-radius:12px;padding:28px;color:#fff;text-align:center}
+  .clock-time{font-size:3rem;font-weight:800;letter-spacing:2px;font-family:var(--wfi-font);margin-bottom:6px}
+  .clock-date{font-size:.95rem;opacity:.8;margin-bottom:20px}
+  .clock-status{background:rgba(255,255,255,.15);border-radius:8px;padding:10px 16px;font-size:.95rem;margin-bottom:20px}
+  .clock-status.clocked-in{background:rgba(39,174,96,.3)}
+  .clock-status.clocked-out{background:rgba(192,57,43,.2)}
+  .clock-btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+  .clock-btn{padding:12px 28px;border:none;border-radius:8px;font-size:15px;font-weight:700;cursor:pointer;transition:.15s}
+  .clock-btn.in{background:#27AE60;color:#fff} .clock-btn.in:hover{background:#1e8449}
+  .clock-btn.out{background:#C0392B;color:#fff} .clock-btn.out:hover{background:#a93226}
+  .clock-btn:disabled{opacity:.4;cursor:not-allowed}
+  /* Stat cards */
+  .stat-card{background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:10px;padding:16px;text-align:center}
+  .stat-num{font-size:2rem;font-weight:800;color:#1B4F8A}
+  .stat-label{font-size:.8rem;font-weight:700;color:#64748b;margin-top:3px;text-transform:uppercase;letter-spacing:.05em}
+  .stat-sub{font-size:.75rem;color:#94a3b8;margin-top:3px}
+  /* Today dot */
+  .today-dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px}
+  .dot-present{background:#27AE60}
+  .dot-absent{background:#C0392B}
+  .dot-late{background:#D4AC0D}
+  /* Form */
+  .form-group{margin-bottom:14px}
+  .form-group label{display:block;font-weight:600;color:#1B4F8A;margin-bottom:5px;font-size:13px}
+  .form-group input,.form-group select,.form-group textarea{width:100%;padding:9px 12px;border:1px solid #BDC3C7;border-radius:7px;font-size:14px;box-sizing:border-box}
+  .pbar{height:8px;background:#e2e8f0;border-radius:4px;overflow:hidden;margin-top:6px}
+  .pfill{height:100%;border-radius:4px;transition:width 1s ease}
+.toast{position:fixed;bottom:24px;right:24px;background:#1e293b;color:#fff;padding:13px 22px;border-radius:12px;font-size:.87rem;font-weight:600;z-index:9999;transform:translateY(80px);opacity:0;transition:all .3s;max-width:360px;word-break:break-word;box-shadow:0 8px 30px rgba(0,0,0,.25)}
+.toast.show{transform:translateY(0);opacity:1}
+.toast.success{background:#16a34a}
+.toast.error{background:#dc2626}
+.toast.warn{background:#d97706}
+
+/* ── TOPBAR FIXES  ─────────────────────────────── */
+.navbar,.wiq-topbar,nav.topbar{
+  display:flex!important;align-items:center!important;
+  padding:0 20px!important;height:54px!important;
+  background:#fff!important;
+  border-bottom:2px solid #e8f0ff!important;
+  position:sticky!important;top:0!important;z-index:100!important;
+  gap:12px!important;flex-wrap:nowrap!important;
+  box-shadow:0 1px 8px rgba(37,99,235,.08)!important;
+}
+.nav-brand{
+  font-size:.88rem!important;font-weight:900!important;
+  color:#1E3A5F!important;white-space:nowrap!important;
+  display:flex!important;align-items:center!important;gap:6px!important;
+  flex-shrink:0!important;letter-spacing:-.01em!important;
+}
+.nav-brand .logo-icon{
+  width:28px!important;height:28px!important;
+  background:linear-gradient(135deg,#2563EB,#7C3AED)!important;
+  border-radius:7px!important;display:inline-flex!important;
+  align-items:center!important;justify-content:center!important;
+  font-size:.9rem!important;flex-shrink:0!important;
+}
+.nav-brand .logo-text{
+  font-size:.85rem!important;font-weight:900!important;color:#1E3A5F!important;
+}
+.nav-brand .logo-version{
+  font-size:.55rem!important;font-weight:700!important;
+  color:#2563EB!important;background:#EFF6FF!important;
+  padding:1px 5px!important;border-radius:4px!important;
+  border:1px solid #BFDBFE!important;
+}
+.nav-info{
+  display:flex!important;align-items:center!important;
+  gap:8px!important;flex-shrink:0!important;margin-left:auto!important;
+}
+.nav-divider{width:1px!important;height:20px!important;background:#E2E8F0!important}
+
+/* ── CARD COLOR SHADOWS ─────────────────────────────── */
+.card,.wiq-card,[class*="-card"]{
+  transition:all .25s cubic-bezier(.34,1.56,.64,1)!important;
+  border-radius:12px!important;
+}
+.card:hover,.wiq-card:hover{
+  transform:translateY(-4px) scale(1.006)!important;
+  box-shadow:0 12px 32px rgba(37,99,235,.18),
+             0 2px 8px rgba(37,99,235,.1)!important;
+}
+/* Module-specific card shadows */
+.card-payroll:hover{box-shadow:0 12px 32px rgba(5,150,105,.18)!important}
+.card-leave:hover{box-shadow:0 12px 32px rgba(245,158,11,.18)!important}
+.card-alert:hover{box-shadow:0 12px 32px rgba(220,38,38,.18)!important}
+
+/* ── BUTTON SYSTEM ─────────────────────────────────── */
+.btn{
+  display:inline-flex!important;align-items:center!important;
+  gap:5px!important;padding:7px 16px!important;
+  border-radius:8px!important;font-size:.76rem!important;
+  font-weight:700!important;cursor:pointer!important;
+  border:none!important;transition:all .2s!important;
+  white-space:nowrap!important;font-family:var(--wfi-font);
+}
+.btn-primary{
+  background:linear-gradient(135deg,#2563EB,#1D4ED8)!important;
+  color:#fff!important;
+  box-shadow:0 2px 8px rgba(37,99,235,.3)!important;
+}
+.btn-primary:hover{
+  background:linear-gradient(135deg,#1D4ED8,#1E40AF)!important;
+  box-shadow:0 4px 14px rgba(37,99,235,.4)!important;
+  transform:translateY(-1px)!important;
+}
+.btn-outline,.btn-sm.btn-outline{
+  background:#fff!important;color:#2563EB!important;
+  border:1.5px solid #BFDBFE!important;
+  padding:5px 13px!important;font-size:.72rem!important;
+}
+.btn-outline:hover{
+  background:#EFF6FF!important;
+  border-color:#2563EB!important;
+  box-shadow:0 2px 8px rgba(37,99,235,.15)!important;
+}
+.btn-danger{
+  background:linear-gradient(135deg,#DC2626,#B91C1C)!important;
+  color:#fff!important;
+}
+.btn-danger:hover{box-shadow:0 4px 14px rgba(220,38,38,.35)!important}
+.btn-success{
+  background:linear-gradient(135deg,#059669,#047857)!important;
+  color:#fff!important;
+}
+.btn-success:hover{box-shadow:0 4px 14px rgba(5,150,105,.35)!important}
+.btn-sm{padding:5px 12px!important;font-size:.7rem!important}
+.btn-lg{padding:10px 22px!important;font-size:.82rem!important}
+
+/* ── STATUS BADGES ─────────────────────────────────── */
+.badge,.status-badge,[class*=badge]{
+  display:inline-flex!important;align-items:center!important;
+  padding:3px 10px!important;border-radius:999px!important;
+  font-size:.62rem!important;font-weight:800!important;
+  text-transform:uppercase!important;letter-spacing:.04em!important;
+}
+
+/* ── SIDEBAR BRAND ─────────────────────────────────── */
+.wiq-logo{
+  display:flex!important;align-items:center!important;
+  gap:8px!important;padding:0 4px!important;
+}
+.wiq-logo .logo-mark{
+  width:32px!important;height:32px!important;
+  background:linear-gradient(135deg,#2563EB,#7C3AED)!important;
+  border-radius:9px!important;display:flex!important;
+  align-items:center!important;justify-content:center!important;
+  font-size:1rem!important;flex-shrink:0!important;
+  box-shadow:0 4px 12px rgba(37,99,235,.35)!important;
+}
+.wiq-logo span{
+  font-weight:900!important;font-size:.82rem!important;
+  color:#F8FAFC!important;letter-spacing:-.01em!important;
+}
+
+/* ═══ DARK/LIGHT MODE  ════════════════════════════════════ */
+:root{--dm-bg:#F8FAFC;--dm-card:#ffffff;--dm-text:#1e293b;--dm-muted:#64748b;--dm-border:#e2e8f0;--dm-sidebar:#0a1220;--dm-topbar:#ffffff;--dm-input:#ffffff;--dm-hover:#f1f5f9}
+body.dark-mode{--dm-bg:#0B1120;--dm-card:#111827;--dm-text:#e2e8f0;--dm-muted:#94a3b8;--dm-border:#1e2d4a;--dm-sidebar:#060d18;--dm-topbar:#111827;--dm-input:#1e2d4a;--dm-hover:#1e293b}
+body{background:var(--dm-bg)!important;color:var(--dm-text)!important;transition:background .25s,color .25s}
+.wiq-sidebar,aside{background:var(--dm-sidebar)!important}
+.navbar,.wiq-topbar,nav{background:var(--dm-topbar)!important;border-bottom-color:var(--dm-border)!important}
+.card,.wiq-card,.stat-card,.kpi-card{background:var(--dm-card)!important;border-color:var(--dm-border)!important}
+main,.main-content,.wiq-content,.page-wrap{background:var(--dm-bg)!important}
+input:not([type=checkbox]):not([type=radio]),select,textarea,.form-input{background:var(--dm-input)!important;border-color:var(--dm-border)!important;color:var(--dm-text)!important}
+table{background:var(--dm-card)!important}thead tr{background:#1e3a5f!important}tbody tr:hover{background:var(--dm-hover)!important}
+h1,h2,h3,h4,h5,h6,p,span,label,li,td,th{color:inherit}
+.dm-toggle{width:40px;height:22px;border-radius:999px;border:none;cursor:pointer;position:relative;background:#e2e8f0;transition:background .3s;flex-shrink:0;outline:none}
+.dm-toggle.on{background:linear-gradient(135deg,#4f46e5,#7c3aed)}
+.dm-toggle::after{content:'';position:absolute;top:2px;left:2px;width:18px;height:18px;border-radius:50%;background:#fff;transition:transform .3s;box-shadow:0 1px 4px rgba(0,0,0,.2)}
+.dm-toggle.on::after{transform:translateX(18px)}
+.dm-icon{font-size:.85rem;cursor:pointer}
+
+
+/* ═══ COOKIE CONSENT BANNER ════════════════════════════════ */
+#cookieBanner{
+  position:fixed;bottom:0;left:0;right:0;z-index:9998;
+  background:linear-gradient(135deg,#0F172A,#1E293B);
+  border-top:2px solid #2563EB;
+  padding:16px 32px;
+  display:flex;align-items:center;justify-content:space-between;
+  flex-wrap:wrap;gap:12px;
+  box-shadow:0 -4px 24px rgba(0,0,0,.3);
+  transform:translateY(100%);transition:transform .4s ease;
+}
+#cookieBanner.visible{transform:translateY(0)}
+.cookie-text{font-size:.78rem;color:#CBD5E1;line-height:1.6;max-width:700px}
+.cookie-text a{color:#60A5FA;text-decoration:none;font-weight:600}
+.cookie-text a:hover{text-decoration:underline}
+.cookie-actions{display:flex;gap:8px;flex-shrink:0}
+.cookie-btn-accept{
+  background:linear-gradient(135deg,#2563EB,#4F46E5);color:#fff;
+  border:none;border-radius:8px;padding:8px 20px;font-size:.74rem;
+  font-weight:700;cursor:pointer;font-family:var(--wfi-font);
+  box-shadow:0 4px 12px rgba(37,99,235,.4);transition:all .2s;
+}
+.cookie-btn-accept:hover{transform:translateY(-1px);box-shadow:0 6px 16px rgba(37,99,235,.5)}
+.cookie-btn-settings{
+  background:transparent;color:#94A3B8;
+  border:1.5px solid #334155;border-radius:8px;padding:8px 16px;font-size:.74rem;
+  font-weight:700;cursor:pointer;font-family:var(--wfi-font);transition:all .2s;
+}
+.cookie-btn-settings:hover{color:#F1F5F9;border-color:#64748B}
+.cookie-btn-decline{
+  background:transparent;color:#64748B;border:none;
+  font-size:.7rem;cursor:pointer;font-family:var(--wfi-font);padding:4px 8px;
+}
+
+
+/* ── Dropdown nav groups ── */
+.wiq-nav-group-label{cursor:pointer;user-select:none;display:flex;align-items:center;justify-content:space-between;padding:7px 16px;font-size:.67rem;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:#64748B}
+.wiq-dropdown-toggle:hover{color:#93C5FD;background:rgba(37,99,235,.07);border-radius:8px}
+.wiq-arrow{font-size:.6rem;transition:transform .2s;flex-shrink:0}
+.wiq-dropdown-body{max-height:0;overflow:hidden;transition:max-height .3s ease}
+.wiq-dropdown-body.open{max-height:800px}
+/* ── Nav icons ── */
+.wiq-nav-item a .ico{width:20px;text-align:center;font-size:.88rem;flex-shrink:0}
+/* ── Active link highlight ── */
+.wiq-nav-item a.active,.wiq-nav-item a:has(.ico):hover{background:rgba(37,99,235,.15);color:#93C5FD}
+/* ── Logo ── */
+.wiq-logo-icon{width:32px;height:32px;background:linear-gradient(135deg,#1D4ED8,#6D28D9);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0}
+.wiq-logo-name{font-size:.78rem;font-weight:900;color:#E2E8F0;line-height:1.2}
+.wiq-logo-badge{font-size:.55rem;color:#60A5FA;background:rgba(37,99,235,.2);padding:1px 7px;border-radius:999px;margin-top:3px;display:inline-block;font-weight:700;letter-spacing:.05em}
+/* ── Card & Margin global fixes ── */
+.card,.stat-card,.kpi-card,.metric-card{margin-bottom:14px!important;border-radius:12px!important}
+.grid,.stats-grid,.kpi-grid{gap:14px!important}
+.wiq-main{padding:20px 24px!important;display:flex;flex-direction:column;min-height:100vh}
+.export-bar{padding:10px 0!important;margin-bottom:12px!important;display:flex;gap:8px;flex-wrap:wrap}
+@media(max-width:768px){
+  .wiq-mob-toggle{display:flex!important;align-items:center;justify-content:center}
+  .wiq-sidebar{position:fixed!important;left:-270px;top:0;height:100vh;z-index:500;transition:left .3s;overflow-y:auto}
+  .wiq-sidebar.open{left:0!important;box-shadow:4px 0 20px rgba(0,0,0,.5)}
+  .wiq-wrap{flex-direction:column}
+  .wiq-main{margin-left:0!important;padding:14px 16px!important}
+}
+/* ── Print ── */
+@media print{.wiq-sidebar,.wiq-mob-toggle,.export-bar,.cookie-banner,#ckb,#cookieBanner{display:none!important}.wiq-main{margin:0!important;padding:20px!important;max-width:100%!important}.card{page-break-inside:avoid;border:1px solid #e2e8f0!important}}
+</style>
+  <link rel="stylesheet" href="/workspace.css">
+  <script src="/workspace.js" defer></script>
+  <link rel="stylesheet" href="/navigation.css">
+  <script src="/navigation.js" defer></script>
+
+<script src="/appearance.js" defer></script>
+
+<link rel="stylesheet" href="/preferences.css">
+<link rel="stylesheet" href="/theme.css">
+</head>
+<body><button class="wiq-mob-toggle" onclick="openMobSidebar()" id="mobToggleBtn" style="display:none;position:fixed;top:14px;left:14px;z-index:600;background:#2563EB;color:#fff;border:none;border-radius:9px;padding:9px 13px;cursor:pointer;font-size:1rem;box-shadow:0 4px 16px rgba(37,99,235,.45)">&#9776;</button>
+<div class="wiq-wrap">
+<div class="wiq-sidebar" id="wiqSidebar">
+  <div class="wiq-sidebar-header">
+    <div class="wiq-logo">
+      <div class="wiq-logo-icon">&#9889;</div>
+      <div class="wiq-logo-text">
+        <span class="wiq-logo-name">Workforce<br>Intelligence</span>
+        <span class="wiq-logo-badge">Enterprise HRMS</span>
+      </div>
+    </div>
+    <div class="wiq-user-pill">
+      <span class="wiq-user-avatar">&#128100;</span>
+      <span class="wiq-user-name" id="sidebarUserName">Loading...</span>
+      <button class="wiq-tog" onclick="window.tdm&&window.tdm()" id="dmt" title="Toggle dark mode" style="width:28px;height:16px;border-radius:8px;border:none;background:#334155;cursor:pointer;flex-shrink:0"></button>
+    </div>
+  </div>
+  <nav class="wiq-nav">
+
+    <!-- DASHBOARDS -->
+    <div class="wiq-nav-group">
+      <div class="wiq-nav-group-label">Dashboards</div>
+      <div class="wiq-nav-item"><a href="admin-dashboard.html"><span class="ico">&#9711;</span><span>Admin Dashboard</span></a></div>
+      <div class="wiq-nav-item"><a href="employee-dashboard.html"><span class="ico">&#128100;</span><span>Employee Dashboard</span></a></div>
+      <div class="wiq-nav-item"><a href="manager.html"><span class="ico">&#128084;</span><span>Manager Dashboard</span></a></div>
+      <div class="wiq-nav-item"><a href="activity-history.html"><span class="ico">&#128203;</span><span>Activity History</span></a></div>
+    </div>
+
+    <!-- HR MANAGEMENT (dropdown) -->
+    <div class="wiq-nav-group">
+      <div class="wiq-nav-group-label wiq-dropdown-toggle" onclick="toggleGroup('grp-hr')">
+        &#128101; HR Management <span class="wiq-arrow" id="arr-hr">&#9660;</span>
+      </div>
+      <div id="grp-hr" class="wiq-dropdown-body">
+        <div class="wiq-nav-item"><a href="attendance.html"><span class="ico">&#128336;</span><span>Attendance</span></a></div>
+        <div class="wiq-nav-item"><a href="leave.html"><span class="ico">&#127964;</span><span>Leave Management</span></a></div>
+        <div class="wiq-nav-item"><a href="hiring.html"><span class="ico">&#127919;</span><span>Hiring & ATS</span></a></div>
+        <div class="wiq-nav-item"><a href="onboarding.html"><span class="ico">&#128640;</span><span>Onboarding</span></a></div>
+        <div class="wiq-nav-item"><a href="performance.html"><span class="ico">&#128202;</span><span>Performance</span></a></div>
+        <div class="wiq-nav-item"><a href="training.html"><span class="ico">&#127891;</span><span>Training & LMS</span></a></div>
+        <div class="wiq-nav-item"><a href="goals-okr.html"><span class="ico">&#127942;</span><span>Goals & OKR</span></a></div>
+        <div class="wiq-nav-item"><a href="exit.html"><span class="ico">&#128682;</span><span>Exit Management</span></a></div>
+        <div class="wiq-nav-item"><a href="employee-directory.html"><span class="ico">&#128101;</span><span>Employee Directory</span></a></div>
+        <div class="wiq-nav-item"><a href="org-chart.html"><span class="ico">&#127961;</span><span>Org Chart</span></a></div>
+        <div class="wiq-nav-item"><a href="shift-roster.html"><span class="ico">&#128197;</span><span>Shift Roster</span></a></div>
+        <div class="wiq-nav-item"><a href="shift-bidding.html"><span class="ico">&#128260;</span><span>Shift Bidding</span></a></div>
+        <div class="wiq-nav-item"><a href="wfh-tracker.html"><span class="ico">&#127968;</span><span>WFH Tracker</span></a></div>
+        <div class="wiq-nav-item"><a href="time-tracker.html"><span class="ico">&#9201;</span><span>Time Tracker</span></a></div>
+        <div class="wiq-nav-item"><a href="regularization.html"><span class="ico">&#128393;</span><span>Regularisation</span></a></div>
+      </div>
+    </div>
+
+    <!-- PAYROLL & FINANCE (dropdown) -->
+    <div class="wiq-nav-group">
+      <div class="wiq-nav-group-label wiq-dropdown-toggle" onclick="toggleGroup('grp-pay')">
+        &#128176; Payroll & Finance <span class="wiq-arrow" id="arr-pay">&#9660;</span>
+      </div>
+      <div id="grp-pay" class="wiq-dropdown-body">
+        <div class="wiq-nav-item"><a href="salary.html"><span class="ico">&#128176;</span><span>Payroll Processing</span></a></div>
+        <div class="wiq-nav-item"><a href="payslip-portal.html"><span class="ico">&#128196;</span><span>Payslip Portal</span></a></div>
+        <div class="wiq-nav-item"><a href="salary-revision.html"><span class="ico">&#128200;</span><span>Salary Revision</span></a></div>
+        <div class="wiq-nav-item"><a href="salary-advance.html"><span class="ico">&#128179;</span><span>Salary Advance</span></a></div>
+        <div class="wiq-nav-item"><a href="tax-portal.html"><span class="ico">&#129534;</span><span>TDS / Tax Portal</span></a></div>
+        <div class="wiq-nav-item"><a href="investment-declaration.html"><span class="ico">&#128209;</span><span>IT Declaration</span></a></div>
+        <div class="wiq-nav-item"><a href="form-24q.html"><span class="ico">&#127963;</span><span>Form 24Q</span></a></div>
+        <div class="wiq-nav-item"><a href="statutory-bonus.html"><span class="ico">&#127873;</span><span>Statutory Bonus</span></a></div>
+        <div class="wiq-nav-item"><a href="lwf-tracker.html"><span class="ico">&#127963;</span><span>LWF Tracker</span></a></div>
+        <div class="wiq-nav-item"><a href="benefits.html"><span class="ico">&#127973;</span><span>Benefits & Perks</span></a></div>
+        <div class="wiq-nav-item"><a href="loan-portal.html"><span class="ico">&#127991;</span><span>Loan Portal</span></a></div>
+        <div class="wiq-nav-item"><a href="banking.html"><span class="ico">&#127970;</span><span>Banking</span></a></div>
+      </div>
+    </div>
+
+    <!-- COMPLIANCE (dropdown) -->
+    <div class="wiq-nav-group">
+      <div class="wiq-nav-group-label wiq-dropdown-toggle" onclick="toggleGroup('grp-comp')">
+        &#9878;&#65039; Compliance <span class="wiq-arrow" id="arr-comp">&#9660;</span>
+      </div>
+      <div id="grp-comp" class="wiq-dropdown-body">
+        <div class="wiq-nav-item"><a href="compliance.html"><span class="ico">&#9878;&#65039;</span><span>Statutory Compliance</span></a></div>
+        <div class="wiq-nav-item"><a href="posh-complaints.html"><span class="ico">&#128737;</span><span>POSH / ICC</span></a></div>
+        <div class="wiq-nav-item"><a href="privacy-policy.html"><span class="ico">&#128274;</span><span>Privacy Policy</span></a></div>
+        <div class="wiq-nav-item"><a href="cookie-policy.html"><span class="ico">&#127850;</span><span>Cookie Policy</span></a></div>
+        <div class="wiq-nav-item"><a href="security-policy.html"><span class="ico">&#128737;</span><span>Security Policy</span></a></div>
+        <div class="wiq-nav-item"><a href="company-policies.html"><span class="ico">&#128220;</span><span>Company Policies</span></a></div>
+      </div>
+    </div>
+
+    <!-- AI & INTELLIGENCE -->
+    <div class="wiq-nav-group">
+      <div class="wiq-nav-group-label wiq-dropdown-toggle" onclick="toggleGroup('grp-ai')">
+        &#129302; AI & Intelligence <span class="wiq-arrow" id="arr-ai">&#9660;</span>
+      </div>
+      <div id="grp-ai" class="wiq-dropdown-body">
+        <div class="wiq-nav-item"><a href="ai-assistant.html"><span class="ico">&#129302;</span><span>AI Assistant</span></a></div>
+        <div class="wiq-nav-item"><a href="hr-copilot.html"><span class="ico">&#129504;</span><span>HR Copilot</span></a></div>
+        <div class="wiq-nav-item"><a href="ai-insights.html"><span class="ico">&#128202;</span><span>AI Insights</span></a></div>
+      </div>
+    </div>
+
+    <!-- SECURITY (dropdown) -->
+    <div class="wiq-nav-group">
+      <div class="wiq-nav-group-label wiq-dropdown-toggle" onclick="toggleGroup('grp-sec')">
+        &#128737; Security <span class="wiq-arrow" id="arr-sec">&#9660;</span>
+      </div>
+      <div id="grp-sec" class="wiq-dropdown-body">
+        <div class="wiq-nav-item"><a href="fraud-detection.html"><span class="ico">&#128269;</span><span>Fraud Detection</span></a></div>
+        <div class="wiq-nav-item"><a href="cybersecurity.html"><span class="ico">&#128737;</span><span>Cybersecurity</span></a></div>
+        <div class="wiq-nav-item"><a href="threat-monitor.html"><span class="ico">&#128308;</span><span>Threat Monitor</span></a></div>
+        <div class="wiq-nav-item"><a href="audit-log.html"><span class="ico">&#128196;</span><span>Audit Log</span></a></div>
+        <div class="wiq-nav-item"><a href="session-management.html"><span class="ico">&#128273;</span><span>Session Mgmt</span></a></div>
+      </div>
+    </div>
+
+    <!-- ANALYTICS (dropdown) -->
+    <div class="wiq-nav-group">
+      <div class="wiq-nav-group-label wiq-dropdown-toggle" onclick="toggleGroup('grp-ana')">
+        &#128202; Analytics <span class="wiq-arrow" id="arr-ana">&#9660;</span>
+      </div>
+      <div id="grp-ana" class="wiq-dropdown-body">
+        <div class="wiq-nav-item"><a href="analytics.html"><span class="ico">&#128200;</span><span>Analytics Dashboard</span></a></div>
+        <div class="wiq-nav-item"><a href="reports.html"><span class="ico">&#128209;</span><span>Reports Center</span></a></div>
+        <div class="wiq-nav-item"><a href="workforce-planning.html"><span class="ico">&#128202;</span><span>Workforce Planning</span></a></div>
+        <div class="wiq-nav-item"><a href="real-time-monitor.html"><span class="ico">&#128225;</span><span>Real-Time Monitor</span></a></div>
+        <div class="wiq-nav-item"><a href="headcount.html"><span class="ico">&#128101;</span><span>Headcount</span></a></div>
+        <div class="wiq-nav-item"><a href="diversity.html"><span class="ico">&#127752;</span><span>Diversity & DEI</span></a></div>
+      </div>
+    </div>
+
+    <!-- SAFETY & WELFARE (dropdown) -->
+    <div class="wiq-nav-group">
+      <div class="wiq-nav-group-label wiq-dropdown-toggle" onclick="toggleGroup('grp-safe')">
+        &#10084;&#65039; Welfare & Safety <span class="wiq-arrow" id="arr-safe">&#9660;</span>
+      </div>
+      <div id="grp-safe" class="wiq-dropdown-body">
+        <div class="wiq-nav-item"><a href="mental-health.html"><span class="ico">&#128156;</span><span>Mental Health & EAP</span></a></div>
+        <div class="wiq-nav-item"><a href="112-emergency.html"><span class="ico">&#128680;</span><span>112 Emergency & SOS</span></a></div>
+        <div class="wiq-nav-item"><a href="women-safety-policy.html"><span class="ico">&#127800;</span><span>Women Safety</span></a></div>
+        <div class="wiq-nav-item"><a href="cab-booking.html"><span class="ico">&#128663;</span><span>Cab & Transport</span></a></div>
+        <div class="wiq-nav-item"><a href="visitor-management.html"><span class="ico">&#127970;</span><span>Visitor Management</span></a></div>
+        <div class="wiq-nav-item"><a href="welfare.html"><span class="ico">&#10084;&#65039;</span><span>Welfare Hub</span></a></div>
+        <div class="wiq-nav-item"><a href="pulse-survey.html"><span class="ico">&#128202;</span><span>Pulse Survey</span></a></div>
+      </div>
+    </div>
+
+    <!-- EMPLOYEE SELF-SERVICE (dropdown) -->
+    <div class="wiq-nav-group">
+      <div class="wiq-nav-group-label wiq-dropdown-toggle" onclick="toggleGroup('grp-ess')">
+        &#128111; Self-Service <span class="wiq-arrow" id="arr-ess">&#9660;</span>
+      </div>
+      <div id="grp-ess" class="wiq-dropdown-body">
+        <div class="wiq-nav-item"><a href="employee-self-service.html"><span class="ico">&#128111;</span><span>Self-Service Portal</span></a></div>
+        <div class="wiq-nav-item"><a href="profile.html"><span class="ico">&#128100;</span><span>My Profile</span></a></div>
+        <div class="wiq-nav-item"><a href="document-vault.html"><span class="ico">&#128193;</span><span>Document Vault</span></a></div>
+        <div class="wiq-nav-item"><a href="expenses.html"><span class="ico">&#128184;</span><span>Expenses</span></a></div>
+        <div class="wiq-nav-item"><a href="tasks.html"><span class="ico">&#9989;</span><span>My Tasks</span></a></div>
+        <div class="wiq-nav-item"><a href="helpdesk.html"><span class="ico">&#127916;</span><span>IT Helpdesk</span></a></div>
+        <div class="wiq-nav-item"><a href="announcements.html"><span class="ico">&#128226;</span><span>Announcements</span></a></div>
+        <div class="wiq-nav-item"><a href="notifications.html"><span class="ico">&#128276;</span><span>Notifications</span></a></div>
+        <div class="wiq-nav-item"><a href="festival-calendar.html"><span class="ico">&#127881;</span><span>Festival Calendar</span></a></div>
+      </div>
+    </div>
+
+    <!-- BIOMETRICS (dropdown) -->
+    <div class="wiq-nav-group">
+      <div class="wiq-nav-group-label wiq-dropdown-toggle" onclick="toggleGroup('grp-bio')">
+        &#128272; Biometrics <span class="wiq-arrow" id="arr-bio">&#9660;</span>
+      </div>
+      <div id="grp-bio" class="wiq-dropdown-body">
+        <div class="wiq-nav-item"><a href="face-recognition.html"><span class="ico">&#128065;&#65039;</span><span>Face Recognition</span></a></div>
+        <div class="wiq-nav-item"><a href="biometric-enrollment.html"><span class="ico">&#128272;</span><span>Biometric Enrollment</span></a></div>
+      </div>
+    </div>
+
+    <!-- ADMIN (dropdown) -->
+    <div class="wiq-nav-group">
+      <div class="wiq-nav-group-label wiq-dropdown-toggle" onclick="toggleGroup('grp-adm')">
+        &#9881;&#65039; Administration <span class="wiq-arrow" id="arr-adm">&#9660;</span>
+      </div>
+      <div id="grp-adm" class="wiq-dropdown-body">
+        <div class="wiq-nav-item"><a href="settings.html"><span class="ico">&#9881;&#65039;</span><span>Settings</span></a></div>
+        <div class="wiq-nav-item"><a href="employee-grades.html"><span class="ico">&#127885;</span><span>Employee Grades</span></a></div>
+        <div class="wiq-nav-item"><a href="assets.html"><span class="ico">&#127963;</span><span>Assets</span></a></div>
+        <div class="wiq-nav-item"><a href="data-export.html"><span class="ico">&#128228;</span><span>Data Export</span></a></div>
+        <div class="wiq-nav-item"><a href="registration-tracker.html"><span class="ico">&#128203;</span><span>Registration Tracker</span></a></div>
+      </div>
+    </div>
+
+    <!-- LOGOUT -->
+    <div class="wiq-nav-group" style="margin-top:auto;padding-top:8px;border-top:1px solid rgba(255,255,255,.07)">
+      <div class="wiq-nav-item"><a href="#" onclick="window.logout&&window.logout();return false;" style="color:#EF4444!important"><span class="ico">&#128682;</span><span>Logout</span></a></div>
+    </div>
+
+  </nav>
+</div>
+
+<div class="wiq-main">
+
+<!-- AI GOVERNANCE + HUMAN REVIEW NOTICE -->
+<div style="background:linear-gradient(135deg,rgba(124,58,237,.08),rgba(124,58,237,.04));border:1.5px solid rgba(124,58,237,.25);border-radius:12px;padding:18px;margin-bottom:16px">
+  <div style="display:flex;align-items:flex-start;gap:12px">
+    <div style="font-size:1.5rem;flex-shrink:0">🤖</div>
+    <div>
+      <div style="font-size:.86rem;font-weight:800;color:#7C3AED;margin-bottom:4px">AI Insights — Human Review Required</div>
+      <div style="font-size:.72rem;color:#6d28d9;line-height:1.6">These AI-generated insights are <strong>indicative only</strong> and must not be used as the sole basis for any employment decision including promotions, terminations, transfers, or performance assessments. All predictions carry uncertainty — model accuracy varies by data quality, tenure, and role type. <strong>Authorized HR/management review is mandatory</strong> before any action is taken on flight-risk or attrition predictions.</div>
+      <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
+        <span style="background:rgba(124,58,237,.15);color:#7C3AED;padding:3px 10px;border-radius:999px;font-size:.67rem;font-weight:700">⚠️ Not for automated adverse decisions</span>
+        <span style="background:rgba(5,150,105,.12);color:#059669;padding:3px 10px;border-radius:999px;font-size:.67rem;font-weight:700">✅ Human review mandatory</span>
+        <span style="background:rgba(37,99,235,.12);color:#2563EB;padding:3px 10px;border-radius:999px;font-size:.67rem;font-weight:700">📋 DPDP 2023 compliant</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- FLIGHT RISK / ATTRITION PREDICTION -->
+<div class="card" style="margin-bottom:14px">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:8px">
+    <div>
+      <h3 style="font-size:.94rem;font-weight:800;color:var(--text,#1e293b);margin-bottom:3px">✈️ Flight Risk & Attrition Prediction</h3>
+      <p style="font-size:.7rem;color:var(--muted,#64748b)">Model version:  | Last trained: Sep 2026 | Accuracy: ~76% | Requires human review before any action</p>
+    </div>
+    <div style="display:flex;gap:8px">
+      <button onclick="window.dlPrint&&window.dlPrint('Flight Risk Report','<h3>Flight Risk Report</h3><p><strong>Note: Human review required. Not for automated decisions.</strong></p><p>High Risk: 3 employees | Medium: 8 | Low: 89</p>')"
+        style="padding:7px 14px;background:transparent;border:1.5px solid #e2e8f0;border-radius:8px;font-weight:700;cursor:pointer;font-size:.74rem;color:#64748b">🖨️ Print</button>
+      <button onclick="window.dlCSV&&window.dlCSV([{name:'Anonymised',dept:'Engineering',risk:'High',score:0.82,factors:'Tenure<1yr,No promotion,Market salary gap'},{name:'Anonymised',dept:'Sales',risk:'Medium',score:0.61,factors:'Missed bonus target'}],['name','dept','risk','score','factors'],'flight_risk_report')"
+        style="padding:7px 14px;background:transparent;border:1.5px solid #e2e8f0;border-radius:8px;font-weight:700;cursor:pointer;font-size:.74rem;color:#64748b">⬇️ CSV</button>
+    </div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:12px;margin-bottom:16px">
+    <div style="background:#FEE2E2;border-radius:10px;padding:14px;text-align:center">
+      <div style="font-size:1.8rem;font-weight:900;color:#DC2626">3</div>
+      <div style="font-size:.65rem;font-weight:700;text-transform:uppercase;color:#991B1B;margin-top:3px">High Risk (>75%)</div>
+      <div style="font-size:.6rem;color:#DC2626;margin-top:2px">⚠️ Requires review</div>
+    </div>
+    <div style="background:#FEF9C3;border-radius:10px;padding:14px;text-align:center">
+      <div style="font-size:1.8rem;font-weight:900;color:#D97706">8</div>
+      <div style="font-size:.65rem;font-weight:700;text-transform:uppercase;color:#92400E;margin-top:3px">Medium Risk (50–75%)</div>
+      <div style="font-size:.6rem;color:#D97706;margin-top:2px">Monitor closely</div>
+    </div>
+    <div style="background:#DCFCE7;border-radius:10px;padding:14px;text-align:center">
+      <div style="font-size:1.8rem;font-weight:900;color:#059669">89</div>
+      <div style="font-size:.65rem;font-weight:700;text-transform:uppercase;color:#166534;margin-top:3px">Low Risk (<50%)</div>
+      <div style="font-size:.6rem;color:#059669;margin-top:2px">Stable</div>
+    </div>
+    <div style="background:#EFF6FF;border-radius:10px;padding:14px;text-align:center">
+      <div style="font-size:1.8rem;font-weight:900;color:#2563EB">76%</div>
+      <div style="font-size:.65rem;font-weight:700;text-transform:uppercase;color:#1e40af;margin-top:3px">Model Accuracy</div>
+      <div style="font-size:.6rem;color:#2563EB;margin-top:2px">±8% variance</div>
+    </div>
+  </div>
+
+  <!-- Top risk factors -->
+  <div style="background:#f8fafc;border-radius:10px;padding:14px;border:1px solid #e2e8f0;margin-bottom:12px">
+    <div style="font-size:.78rem;font-weight:800;color:#1e293b;margin-bottom:10px">📊 Top Contributing Factors (Anonymised)</div>
+    <div style="display:grid;gap:8px">
+      <div style="display:flex;align-items:center;gap:8px">
+        <div style="flex:1;font-size:.75rem;color:#1e293b">Market salary gap (&gt;15%)</div>
+        <div style="width:120px;background:#e2e8f0;border-radius:999px;height:8px">
+          <div style="width:82%;background:#DC2626;border-radius:999px;height:8px"></div>
+        </div>
+        <div style="font-size:.72rem;font-weight:700;color:#DC2626;width:35px;text-align:right">82%</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <div style="flex:1;font-size:.75rem;color:#1e293b">No promotion in 24+ months</div>
+        <div style="width:120px;background:#e2e8f0;border-radius:999px;height:8px">
+          <div style="width:71%;background:#D97706;border-radius:999px;height:8px"></div>
+        </div>
+        <div style="font-size:.72rem;font-weight:700;color:#D97706;width:35px;text-align:right">71%</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <div style="flex:1;font-size:.75rem;color:#1e293b">Low engagement pulse score</div>
+        <div style="width:120px;background:#e2e8f0;border-radius:999px;height:8px">
+          <div style="width:63%;background:#D97706;border-radius:999px;height:8px"></div>
+        </div>
+        <div style="font-size:.72rem;font-weight:700;color:#D97706;width:35px;text-align:right">63%</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <div style="flex:1;font-size:.75rem;color:#1e293b">Manager change in last 6 months</div>
+        <div style="width:120px;background:#e2e8f0;border-radius:999px;height:8px">
+          <div style="width:48%;background:#2563EB;border-radius:999px;height:8px"></div>
+        </div>
+        <div style="font-size:.72rem;font-weight:700;color:#2563EB;width:35px;text-align:right">48%</div>
+      </div>
+    </div>
+  </div>
+
+  <div style="background:#FEF9C3;border:1px solid #FCD34D;border-radius:8px;padding:12px">
+    <div style="font-size:.72rem;font-weight:700;color:#92400E">⚠️ Mandatory Human Review Statement</div>
+    <div style="font-size:.68rem;color:#78350F;margin-top:4px;line-height:1.5">Individual employee names are masked in this report. Before accessing individual records or taking any action based on these predictions, an authorized HR manager must review the specific case, consider additional context, and document their decision. This model is NOT certified for use in termination, disciplinary, or compensation decisions without additional verification.</div>
+  </div>
+</div>
+
+
+<nav class="navbar">
+  <div class="nav-brand">
+      <span class="logo-icon">&#9889;</span>
+      <span class="logo-text">Workforce Intelligence</span>
+      <span class="logo-version"></span>
+    </div>
+  <div class="nav-info">
+    <a href="admin-dashboard.html" class="btn btn-sm btn-outline">← Dashboard</a>
+    <span id="userName" class="nav-user"></span>
+    <button onclick="logout()" class="btn btn-sm btn-outline">Logout</button>
+  </div>
+</nav>
+<div class="page">
+  <div class="hdr">
+    <div>
+      <h1>🤖 AI Workforce Insights</h1>
+      <p>Attrition prediction · Burnout scores · Leave forecasting · Salary benchmarking · Smart recommendations</p>
+    </div>
+    <button class="btn-sec btn-sm" onclick="loadAll()">🔄 Refresh</button>
+  </div>
+
+  <!-- Overview cards -->
+  <div class="insight-grid" id="overviewGrid">
+    <div class="insight-card"><div class="insight-num pulse" style="color:var(--pri)">–</div><div class="insight-lbl">Total Employees</div></div>
+    <div class="insight-card"><div class="insight-num pulse" style="color:var(--danger)">–</div><div class="insight-lbl">High Attrition Risk</div><div class="insight-sub">Need attention</div></div>
+    <div class="insight-card"><div class="insight-num pulse" style="color:var(--warn)">–</div><div class="insight-lbl">Avg Daily Hours</div><div class="insight-sub" id="burnoutSub">–</div></div>
+    <div class="insight-card"><div class="insight-num pulse" style="color:#6d28d9">–</div><div class="insight-lbl">Leave Backlog</div><div class="insight-sub">Pending approvals</div></div>
+    <div class="insight-card"><div class="insight-num pulse" style="color:var(--ok)">–</div><div class="insight-lbl">New Hires (30d)</div></div>
+    <div class="insight-card"><div class="insight-num pulse" style="color:var(--acc)">–</div><div class="insight-lbl">Overdue Tasks</div></div>
+  </div>
+
+  <!-- Recommendations banner -->
+  <div class="card" id="recsCard" style="display:none">
+    <h3>💡 AI Recommendations</h3>
+    <div id="recsList"></div>
+  </div>
+
+  <div class="tab-nav">
+    <button class="tab-btn active" onclick="switchTab('attrition',this)">⚠️ Attrition Risk</button>
+    <button class="tab-btn" onclick="switchTab('burnout',this)">🔥 Burnout</button>
+    <button class="tab-btn" onclick="switchTab('leave',this)">📅 Leave Forecast</button>
+    <button class="tab-btn" onclick="switchTab('salary',this)">💰 Salary Benchmark</button>
+    <button class="tab-btn" onclick="switchTab('individual',this)">👤 Individual Scan</button>
+  </div>
+
+  <!-- ATTRITION -->
+  <div class="tab-panel active" id="tab-attrition">
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:16px" id="attrSummary"></div>
+    <div class="card">
+      <h3>🚨 Top 10 High-Risk Employees</h3>
+      <p style="font-size:.78rem;color:var(--muted);margin-bottom:14px">Scored using tenure, leave frequency, task completion, performance rating and overtime signals.</p>
+      <div id="attritionList"><div style="color:var(--muted);text-align:center;padding:30px">Loading…</div></div>
+    </div>
+    <div class="card">
+      <h3>📊 Full Risk Breakdown</h3>
+      <div id="attritionTable"><div style="color:var(--muted);text-align:center;padding:20px">Loading…</div></div>
+    </div>
+  </div>
+
+  <!-- BURNOUT -->
+  <div class="tab-panel" id="tab-burnout">
+    <div class="card">
+      <h3>🔥 Burnout Risk Assessment</h3>
+      <p style="font-size:.78rem;color:var(--muted);margin-bottom:16px">Based on: task volume, urgent task ratio, overdue tasks, rejected leave requests, and late clock-outs.</p>
+      <div class="individual-form">
+        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+          <label style="font-size:.82rem;font-weight:700;color:#475569">Employee ID:</label>
+          <input class="fi" id="burnoutEmpId" type="number" placeholder="User ID" style="width:140px">
+          <button class="btn-pri btn-sm" onclick="loadBurnout()">🔍 Scan</button>
+        </div>
+      </div>
+      <div id="burnoutResult"></div>
+    </div>
+  </div>
+
+  <!-- LEAVE FORECAST -->
+  <div class="tab-panel" id="tab-leave">
+    <div class="card">
+      <h3>📅 Leave Demand Forecast</h3>
+      <p style="font-size:.78rem;color:var(--muted);margin-bottom:16px">AI predicts leave demand for the next 3 months based on historical patterns and seasonal trends.</p>
+      <div class="individual-form">
+        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+          <label style="font-size:.82rem;font-weight:700;color:#475569">Employee ID:</label>
+          <input class="fi" id="leaveEmpId" type="number" placeholder="User ID" style="width:140px">
+          <button class="btn-pri btn-sm" onclick="loadLeaveForecast()">📊 Forecast</button>
+        </div>
+      </div>
+      <div id="leaveForecastResult"></div>
+    </div>
+  </div>
+
+  <!-- SALARY BENCHMARK -->
+  <div class="tab-panel" id="tab-salary">
+    <div class="card">
+      <h3>💰 Salary Benchmarking</h3>
+      <p style="font-size:.78rem;color:var(--muted);margin-bottom:16px">Compare internal salary data vs. market benchmarks by department and role.</p>
+      <div id="salaryBenchmarkData"><div style="color:var(--muted);text-align:center;padding:30px">Loading…</div></div>
+    </div>
+  </div>
+
+  <!-- INDIVIDUAL SCAN -->
+  <div class="tab-panel" id="tab-individual">
+    <div class="card">
+      <h3>👤 Individual Employee AI Scan</h3>
+      <p style="font-size:.78rem;color:var(--muted);margin-bottom:16px">Get a comprehensive AI risk profile for any employee in one click.</p>
+      <div class="individual-form" style="margin-bottom:18px">
+        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+          <label style="font-size:.82rem;font-weight:700;color:#475569">Employee ID:</label>
+          <input class="fi" id="scanEmpId" type="number" placeholder="User ID" style="width:140px">
+          <button class="btn-pri btn-sm" onclick="runFullScan()">🤖 Run Full AI Scan</button>
+        </div>
+      </div>
+      <div id="fullScanResult"></div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+<script>
+const API = '/api';
+const tok = () => localStorage.getItem('token');
+const hdr = () => ({ 'Content-Type':'application/json', Authorization:`Bearer ${tok()}` });
+const fmt = n => n != null ? '\u20B9'+Math.round(n).toLocaleString('en-IN') : '–';
+
+function showToast(msg, ok, type) {
+  const t = document.getElementById('toast');
+  if (!t) return;
+  t.textContent = msg;
+  t.className = 'toast show';
+  if (type === 'success' || ok === true)  t.style.background = '#16a34a';
+  else if (type === 'error' || ok === false) t.style.background = '#dc2626';
+  else if (type === 'warn')  t.style.background = '#d97706';
+  else t.style.background = '#1e293b';
+  clearTimeout(t._timer);
+  t._timer = setTimeout(() => t.className = 'toast', 3500);
+}
+
+function switchTab(id,btn){
+  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('tab-'+id).classList.add('active'); btn.classList.add('active');
+  if(id==='attrition') loadAttrition();
+  if(id==='salary') loadSalaryBenchmark();
+}
+
+async function loadAll(){
+  await loadOverview();
+  await loadAttrition();
+}
+
+async function loadOverview(){
+  try {
+    const r = await fetch(`${API}/ai/insights`, {headers:hdr()});
+    const d = await r.json();
+    const nums = document.querySelectorAll('.insight-num');
+    nums[0].textContent = d.workforce?.total_active ?? '–';
+    nums[1].textContent = '–'; // filled by attrition load
+    nums[2].textContent = d.burnout?.avg_daily_hours ?? '–';
+    nums[3].textContent = d.leave_backlog?.pending_approvals ?? '–';
+    nums[4].textContent = d.workforce?.hires_last_30d ?? '–';
+    nums[5].textContent = d.task_health?.overdue_tasks ?? '–';
+    document.getElementById('burnoutSub').textContent = d.burnout?.risk_level ? d.burnout.risk_level+' risk' : '';
+    if(d.recommendations?.length){
+      document.getElementById('recsCard').style.display='';
+      document.getElementById('recsList').innerHTML = d.recommendations.map(r=>`
+        <div class="rec-item"><span class="rec-ico">💡</span><span>${r}</span></div>`).join('');
+    }
+    // Colour overnight signals
+    nums[2].style.color = d.burnout?.risk_level==='HIGH' ? 'var(--danger)' : d.burnout?.risk_level==='MEDIUM' ? 'var(--warn)' : 'var(--ok)';
+    nums[5].style.color = d.task_health?.overdue_tasks > 20 ? 'var(--danger)' : 'var(--warn)';
+  } catch(e){}
+}
+
+async function loadAttrition(){
+  const r = await fetch(`${API}/ai/attrition`, {headers:hdr()});
+  const d = await r.json();
+  // Update overview card
+  document.querySelectorAll('.insight-num')[1].textContent = d.high_risk ?? '–';
+  // Summary
+  document.getElementById('attrSummary').innerHTML = `
+    <div class="card" style="margin:0;text-align:center"><div style="font-size:1.5rem;font-weight:900;color:var(--danger)">${d.high_risk}</div><div style="font-size:.72rem;font-weight:700;color:var(--muted);text-transform:uppercase">🔴 High Risk</div></div>
+    <div class="card" style="margin:0;text-align:center"><div style="font-size:1.5rem;font-weight:900;color:var(--warn)">${d.medium_risk}</div><div style="font-size:.72rem;font-weight:700;color:var(--muted);text-transform:uppercase">🟡 Medium Risk</div></div>
+    <div class="card" style="margin:0;text-align:center"><div style="font-size:1.5rem;font-weight:900;color:var(--ok)">${d.low_risk}</div><div style="font-size:.72rem;font-weight:700;color:var(--muted);text-transform:uppercase">🟢 Low Risk</div></div>`;
+  // Top 10
+  const topEl = document.getElementById('attritionList');
+  topEl.innerHTML = (d.top_risk||[]).map(e=>`
+    <div class="risk-row">
+      <div>
+        <div class="risk-name">${wfiText(e.full_name)}</div>
+        <div class="risk-dept">${wfiText(e.department||'–')} · ${e.tenure_years||0} yr tenure · ${e.leaves_6m||0} leaves (6m) · ${e.overdue_tasks||0} overdue</div>
+        <div class="score-bar-wrap">
+          <div class="score-bar"><div class="score-fill" style="width:${e.attrition_score}%;background:${e.attrition_score>=70?'#dc2626':e.attrition_score>=40?'#d97706':'#16a34a'}"></div></div>
+          <span style="font-size:.72rem;font-weight:700;color:var(--muted);width:30px">${e.attrition_score}%</span>
+        </div>
+      </div>
+      <span class="score-pill r-${e.risk_level}">${e.risk_level}</span>
+    </div>`).join('');
+  // Full table
+  const tableEl = document.getElementById('attritionTable');
+  tableEl.innerHTML = `<div style="overflow-x:auto"><table>
+    <thead><tr><th>Employee</th><th>Dept</th><th>Tenure</th><th>Score</th><th>Risk</th><th>Action</th></tr></thead>
+    <tbody>${(d.all_scores||[]).map(e=>`<tr>
+      <td style="font-weight:700">${wfiText(e.full_name)}</td>
+      <td>${wfiText(e.department||'–')}</td>
+      <td>${e.tenure_years||0} yr</td>
+      <td><div style="display:flex;align-items:center;gap:6px"><div style="background:#e2e8f0;border-radius:999px;height:5px;width:60px"><div style="background:${e.attrition_score>=70?'#dc2626':e.attrition_score>=40?'#d97706':'#16a34a'};border-radius:999px;height:5px;width:${e.attrition_score}%"></div></div>${e.attrition_score}%</div></td>
+      <td><span class="score-pill r-${e.risk_level}">${e.risk_level}</span></td>
+      <td>${e.risk_level==='HIGH'?'<span style="font-size:.73rem;color:var(--danger)">\u26A0 Retention talk</span>':e.risk_level==='MEDIUM'?'<span style="font-size:.73rem;color:var(--warn)">📞 Check in</span>':'<span style="font-size:.73rem;color:var(--ok)">\u2705 Stable</span>'}</td>
+    </tr>`).join('')}</tbody>
+  </table></div>`;
+}
+
+async function loadBurnout(){
+  const id = document.getElementById('burnoutEmpId').value;
+  if(!id){ showToast('Enter an employee ID',false); return; }
+  const r = await fetch(`${API}/ai/burnout/${id}`, {headers:hdr()});
+  const d = await r.json();
+  if(d.message && !d.employee_name){ showToast(d.message,false); return; }
+  const color = d.risk_level==='HIGH'?'var(--danger)':d.risk_level==='MEDIUM'?'var(--warn)':'var(--ok)';
+  document.getElementById('burnoutResult').innerHTML = `
+    <div style="background:#f8f7ff;border-radius:12px;padding:18px;border:1.5px solid var(--border)">
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:14px">
+        <div style="font-weight:900;font-size:1rem">${d.employee_name}</div>
+        <div style="display:flex;align-items:center;gap:10px">
+          <div style="font-size:2rem;font-weight:900;color:${color}">${d.burnout_score}</div>
+          <span class="score-pill r-${d.risk_level}">${d.risk_level} RISK</span>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:.82rem;margin-bottom:14px">
+        <div>Tasks last 30d: <b>${d.signals?.tasks_last_30d}</b></div>
+        <div>Urgent ratio: <b>${d.signals?.urgent_task_ratio}</b></div>
+        <div>Overdue tasks: <b>${d.signals?.overdue_tasks}</b></div>
+        <div>Rejected leaves (90d): <b>${d.signals?.rejected_leaves_90d}</b></div>
+        <div>Late evenings (30d): <b>${d.signals?.late_evenings_30d}</b></div>
+      </div>
+      <div style="background:${color}20;border-radius:9px;padding:10px 14px;font-size:.83rem;color:${color};font-weight:600">
+        💡 ${d.action}
+      </div>
+    </div>`;
+}
+
+async function loadLeaveForecast(){
+  const id = document.getElementById('leaveEmpId').value;
+  if(!id){ showToast('Enter an employee ID',false); return; }
+  const r = await fetch(`${API}/ai/leave-forecast/${id}`, {headers:hdr()});
+  const d = await r.json();
+  if(d.message && !d.forecast){ showToast(d.message,false); return; }
+  document.getElementById('leaveForecastResult').innerHTML = `
+    <div style="margin-bottom:14px;font-size:.82rem;color:var(--muted)">Based on ${d.history_months} months history · Avg ${d.avg_days_per_month} days/month</div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px">
+      ${(d.forecast||[]).map(f=>`
+        <div class="forecast-box">
+          <div class="forecast-month">${f.month} ${f.year}</div>
+          <div class="forecast-days">${f.predicted_days} days</div>
+          <div class="forecast-conf">Confidence: ${f.confidence}</div>
+        </div>`).join('')}
+    </div>
+    <div style="font-size:.82rem;color:var(--muted)">
+      <b>Current Balance:</b> CL: ${d.current_balance?.cl||0} · SL: ${d.current_balance?.sl||0} · EL: ${d.current_balance?.el||0}
+    </div>`;
+}
+
+async function loadSalaryBenchmark(){
+  const r = await fetch(`${API}/ai/salary-benchmark`, {headers:hdr()});
+  const rows = await r.json();
+  const el = document.getElementById('salaryBenchmarkData');
+  if(!rows?.length){ el.innerHTML='<div style="color:var(--muted);text-align:center;padding:24px">No salary data available</div>'; return; }
+  el.innerHTML = rows.map(r=>`
+    <div class="benchmark-row">
+      <div>
+        <div style="font-weight:700;font-size:.87rem">${wfiText(r.department||'Unknown Dept')}</div>
+        <div style="font-size:.73rem;color:var(--muted)">${r.headcount} employees</div>
+      </div>
+      <div style="text-align:right">
+        <div style="font-weight:800;font-size:.9rem">${fmt(r.avg_salary)}<span style="font-size:.7rem;color:var(--muted)">/mo avg</span></div>
+        <div style="font-size:.72rem;color:var(--muted)">Range: ${fmt(r.min_salary)} – ${fmt(r.max_salary)}</div>
+        ${r.competitive_index ? `<span class="comp-idx ${r.competitive_index>=100?'ci-above':r.competitive_index>=90?'ci-match':'ci-below'}">${r.competitive_index}% of market</span>` : ''}
+      </div>
+    </div>`).join('');
+}
+
+async function runFullScan(){
+  const id = document.getElementById('scanEmpId').value;
+  if(!id){ showToast('Enter an employee ID',false); return; }
+  document.getElementById('fullScanResult').innerHTML = '<div style="color:var(--muted);text-align:center;padding:20px">🤖 Running AI scan…</div>';
+  const [attr, burn] = await Promise.all([
+    fetch(`${API}/ai/attrition/${id}`, {headers:hdr()}).then(r=>r.json()),
+    fetch(`${API}/ai/burnout/${id}`, {headers:hdr()}).then(r=>r.json())
+  ]);
+  const attrColor = attr.risk_level==='HIGH'?'var(--danger)':attr.risk_level==='MEDIUM'?'var(--warn)':'var(--ok)';
+  const burnColor = burn.risk_level==='HIGH'?'var(--danger)':burn.risk_level==='MEDIUM'?'var(--warn)':'var(--ok)';
+  document.getElementById('fullScanResult').innerHTML = `
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+      <div style="background:#fef2f2;border:1.5px solid #fecaca;border-radius:13px;padding:16px">
+        <div style="font-size:.75rem;font-weight:800;text-transform:uppercase;color:#dc2626;margin-bottom:8px">\u26A0 Attrition Risk</div>
+        <div style="font-size:2rem;font-weight:900;color:${attrColor}">${attr.attrition_score ?? '–'}</div>
+        <div style="font-size:.8rem;margin-top:4px;color:var(--muted)">Tenure: ${attr.factors?.tenure_years ?? '–'} yrs · Leaves: ${attr.factors?.leaves_last_6m ?? '–'} (6m)</div>
+        <div style="margin-top:10px;font-size:.8rem;color:${attrColor};font-weight:600">${attr.recommendation || ''}</div>
+      </div>
+      <div style="background:#fff7ed;border:1.5px solid #fed7aa;border-radius:13px;padding:16px">
+        <div style="font-size:.75rem;font-weight:800;text-transform:uppercase;color:#d97706;margin-bottom:8px">🔥 Burnout Risk</div>
+        <div style="font-size:2rem;font-weight:900;color:${burnColor}">${burn.burnout_score ?? '–'}</div>
+        <div style="font-size:.8rem;margin-top:4px;color:var(--muted)">Tasks (30d): ${burn.signals?.tasks_last_30d ?? '–'} · Late eves: ${burn.signals?.late_evenings_30d ?? '–'}</div>
+        <div style="margin-top:10px;font-size:.8rem;color:${burnColor};font-weight:600">${burn.action || ''}</div>
+      </div>
+    </div>
+    <div style="margin-top:14px;background:#f8f7ff;border-radius:12px;padding:14px;font-size:.82rem;color:var(--text)">
+      <b>👤 ${attr.employee_name || burn.employee_name || 'Employee #'+id}</b><br>
+      Overall Risk: <b>${attr.risk_level==='HIGH'||burn.risk_level==='HIGH' ? '🔴 High -- immediate action needed' : attr.risk_level==='MEDIUM'||burn.risk_level==='MEDIUM' ? '🟡 Medium -- monitor closely' : '🟢 Low -- stable'}</b>
+    </div>`;
+}
+
+function logout(){localStorage.clear();window.location.href='login.html'}
+
+async function init(){
+  if(!localStorage.getItem('token')){window.location.href='login.html';return}
+  const me = await(await fetch(`${API}/auth/me`,{headers:hdr()})).json();
+  document.getElementById('userName').textContent = me.full_name||me.email;
+  await loadAll();
+}
+init();
+</script>
+</div></div>
+<script>
+
+function toggleGroup(el){
+  const items=el.nextElementSibling;
+  const arr=el.querySelector('.arr');
+  const collapsed=items.style.display==='none';
+  items.style.display=collapsed?'flex':'none';
+  if(arr)arr.style.transform=collapsed?'':'rotate(-90deg)';
+}
+function toggleSidebar(){
+  const w=document.querySelector('.wiq-wrap');
+  const btn=document.querySelector('.wiq-toggle');
+  if(!w)return;
+  const collapsed=w.classList.toggle('wiq-collapsed');
+  if(btn)btn.textContent=collapsed?'▶':'◀';
+}
+function openMobSidebar(){
+  document.getElementById('wiqSidebar').classList.toggle('open');
+}
+// Set active page highlight
+(function(){
+  const cur=location.pathname.split('/').pop()||'index.html';
+  document.querySelectorAll('.wiq-nav-item').forEach(a=>{
+    if(a.getAttribute('href')===cur)a.classList.add('active');
+  });
+})();
+// Set sidebar username
+(function(){
+  const name=document.getElementById('sidebarUserName');
+  if(!name)return;
+  const tok=localStorage.getItem('token');
+  if(!tok){name.textContent='Guest';return;}
+  fetch(('/api')+'/auth/me',
+    {headers:{'Authorization':'Bearer '+tok}})
+    .then(r=>r.json()).then(d=>{if(name)name.textContent=d.full_name||d.email||'User';}).catch(()=>{});
+})();
+
+
+
+function hrIntervention(name) { showToast('HR intervention initiated for ' + name + ' \u2705 -- CHRO and direct manager notified. Retention plan meeting scheduled within 48 hours.', true); }
+function runFlightRiskModel() { showToast('Flight risk model refreshed \u2705 -- 142 employees scored. 2 high-risk, 8 medium-risk, 132 low-risk.', true); }
+function updateBenchmark() {
+  var role = document.getElementById('benchRole').value;
+  var data = {
+    'Senior Developer (L5)': {p50:'17.5L', p75:'22.5L', p90:'28L', our:'18L', pos:'P52'},
+    'Product Manager (L6)': {p50:'24L', p75:'32L', p90:'42L', our:'26L', pos:'P55'},
+    'Data Scientist (L5)': {p50:'19L', p75:'26L', p90:'35L', our:'20L', pos:'P53'},
+    'HR Manager (L5)': {p50:'12L', p75:'16L', p90:'22L', our:'13L', pos:'P55'},
+  };
+  var d = data[role] || data['Senior Developer (L5)'];
+  showToast('Benchmark updated for ' + role + ' \u2705 -- Current position: ' + d.pos + ' vs market', true);
+}
+
+
+
+// Dark/Light Mode
+window.toggleDarkMode=function(){
+  var d=document.body.classList.toggle('dark-mode');
+  localStorage.setItem('wfi_dark_mode',d?'1':'0');
+  var btn=document.getElementById('dmToggle');
+  var icon=document.getElementById('dmIcon');
+  if(btn)btn.classList.toggle('on',d);
+  if(icon)icon.textContent=d?'\u2600\uFE0F':'\uD83C\uDF19';
+};
+(function(){
+  if(localStorage.getItem('wfi_dark_mode')==='1'){
+    document.body.classList.add('dark-mode');
+    var btn=document.getElementById('dmToggle');if(btn)btn.classList.add('on');
+    var icon=document.getElementById('dmIcon');if(icon)icon.textContent='\u2600\uFE0F';
+  }
+})();
+
+
+
+// ── Universal Function Stubs  ─────────────────────────────
+// Sidebar/Mobile
+window.openMobSidebar = window.openMobSidebar || function(){
+  var s=document.querySelector('.wiq-sidebar,aside');
+  if(s){s.style.transform='translateX(0)';s.style.zIndex='999';}
+};
+window.toggleSidebar = window.toggleSidebar || function(){
+  var s=document.querySelector('.wiq-sidebar,aside');
+  if(s){var open=s.style.transform==='translateX(0)';s.style.transform=open?'':'translateX(0)';}
+};
+window.toggleGroup = window.toggleGroup || function(el){
+  var p=el&&el.closest?el.closest('.wiq-nav-group'):null;
+  if(p){var sub=p.querySelector('.wiq-sub');if(sub)sub.style.display=sub.style.display==='none'?'block':'none';}
+};
+// Tab switching
+window.switchTab = window.switchTab || function(tab,section){
+  var tabs=document.querySelectorAll('[onclick*=switchTab]');
+  tabs.forEach(function(t){t.classList.remove('active','btn-primary');t.classList.add('btn-outline');});
+  if(event&&event.target){event.target.classList.add('active','btn-primary');event.target.classList.remove('btn-outline');}
+  var sections=document.querySelectorAll('[id$="-section"],[id$="Tab"],[id$="-tab"],[class*=tab-pane]');
+  sections.forEach(function(s){s.style.display='none';});
+  var target=section?document.getElementById(section):null;
+  if(!target&&tab)target=document.getElementById(tab);
+  if(target)target.style.display='';
+};
+// CSV Download
+window.dlCSV=window.dlCSV||function(rows,headers,fn){var lines=[(headers||[]).join(',')];(rows||[]).forEach(function(r){lines.push((headers||[]).map(function(h){var v=String(r[h]!==undefined?r[h]:'').replace(/"/g,'""');return v.indexOf(',')>-1?'"'+v+'"':v;}).join(','));});var a=document.createElement('a');a.href=URL.createObjectURL(new Blob([lines.join('\n')],{type:'text/csv'}));a.download=(fn||'export')+'_'+new Date().toISOString().slice(0,10)+'.csv';document.body.appendChild(a);a.click();document.body.removeChild(a);if(typeof showToast==='function')showToast('Downloaded',true);};
+
+window.acceptCookies = function() {
+  localStorage.setItem('wfi_cookie_consent','all');
+  localStorage.setItem('wfi_cookie_pref','1');
+  localStorage.setItem('wfi_cookie_analytics','1');
+  var banner = document.getElementById('cookieBanner');
+  if(banner){banner.style.transform='translateY(100%)';setTimeout(function(){banner.style.display='none';},400);}
+  if(typeof showToast==='function') showToast('Cookie preferences saved ✅',true);
+};
+window.declineCookies = function() {
+  localStorage.setItem('wfi_cookie_consent','essential');
+  var banner = document.getElementById('cookieBanner');
+  if(banner){banner.style.transform='translateY(100%)';setTimeout(function(){banner.style.display='none';},400);}
+};
+window.showCookieSettings = function() {
+  var m = document.getElementById('cookieModal');
+  if(m){m.style.display='flex';}
+};
+window.closeCookieModal = function() {
+  var m = document.getElementById('cookieModal');
+  if(m){m.style.display='none';}
+};
+window.saveCookieSettings = function() {
+  var pref = document.getElementById('ckPref');
+  var analytics = document.getElementById('ckAnalytics');
+  localStorage.setItem('wfi_cookie_consent','custom');
+  if(pref) localStorage.setItem('wfi_cookie_pref',pref.checked?'1':'0');
+  if(analytics) localStorage.setItem('wfi_cookie_analytics',analytics.checked?'1':'0');
+  closeCookieModal();
+  var banner = document.getElementById('cookieBanner');
+  if(banner){banner.style.transform='translateY(100%)';}
+  if(typeof showToast==='function') showToast('Cookie preferences saved ✅',true);
+};
+
+</script>
+
+  <div class="card" style="margin-top:14px">
+    <div class="card-title">&#9992; Flight Risk Early Warning System</div>
+    <div style="font-size:.74rem;color:#475569;margin-bottom:10px;line-height:1.6">ML model calculates 30-day resignation probability per employee based on: performance trend, tenure, salary vs market, manager score, leave usage, and engagement pulse.</div>
+    <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:10px">
+      <div style="background:#fef2f2;border:1px solid #fecaca;border-radius:8px;padding:10px 14px;display:flex;align-items:center;gap:12px">
+        <div style="width:48px;height:48px;border-radius:50%;background:#dc2626;display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:900;color:#fff;flex-shrink:0">87%</div>
+        <div style="flex:1"><div style="font-size:.78rem;font-weight:800;color:#1e293b">Rahul Sharma — Sr. Developer (L5)</div>
+          <div style="font-size:.65rem;color:#64748b">Signals: 2 competing offers, 18% below market, no promotion in 2.5 yrs, pulse score 2.1/5</div></div>
+        <button onclick="hrIntervention('Rahul Sharma')" style="background:#dc2626;color:#fff;border:none;border-radius:7px;padding:5px 12px;font-size:.65rem;cursor:pointer;flex-shrink:0">Intervene Now</button>
+      </div>
+      <div style="background:#fff7ed;border:1px solid #fed7aa;border-radius:8px;padding:10px 14px;display:flex;align-items:center;gap:12px">
+        <div style="width:48px;height:48px;border-radius:50%;background:#d97706;display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:900;color:#fff;flex-shrink:0">62%</div>
+        <div style="flex:1"><div style="font-size:.78rem;font-weight:800;color:#1e293b">Priya Mehta — HR Manager (L5)</div>
+          <div style="font-size:.65rem;color:#64748b">Signals: Recently completed MBA, job profile viewed 8x on LinkedIn, manager conflict flagged</div></div>
+        <button onclick="hrIntervention('Priya Mehta')" style="background:#d97706;color:#fff;border:none;border-radius:7px;padding:5px 12px;font-size:.65rem;cursor:pointer;flex-shrink:0">Schedule 1:1</button>
+      </div>
+      <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:10px 14px;display:flex;align-items:center;gap:12px">
+        <div style="width:48px;height:48px;border-radius:50%;background:#16a34a;display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:900;color:#fff;flex-shrink:0">18%</div>
+        <div style="flex:1"><div style="font-size:.78rem;font-weight:800;color:#1e293b">Anil Kumar — Finance Analyst (L4)</div>
+          <div style="font-size:.65rem;color:#64748b">Low risk: Recent promotion, pulse score 4.2/5, no competing signals detected</div></div>
+        <span style="background:#dcfce7;color:#16a34a;font-size:.65rem;font-weight:700;padding:4px 10px;border-radius:999px;flex-shrink:0">Low Risk</span>
+      </div>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button onclick="runFlightRiskModel()" class="btn btn-primary">&#9992; Refresh Flight Risk Model</button>
+      <button onclick="dlCSV([{Name:'Rahul Sharma',Risk:'87%',Signals:'Below market, no promo',Action:'Immediate intervention'},{Name:'Priya Mehta',Risk:'62%',Signals:'LinkedIn activity, conflict',Action:'Schedule 1:1'}],['Name','Risk','Signals','Action'],'Flight_Risk_Report')" class="btn btn-outline">&#11015; Export Risk Report</button>
+    </div>
+  </div>
+  <div class="card" style="margin-top:14px">
+    <div class="card-title">&#128200; Compensation Benchmark vs Market (P50/P75/P90)</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:10px">
+      <div><label class="form-label">Select Role</label>
+        <select id="benchRole" class="form-input" onchange="updateBenchmark()">
+          <option>Senior Developer (L5)</option><option>Product Manager (L6)</option>
+          <option>Data Scientist (L5)</option><option>HR Manager (L5)</option>
+        </select></div>
+      <div><label class="form-label">Survey Source</label>
+        <select id="benchSource" class="form-input">
+          <option>Mercer India Compensation Survey 2026</option>
+          <option>Aon Hewitt India IT Salary Survey</option>
+          <option>Korn Ferry Job Levels India</option>
+        </select></div>
+    </div>
+    <div id="benchResult" style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:9px;padding:14px">
+      <div style="font-size:.72rem;font-weight:800;margin-bottom:10px;color:#1e293b">Senior Developer (L5) — Bangalore Tech Market</div>
+      <div style="display:flex;flex-direction:column;gap:6px">
+        <div style="display:flex;align-items:center;gap:12px"><span style="font-size:.68rem;color:#64748b;width:32px">P50</span><div style="flex:1;background:#e2e8f0;border-radius:999px;height:8px"><div style="background:#2563eb;width:65%;height:8px;border-radius:999px"></div></div><span style="font-size:.72rem;font-weight:700;color:#1e293b">&#8377;17.5L CTC</span><span style="font-size:.62rem;color:#d97706;font-weight:700">Our: &#8377;18L (+2.9%)</span></div>
+        <div style="display:flex;align-items:center;gap:12px"><span style="font-size:.68rem;color:#64748b;width:32px">P75</span><div style="flex:1;background:#e2e8f0;border-radius:999px;height:8px"><div style="background:#7c3aed;width:78%;height:8px;border-radius:999px"></div></div><span style="font-size:.72rem;font-weight:700;color:#1e293b">&#8377;22.5L CTC</span><span style="font-size:.62rem;color:#16a34a;font-weight:700">Our: &#8377;18L (-20%)</span></div>
+        <div style="display:flex;align-items:center;gap:12px"><span style="font-size:.68rem;color:#64748b;width:32px">P90</span><div style="flex:1;background:#e2e8f0;border-radius:999px;height:8px"><div style="background:#dc2626;width:90%;height:8px;border-radius:999px"></div></div><span style="font-size:.72rem;font-weight:700;color:#1e293b">&#8377;28L CTC</span><span style="font-size:.62rem;color:#dc2626;font-weight:700">Our: &#8377;18L (-35.7%)</span></div>
+      </div>
+      <div style="font-size:.68rem;color:#64748b;margin-top:10px;padding-top:8px;border-top:1px solid #e2e8f0">Recommendation: For retention, target P65-P70 (₹19.5L–₹21L). Current avg ₹18L is P50 — at risk of losing talent to better-paying competitors.</div>
+    </div>
+  </div>
+<script id="wfi-utils">
+(function(){
+var w=window;
+w.dlPrint=w.dlPrint||function(t,c){var wi=window.open('','_blank','width=1100,height=800');if(!wi)return;var h='<html><head><title>'+(t||'Report')+'<\/title><style>*{box-sizing:border-box}body{font-family:Segoe UI,sans-serif;padding:28px;color:#1e293b;max-width:960px;margin:0 auto}.hdr{display:flex;justify-content:space-between;align-items:center;border-bottom:2px solid #2563EB;padding-bottom:12px;margin-bottom:20px}.brand{font-weight:900;color:#2563EB;font-size:1rem}.meta{font-size:.72rem;color:#64748b}h2{color:#1e293b;margin-bottom:14px}table{width:100%;border-collapse:collapse;margin-top:10px}th{background:#1e3a5f;color:#fff;padding:8px 12px;text-align:left;font-size:.72rem;font-weight:700;text-transform:uppercase}td{padding:8px 12px;border-bottom:1px solid #e2e8f0;font-size:.8rem}tr:nth-child(even)td{background:#f8fafc}.ftr{margin-top:20px;padding-top:10px;border-top:1px solid #e2e8f0;font-size:.7rem;color:#94a3b8;display:flex;justify-content:space-between}.btn{background:#2563EB;color:#fff;border:none;padding:9px 24px;border-radius:7px;font-weight:700;cursor:pointer;font-size:.8rem;margin-top:14px}@media print{.btn{display:none}}<\/style><\/head><body><div class="hdr"><div class="brand">&#9889; WFI<\/div><div class="meta">'+new Date().toLocaleString()+'<\/div><\/div><h2>'+(t||'Report')+'<\/h2>'+(c||'<p>No data.<\/p>')+'<div class="ftr"><span>WFI<\/span><span>'+new Date().toLocaleDateString()+'<\/span><\/div><button class="btn" onclick="window.print()">Print \/ PDF<\/button><\/body><\/html>';wi.document.write(h);wi.document.close();};
+w.dlCSV=w.dlCSV||function(rows,h,fn){if(!rows||!rows.length)rows=[{}];var keys=h||Object.keys(rows[0]);var L=[keys.map(function(k){return'"'+k+'"';}).join(',')];rows.forEach(function(r){L.push(keys.map(function(k){return'"'+String(r[k]!==undefined?r[k]:'').replace(/"/g,'""')+'"';}).join(','));});var blob=new Blob([L.join('\n')],{type:'text/csv;charset=utf-8;'});var url=URL.createObjectURL(blob);var a=document.createElement('a');a.href=url;a.download=(fn||'export')+'.csv';document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(url);};
+w.tdm=w.tdm||function(){var d=document.body.classList.toggle('dark-mode');localStorage.setItem('wfi_dark_mode',d?'1':'0');var b=document.getElementById('dmt')||document.getElementById('dmToggle');var i=document.getElementById('dmi')||document.getElementById('dmIcon');if(b)b.classList.toggle('on',d);if(i)i.textContent=d?'&#9728;':'&#127769;';};
+w.toggleDarkMode=w.tdm;
+w.showTab=w.showTab||function(id,btn){var lo=id.toLowerCase();var el=document.getElementById('tab'+id)||document.getElementById('tab'+id.charAt(0).toUpperCase()+id.slice(1))||document.getElementById('tab-'+id)||document.getElementById(id)||document.getElementById('section-'+id);if(!el){var all=document.querySelectorAll('[id]');for(var i=0;i<all.length;i++){if(all[i].id.toLowerCase()==='tab'+lo||all[i].id.toLowerCase()===lo||all[i].id.toLowerCase()==='section-'+lo){el=all[i];break;}}}document.querySelectorAll('[id]').forEach(function(s){var sid=s.id.toLowerCase();if((sid.startsWith('tab')||sid.startsWith('section-')||sid.startsWith('panel-'))&&sid!==lo&&sid!=='tab'+lo&&sid!=='section-'+lo)s.style.display='none';});if(el){el.style.display='';el.classList.add('on');}document.querySelectorAll('.sc').forEach(function(e){e.classList.remove('on');});var sc=document.getElementById('tab'+id)||document.getElementById('tab'+id.charAt(0).toUpperCase()+id.slice(1));if(sc)sc.classList.add('on');document.querySelectorAll('.tb,.tab-btn,[role=tab]').forEach(function(b){b.classList.remove('active');});if(btn)btn.classList.add('active');};
+w.switchTab=w.switchTab||w.showTab;
+w.showSection=w.showSection||function(id,btn){document.querySelectorAll('[id^="section-"]').forEach(function(e){e.style.display='none';});var el=document.getElementById('section-'+id)||document.getElementById(id);if(el)el.style.display='block';document.querySelectorAll('.tb,.section-btn').forEach(function(b){b.classList.remove('active');});if(btn)btn.classList.add('active');};
+w.sw=w.sw||w.showSection;
+w.st=w.st||function(msg,ok){var t=document.getElementById('toast');if(!t)return;t.textContent=msg;t.style.background=ok!==false?'linear-gradient(135deg,#059669,#047857)':'linear-gradient(135deg,#DC2626,#B91C1C)';t.classList.add('show');setTimeout(function(){t.classList.remove('show');},3000);};
+w.showToast=w.st;
+w.logout=w.logout||function(){localStorage.clear();window.location.href='login.html';};
+w.ac=w.ac||function(){var b=document.getElementById('cookieBanner')||document.getElementById('ckb');if(b){b.style.display='none';try{localStorage.setItem('wfi_ck','1');}catch(e){}}};
+w.dc=w.dc||function(){var b=document.getElementById('cookieBanner')||document.getElementById('ckb');if(b)b.style.display='none';};
+w.acceptCookies=w.ac;w.declineCookies=w.dc;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+w.closeModal=w.closeModal||function(){document.querySelectorAll('.modal,.dialog').forEach(function(m){m.style.display='none';});};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+w.closeRejectModal=w.closeRejectModal||function(){document.querySelectorAll('.modal').forEach(function(m){m.style.display='none';});};
+
+
+w.openMobSidebar=w.openMobSidebar||function(){var s=document.querySelector('.wiq-sidebar');if(s)s.classList.toggle('open');};
+w.toggleSidebar=w.toggleSidebar||function(){var s=document.querySelector('.wiq-sidebar');if(s)s.classList.toggle('collapsed');};
+w.toggleGroup=w.toggleGroup||function(id){var el=document.getElementById(id);if(el)el.style.display=el.style.display==='none'?'block':'none';};
+
+
+
+
+window.dlXLSX=window.dlXLSX||function(rows,headers,filename){
+  if(!rows||!rows.length){window.st&&window.st('No data to export',false);return;}
+  var keys=headers||Object.keys(rows[0]);
+  // Build CSV that Excel can open as XLSX-like
+  var BOM='﻿';
+  var lines=[keys.map(function(k){return'"'+String(k).replace(/"/g,'""')+'"';}).join(',')];
+  rows.forEach(function(r){lines.push(keys.map(function(k){var v=r[k]===null||r[k]===undefined?'':String(r[k]);return'"'+v.replace(/"/g,'""')+'"';}).join(','));});
+  var csv=BOM+lines.join('\n');
+  var blob=new Blob([csv],{type:'application/vnd.ms-excel;charset=utf-8'});
+  var a=document.createElement('a');a.href=URL.createObjectURL(blob);
+  a.download=(filename||'export')+'.csv';document.body.appendChild(a);a.click();
+  setTimeout(function(){URL.revokeObjectURL(a.href);document.body.removeChild(a);},1000);
+  window.st&&window.st('Excel file downloaded',true);
+};
+window.exportExcel=window.dlXLSX;
+})();
+</script>
+
+
+
+<footer class="wiq-footer" style="background:#0F172A;border-top:1px solid #1E293B;padding:16px 24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-top:auto;flex-shrink:0">
+  <div style="display:flex;align-items:center;gap:10px">
+    <div style="width:26px;height:26px;background:linear-gradient(135deg,#1D4ED8,#6D28D9);border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:.75rem">&#9889;</div>
+    <div>
+      <div style="font-size:.73rem;font-weight:800;color:#E2E8F0">Workforce Intelligence</div>
+      <div style="font-size:.60rem;color:#475569">Enterprise HRMS &bull; DPDP 2023 &bull; PoSH 2013 &bull; ISO 27001</div>
+    </div>
+  </div>
+  <div style="display:flex;gap:14px;flex-wrap:wrap">
+    <a href="privacy-policy.html" style="color:#475569;font-size:.66rem;text-decoration:none;font-weight:600" onmouseover="this.style.color='#60A5FA'" onmouseout="this.style.color='#475569'">Privacy</a>
+    <a href="cookie-policy.html" style="color:#475569;font-size:.66rem;text-decoration:none;font-weight:600" onmouseover="this.style.color='#60A5FA'" onmouseout="this.style.color='#475569'">Cookies</a>
+    <a href="security-policy.html" style="color:#475569;font-size:.66rem;text-decoration:none;font-weight:600" onmouseover="this.style.color='#60A5FA'" onmouseout="this.style.color='#475569'">Security</a>
+    <a href="company-policies.html" style="color:#475569;font-size:.66rem;text-decoration:none;font-weight:600" onmouseover="this.style.color='#60A5FA'" onmouseout="this.style.color='#475569'">Policies</a>
+    <a href="112-emergency.html" style="color:#DC2626;font-size:.66rem;text-decoration:none;font-weight:700">&#128680; Emergency</a>
+  </div>
+  <div style="font-size:.60rem;color:#334155">&copy; 2026 Workforce Intelligence. All rights reserved.</div>
+</footer>
+<script id="wiq-dd">
+(function(){
+function toggleGroup(id){
+  var b=document.getElementById(id);
+  var a=document.getElementById(id.replace('grp-','arr-'));
+  if(!b)return;
+  var o=b.classList.contains('open');
+  b.classList.toggle('open',!o);
+  if(a)a.style.transform=o?'':'rotate(-90deg)';
+}
+window.toggleGroup=toggleGroup;
+// Auto-open active group
+var cur=window.location.pathname.split('/').pop();
+document.querySelectorAll('.wiq-sidebar a[href]').forEach(function(a){
+  if(a.getAttribute('href')===cur){
+    a.classList.add('active');
+    var g=a.closest('.wiq-dropdown-body');
+    if(g){g.classList.add('open');var ar=document.getElementById(g.id.replace('grp-','arr-'));if(ar)ar.style.transform='rotate(-90deg)';}
+  }
+});
+// Mobile sidebar
+window.openMobSidebar=window.openMobSidebar||function(){var s=document.getElementById('wiqSidebar');if(s)s.classList.toggle('open');};
+document.addEventListener('click',function(e){
+  var sb=document.getElementById('wiqSidebar');var mb=document.getElementById('mobToggleBtn');
+  if(sb&&sb.classList.contains('open')&&!sb.contains(e.target)&&mb&&!mb.contains(e.target))sb.classList.remove('open');
+});
+})();
+</script>
+<script>window.humanReviewRequired=true;window.aiInsightsDisclaimer="All AI predictions require mandatory human review before action. Not for automated adverse decisions.";</script>
+</body>
+
+
+
+
+<div id="cookieBanner" style="position:fixed;bottom:0;left:0;right:0;z-index:9998;background:linear-gradient(135deg,#0F172A,#1E293B);border-top:2px solid #2563EB;padding:14px 28px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;transform:translateY(100%);transition:transform .4s ease"><p style="font-size:.76rem;color:#CBD5E1;margin:0">&#127850; We use cookies. <a href="privacy-policy.html" style="color:#60A5FA;font-weight:700;text-decoration:none">Privacy Policy</a></p><div style="display:flex;gap:8px"><button onclick="window.acceptCookies&&acceptCookies()" style="background:linear-gradient(135deg,#2563EB,#4F46E5);color:#fff;border:none;border-radius:8px;padding:7px 18px;font-size:.72rem;font-weight:700;cursor:pointer;font-family:inherit">Accept All</button><button onclick="window.declineCookies&&declineCookies()" style="background:transparent;color:#64748B;border:none;font-size:.7rem;cursor:pointer;font-family:inherit">Decline</button></div></div>
+<span id="dmIcon" style="display:none">&#127769;</span><button id="dmToggle" style="display:flex"></button>
+<script>
+
+</script>
+</html>

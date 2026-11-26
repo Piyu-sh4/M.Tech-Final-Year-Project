@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Profile – Workforce Intelligence v7.0</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+:root{--blue:#1B4F8A;--cyan:#2E86C1;--green:#27AE60;--red:#C0392B;--gold:#D4AC0D;--bg:#f0f4f8}
+*{box-sizing:border-box}
+body{background:var(--bg);color:#1e293b;font-family:'Segoe UI',Arial,sans-serif;margin:0}
+.profile-wrap{max-width:860px;margin:32px auto;padding:0 16px 60px}
+.card{background:#fff;border-radius:16px;padding:28px;box-shadow:0 2px 16px rgba(0,0,0,.08);margin-bottom:20px}
+.card-title{font-size:1rem;font-weight:800;color:var(--blue);margin:0 0 18px;display:flex;align-items:center;gap:8px}
+
+/* ── Avatar / photo ── */
+.avatar-wrap{display:flex;flex-direction:column;align-items:center;margin-bottom:20px}
+.avatar{width:90px;height:90px;border-radius:50%;object-fit:cover;border:3px solid var(--cyan);background:linear-gradient(135deg,var(--blue),var(--cyan));display:flex;align-items:center;justify-content:center;font-size:2.2rem;color:#fff;font-weight:700;overflow:hidden}
+.avatar img{width:100%;height:100%;object-fit:cover}
+.photo-upload-btn{margin-top:8px;background:var(--bg);border:1.5px dashed #94a3b8;border-radius:8px;padding:5px 16px;font-size:.78rem;cursor:pointer;color:var(--blue);font-weight:600;transition:border-color .2s}
+.photo-upload-btn:hover{border-color:var(--cyan)}
+#photoInput{display:none}
+
+/* ── ID Card ── */
+.id-card{background:linear-gradient(135deg,#0f2040 0%,#1B4F8A 60%,#2E86C1 100%);border-radius:20px;padding:24px 28px;color:#fff;position:relative;overflow:hidden;max-width:420px;margin:0 auto;box-shadow:0 8px 32px rgba(27,79,138,.4)}
+.id-card::before{content:'';position:absolute;top:-40px;right:-40px;width:140px;height:140px;border-radius:50%;background:rgba(255,255,255,.05)}
+.id-card::after{content:'';position:absolute;bottom:-30px;left:-30px;width:100px;height:100px;border-radius:50%;background:rgba(255,255,255,.04)}
+.id-logo{font-size:1.1rem;font-weight:900;letter-spacing:.06em;opacity:.9;margin-bottom:16px}
+.id-photo{width:72px;height:72px;border-radius:12px;border:2.5px solid rgba(255,255,255,.4);object-fit:cover;background:rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;font-size:1.8rem;margin-bottom:12px;overflow:hidden}
+.id-photo img{width:100%;height:100%;object-fit:cover}
+.id-name{font-size:1.2rem;font-weight:800;margin-bottom:2px}
+.id-designation{font-size:.78rem;color:#a5f3fc;font-weight:600;margin-bottom:12px}
+.id-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
+.id-field{background:rgba(255,255,255,.08);border-radius:8px;padding:8px 12px}
+.id-field-label{font-size:.6rem;color:#93c5fd;text-transform:uppercase;letter-spacing:.07em;font-weight:700;margin-bottom:2px}
+.id-field-value{font-size:.8rem;font-weight:700;color:#fff}
+.id-barcode{background:rgba(255,255,255,.12);border-radius:8px;padding:8px 14px;text-align:center;font-size:.7rem;letter-spacing:.15em;color:#bfdbfe;font-family:monospace;margin-top:4px}
+.id-footer{display:flex;justify-content:space-between;align-items:center;margin-top:12px;font-size:.65rem;color:rgba(255,255,255,.5)}
+.print-btn{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);border-radius:8px;color:#fff;padding:7px 18px;font-size:.78rem;font-weight:700;cursor:pointer;margin-top:14px;display:block;width:100%;transition:background .2s}
+.print-btn:hover{background:rgba(255,255,255,.25)}
+
+/* ── Form ── */
+.form-group{margin-bottom:14px}
+.form-group label{display:block;font-weight:700;color:var(--blue);margin-bottom:5px;font-size:.78rem;text-transform:uppercase;letter-spacing:.04em}
+.form-group input,.form-group textarea,.form-group select{width:100%;padding:10px 14px;border:1.5px solid #e2e8f0;border-radius:9px;font-size:.88rem;transition:border-color .2s;background:#fff}
+.form-group input:focus,.form-group textarea:focus,.form-group select:focus{border-color:var(--cyan);outline:none;box-shadow:0 0 0 3px rgba(46,134,193,.12)}
+.form-group input[readonly]{background:#f8fafc;color:#64748b}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.form-grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+@media(max-width:600px){.form-grid,.form-grid-3{grid-template-columns:1fr}}
+
+/* ── Bank card ── */
+.bank-preview{background:linear-gradient(135deg,#1e293b,#374151);border-radius:14px;padding:18px 22px;color:#fff;margin-bottom:16px;font-family:'Courier New',monospace}
+.bank-preview-label{font-size:.62rem;color:#94a3b8;text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px}
+.bank-preview-value{font-size:.92rem;font-weight:700;margin-bottom:10px;color:#f1f5f9}
+.bank-preview-row{display:flex;gap:20px}
+.bank-chip{font-size:1.2rem}
+.masked-acct{font-size:1rem;letter-spacing:.18em;color:#e2e8f0;margin:10px 0}
+
+/* ── Badges ── */
+.badge-row{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-bottom:16px}
+.badge{padding:5px 14px;border-radius:20px;font-size:.78rem;font-weight:700}
+.badge-blue{background:#dbeafe;color:#1B4F8A}
+.badge-gold{background:#fef9c3;color:#d97706}
+.badge-green{background:#dcfce7;color:#15803d}
+.badge-red{background:#fee2e2;color:#b91c1c}
+
+/* ── Info rows ── */
+.info-row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #f1f5f9;font-size:.85rem}
+.info-row:last-child{border-bottom:none}
+.info-label{color:#64748b;font-weight:600}
+
+/* ── Buttons ── */
+.btn-save{background:linear-gradient(135deg,var(--blue),var(--cyan));color:#fff;border:none;padding:12px 28px;border-radius:10px;font-size:.9rem;font-weight:700;cursor:pointer;width:100%;transition:opacity .2s}
+.btn-save:hover{opacity:.9}
+.btn-warn{background:#D4AC0D;color:#fff;border:none;padding:12px 28px;border-radius:10px;font-size:.9rem;font-weight:700;cursor:pointer;width:100%;margin-top:10px;transition:opacity .2s}
+.btn-warn:hover{opacity:.9}
+.btn-bank{background:linear-gradient(135deg,#064e3b,#047857);color:#fff;border:none;padding:12px 28px;border-radius:10px;font-size:.9rem;font-weight:700;cursor:pointer;width:100%;transition:opacity .2s}
+.btn-bank:hover{opacity:.9}
+
+/* ── Section divider ── */
+.sec-div{border:none;border-top:2px solid #f1f5f9;margin:22px 0}
+
+/* ── Messages ── */
+.msg{padding:11px 16px;border-radius:9px;margin-bottom:12px;font-size:.85rem;font-weight:600;display:none}
+.msg.success{background:#dcfce7;color:#15803d;display:block}
+.msg.error{background:#fee2e2;color:#b91c1c;display:block}
+
+/* ── Section tabs ── */
+.tab-pills{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px}
+.tab-pill{padding:8px 18px;border-radius:999px;border:1.5px solid #e2e8f0;background:#fff;font-size:.82rem;font-weight:700;cursor:pointer;color:#64748b;transition:all .2s}
+.tab-pill.active{background:var(--blue);color:#fff;border-color:var(--blue)}
+
+/* ── Print ── */
+@media print{
+  nav,.tab-pills,.btn-save,.btn-warn,.btn-bank,.photo-upload-btn,
+  #editSection,#bankSection,#pwdSection,#advanceSection{display:none!important}
+  body{background:#fff}
+  .id-card{box-shadow:none;page-break-inside:avoid}
+}
+</style>
+<script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"></script>
+</head>
+<body>
+<nav class="navbar">
+  <div class="nav-brand">⚡ Workforce Intelligence</div>
+  <div class="nav-links">
+    <span id="navName" style="color:#fff;font-weight:600;margin-right:16px"></span>
+    <a href="salary.html" style="color:#fff">💰 Salary</a>
+    <a href="leave.html" style="color:#fff;margin-left:16px">🏖️ Leave</a>
+    <a href="javascript:history.back()" style="color:#fff;margin-left:16px">← Back</a>
+    <a href="login.html" onclick="localStorage.clear()" style="color:#fff;margin-left:16px">Logout</a>
+  </div>
+</nav>
+
+<div class="profile-wrap">
+
+  <!-- ── Identity Header Card ── -->
+  <div class="card">
+    <div class="avatar-wrap">
+      <div class="avatar" id="avatarWrap">
+        <span id="avatarInitials">?</span>
+      </div>
+      <label class="photo-upload-btn" for="photoInput">📷 Upload Photo</label>
+      <input type="file" id="photoInput" accept="image/jpeg,image/png,image/webp" onchange="uploadPhoto(this)">
+      <div id="photoMsg" style="font-size:.75rem;margin-top:4px;color:#64748b"></div>
+    </div>
+    <h2 style="text-align:center;color:var(--blue);margin:0 0 2px" id="profileName">Loading…</h2>
+    <p style="text-align:center;color:#64748b;margin:0 0 2px" id="profileEmail"></p>
+    <p style="text-align:center;color:var(--cyan);font-weight:700;margin:0 0 16px" id="profileDesignation"></p>
+    <div class="badge-row" id="badgeRow"></div>
+    <div id="roInfo">
+      <div class="info-row"><span class="info-label">Employee Code</span><span id="infoEmpCode" style="font-family:monospace;font-weight:700;color:var(--blue)">—</span></div>
+      <div class="info-row"><span class="info-label">Department</span><span id="infoDept">—</span></div>
+      <div class="info-row"><span class="info-label">Join Date</span><span id="infoJoin">—</span></div>
+      <div class="info-row"><span class="info-label">Employment Type</span><span id="infoEmpType">—</span></div>
+      <div class="info-row"><span class="info-label">Last Login</span><span id="infoLogin">—</span></div>
+    </div>
+  </div>
+
+  <!-- ── Section tabs ── -->
+  <div class="tab-pills">
+    <button class="tab-pill active" onclick="showTab('idcard',this)">🪪 ID Card</button>
+    <button class="tab-pill" onclick="showTab('edit',this)">✏️ Edit Profile</button>
+    <button class="tab-pill" onclick="showTab('bank',this)">🏦 Bank Details</button>
+    <button class="tab-pill" onclick="showTab('pwd',this)">🔑 Password</button>
+    <button class="tab-pill" id="advTab" style="display:none" onclick="showTab('advance',this)">💳 Salary Advance</button>
+  </div>
+
+  <!-- ── ID Card Section ── -->
+  <div id="idcardSection" class="card">
+    <div class="card-title">🪪 Employee Identity Card</div>
+    <div class="id-card" id="idCardEl">
+      <div class="id-logo">⚡ WorkforceIQ — IIT Patna</div>
+      <div style="display:flex;gap:16px;align-items:flex-start">
+        <div>
+          <div class="id-photo" id="idPhotoWrap"><span id="idPhotoInitial">?</span></div>
+        </div>
+        <div style="flex:1">
+          <div class="id-name" id="idName">—</div>
+          <div class="id-designation" id="idDesignation">—</div>
+          <div class="id-grid">
+            <div class="id-field"><div class="id-field-label">Emp. Code</div><div class="id-field-value" id="idEmpCode">—</div></div>
+            <div class="id-field"><div class="id-field-label">Department</div><div class="id-field-value" id="idDept">—</div></div>
+            <div class="id-field"><div class="id-field-label">Role</div><div class="id-field-value" id="idRole">—</div></div>
+            <div class="id-field"><div class="id-field-label">Join Date</div><div class="id-field-value" id="idJoin">—</div></div>
+          </div>
+        </div>
+      </div>
+      <div class="id-field" style="margin-top:10px"><div class="id-field-label">Email</div><div class="id-field-value" id="idEmail">—</div></div>
+      <div class="id-field" style="margin-top:6px"><div class="id-field-label">Phone</div><div class="id-field-value" id="idPhone">—</div></div>
+      <!-- Real canvas barcode -->
+      <div style="background:rgba(255,255,255,.96);border-radius:8px;padding:8px 10px 4px;margin-top:10px;text-align:center">
+        <canvas id="employeeBarcodeCanvas" height="48" style="width:100%;display:block"></canvas>
+        <div id="employeeBarcodeText" style="font-size:.6rem;color:#1e293b;letter-spacing:.16em;font-family:monospace;margin-top:3px;font-weight:700">—</div>
+      </div>
+      <div class="id-footer">
+        <span>WorkforceIQ v7.0</span>
+        <span id="idValidYear"></span>
+      </div>
+    </div>
+    <button class="print-btn" onclick="printIDCard()">🖨️ Print / Save ID Card</button>
+  </div>
+
+  <!-- ── Edit Profile Section ── -->
+  <div id="editSection" class="card" style="display:none">
+    <div class="card-title">✏️ Edit Profile</div>
+    <div id="msgBox" class="msg"></div>
+    <div class="form-grid">
+      <div class="form-group"><label>Full Name *</label><input type="text" id="fullName" placeholder="Your full name"></div>
+      <div class="form-group"><label>Phone</label><input type="text" id="phone" placeholder="+91 98765 43210"></div>
+    </div>
+    <div class="form-grid">
+      <div class="form-group">
+        <label>Gender</label>
+        <select id="gender">
+          <option value="">Prefer not to say</option>
+          <option value="male">Male</option>
+          <option value="female">Female</option>
+          <option value="other">Other</option>
+        </select>
+      </div>
+      <div class="form-group"><label>Email (read-only)</label><input type="email" id="emailRO" readonly></div>
+    </div>
+    <div class="form-group"><label>Address</label><textarea id="address" rows="2" placeholder="House / Street, City, State – PIN Code"></textarea></div>
+    <div class="form-group"><label>Emergency Contact</label><input type="text" id="emergencyContact" placeholder="Name · Phone · Relation"></div>
+    <div class="form-group"><label>Bio / Notes</label><textarea id="profileNotes" rows="2" placeholder="Short bio or notes…"></textarea></div>
+    <button class="btn-save" onclick="saveProfile()">💾 Save Profile</button>
+  </div>
+
+  <!-- ── Bank Details Section ── -->
+  <div id="bankSection" class="card" style="display:none">
+    <div class="card-title">🏦 Bank Account Details</div>
+    <div style="background:#fefce8;border:1px solid #fde047;border-radius:10px;padding:10px 14px;font-size:.8rem;color:#854d0e;margin-bottom:16px">
+      ⚠️ Bank details are used only for salary transfers. Changes are logged in the audit trail and reviewed by HR.
+    </div>
+
+    <!-- Live bank card preview -->
+    <div class="bank-preview" id="bankPreview">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+        <span class="bank-chip">💳</span>
+        <span style="font-size:.7rem;color:#9ca3af;letter-spacing:.06em">SALARY ACCOUNT</span>
+      </div>
+      <div class="masked-acct" id="previewAcct">•••• •••• •••• ••••</div>
+      <div class="bank-preview-row">
+        <div><div class="bank-preview-label">Account Holder</div><div class="bank-preview-value" id="previewHolder">—</div></div>
+        <div><div class="bank-preview-label">Bank</div><div class="bank-preview-value" id="previewBank">—</div></div>
+        <div><div class="bank-preview-label">IFSC</div><div class="bank-preview-value" id="previewIFSC">—</div></div>
+      </div>
+    </div>
+
+    <div id="bankMsg" class="msg"></div>
+    <div class="form-grid">
+      <div class="form-group"><label>Account Holder Name *</label><input type="text" id="accountHolder" placeholder="As per bank records" oninput="updateBankPreview()"></div>
+      <div class="form-group">
+        <label>Account Type</label>
+        <select id="accountType" onchange="updateBankPreview()">
+          <option value="savings">Savings</option>
+          <option value="current">Current</option>
+          <option value="salary">Salary Account</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-grid">
+      <div class="form-group"><label>Bank Name *</label><input type="text" id="bankName" placeholder="e.g. State Bank of India" oninput="updateBankPreview()"></div>
+      <div class="form-group"><label>IFSC Code *</label><input type="text" id="ifscCode" placeholder="e.g. SBIN0001234" maxlength="11" style="text-transform:uppercase" oninput="validateIFSC(this);updateBankPreview()"></div>
+    </div>
+    <div class="form-group"><label>Account Number *</label><input type="text" id="accountNumber" placeholder="9-18 digit account number" oninput="updateBankPreview()"></div>
+    <div class="form-group"><label>Confirm Account Number *</label><input type="text" id="accountNumberConfirm" placeholder="Re-enter account number"></div>
+    <button class="btn-bank" onclick="saveBankDetails()">🏦 Save Bank Details</button>
+  </div>
+
+  <!-- ── Change Password Section ── -->
+  <div id="pwdSection" class="card" style="display:none">
+    <div class="card-title">🔑 Change Password</div>
+    <div id="pwdMsg" class="msg"></div>
+    <div class="form-group"><label>Current Password</label><input type="password" id="curPwd" placeholder="Current password"></div>
+    <div class="form-grid">
+      <div class="form-group"><label>New Password</label><input type="password" id="newPwd" placeholder="Min 8 chars, 1 uppercase, 1 number"></div>
+      <div class="form-group"><label>Confirm New Password</label><input type="password" id="confirmPwd" placeholder="Repeat new password"></div>
+    </div>
+    <button class="btn-warn" onclick="changePassword()">🔒 Change Password</button>
+  </div>
+
+  <!-- ── Salary Advance Section ── -->
+  <div class="card" id="advanceSection" style="display:none">
+    <div class="card-title">💳 Request Salary Advance</div>
+    <div id="advMsg" class="msg"></div>
+    <div class="form-grid">
+      <div class="form-group"><label>Amount (₹)</label><input type="number" id="advAmount" placeholder="e.g. 5000"></div>
+      <div class="form-group"><label>Repay Over (months)</label><input type="number" id="advMonths" value="1" min="1" max="12"></div>
+    </div>
+    <div class="form-group"><label>Reason</label><textarea id="advReason" rows="2" placeholder="Reason for advance…"></textarea></div>
+    <button class="btn-save" onclick="requestAdvance()">📤 Submit Request</button>
+  </div>
+
+</div><!-- end profile-wrap -->
+
+<script>
+const API   = 'http://localhost:5000/api';
+const token = localStorage.getItem('token');
+if (!token) location.href = 'login.html';
+
+function hdrs(json=true){
+  const h={'Authorization':'Bearer '+token};
+  if(json) h['Content-Type']='application/json';
+  return h;
+}
+function ap(url,opts={}){return fetch(API+url,{headers:hdrs(),...opts}).then(r=>r.json());}
+function showMsg(id,text,type){
+  const m=document.getElementById(id);
+  m.textContent=text; m.className='msg '+type;
+  setTimeout(()=>{m.className='msg';},5000);
+}
+
+/* ── Tab navigation ── */
+function showTab(name, btn){
+  ['idcard','edit','bank','pwd','advance'].forEach(function(t){
+    const s=document.getElementById(t+'Section');
+    if(s) s.style.display='none';
+  });
+  document.querySelectorAll('.tab-pill').forEach(function(b){b.classList.remove('active');});
+  const target = document.getElementById(name+'Section');
+  if(target) target.style.display='';
+  if(btn) btn.classList.add('active');
+}
+
+/* ── Load profile ── */
+let _profileData = null;
+async function loadProfile(){
+  const d = await ap('/auth/me');
+  _profileData = d;
+  document.getElementById('navName').textContent = d.full_name;
+
+  // Avatar
+  const aw = document.getElementById('avatarWrap');
+  if(d.photo_url){
+    aw.innerHTML='<img src="'+d.photo_url+'" alt="Profile Photo">';
+  } else {
+    aw.innerHTML='<span id="avatarInitials">'+d.full_name.charAt(0).toUpperCase()+'</span>';
+  }
+
+  // Header
+  document.getElementById('profileName').textContent = d.full_name;
+  document.getElementById('profileEmail').textContent = d.email;
+  document.getElementById('profileDesignation').textContent = d.designation || d.role_name || '';
+
+  // Badges
+  document.getElementById('badgeRow').innerHTML=`
+    <span class="badge badge-blue">${d.role_name||'Employee'}</span>
+    <span class="badge badge-gold">Level ${d.access_level||1}</span>
+    <span class="badge badge-green">⭐ ${d.total_points||0} pts</span>
+    <span class="badge ${d.status==='active'?'badge-green':'badge-red'}">${d.status||'active'}</span>`;
+
+  // Read-only info
+  document.getElementById('infoEmpCode').textContent = d.employee_code || '—';
+  document.getElementById('infoDept').textContent    = d.dept_name || '—';
+  document.getElementById('infoJoin').textContent    = d.join_date ? new Date(d.join_date).toLocaleDateString('en-IN') : '—';
+  document.getElementById('infoEmpType').textContent = (d.employment_type||'full_time').replace(/_/g,' ');
+  document.getElementById('infoLogin').textContent   = d.last_login ? new Date(d.last_login).toLocaleString('en-IN') : '—';
+
+  // Edit form fields
+  document.getElementById('fullName').value       = d.full_name;
+  document.getElementById('phone').value          = d.phone || '';
+  document.getElementById('emailRO').value        = d.email;
+  document.getElementById('profileNotes').value   = d.profile_notes || '';
+  document.getElementById('gender').value         = d.gender || '';
+  document.getElementById('address').value        = d.address || '';
+  document.getElementById('emergencyContact').value = d.emergency_contact || '';
+
+  // Bank fields
+  document.getElementById('bankName').value            = d.bank_name || '';
+  document.getElementById('accountNumber').value       = d.account_number || '';
+  document.getElementById('accountNumberConfirm').value= d.account_number || '';
+  document.getElementById('ifscCode').value            = d.ifsc_code || '';
+  document.getElementById('accountHolder').value       = d.account_holder_name || d.full_name;
+  document.getElementById('accountType').value         = d.account_type || 'savings';
+  updateBankPreview();
+
+  // ID Card
+  fillIDCard(d);
+
+  // Advance tab for employees (role 2)
+  if(d.role_id===2){
+    document.getElementById('advTab').style.display='';
+    document.getElementById('advanceSection').style.display='none';
+  }
+}
+
+/* ── ID Card ── */
+function fillIDCard(d){
+  document.getElementById('idName').textContent       = d.full_name;
+  document.getElementById('idDesignation').textContent= d.designation || d.role_name || '';
+  document.getElementById('idEmpCode').textContent    = d.employee_code || '—';
+  document.getElementById('idDept').textContent       = d.dept_name || '—';
+  document.getElementById('idRole').textContent       = d.role_name || '—';
+  document.getElementById('idJoin').textContent       = d.join_date ? new Date(d.join_date).toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'}) : '—';
+  document.getElementById('idEmail').textContent      = d.email;
+  document.getElementById('idPhone').textContent      = d.phone || '—';
+  document.getElementById('idValidYear').textContent  = 'Valid: '+new Date().getFullYear();
+  // Barcode — use employee_code (CODE128 safe: uppercase alphanumeric + hyphen)
+  var barcodeVal = (d.employee_code || ('EMP'+String(d.user_id).padStart(4,'0'))).replace(/[^A-Z0-9\-]/gi,'').toUpperCase();
+  document.getElementById('employeeBarcodeText').textContent = barcodeVal;
+  try {
+    JsBarcode('#employeeBarcodeCanvas', barcodeVal, {
+      format:      'CODE128',
+      width:       2,
+      height:      48,
+      displayValue:false,
+      margin:      4,
+      background:  'transparent',
+      lineColor:   '#0f172a'
+    });
+  } catch(e) {
+    // Fallback: simple canvas bars
+    (function(){
+      var canvas = document.getElementById('employeeBarcodeCanvas');
+      if(!canvas) return;
+      var ctx = canvas.getContext('2d');
+      canvas.width  = canvas.offsetWidth || 360;
+      canvas.height = 48;
+      ctx.clearRect(0,0,canvas.width,canvas.height);
+      var barW = Math.floor(canvas.width / (barcodeVal.length * 11 + 20));
+      if(barW<1) barW=1;
+      var x=10;
+      ctx.fillStyle='#0f172a';
+      for(var i=0;i<barcodeVal.length;i++){
+        var bits=(barcodeVal.charCodeAt(i)).toString(2).padStart(8,'0');
+        for(var b=0;b<8;b++){ if(bits[b]==='1') ctx.fillRect(x,4,barW,40); x+=barW+1; }
+        x+=2;
+      }
+    })();
+  }
+  // Photo in card
+  const ipw = document.getElementById('idPhotoWrap');
+  if(d.photo_url){
+    ipw.innerHTML='<img src="'+d.photo_url+'" alt="">';
+  } else {
+    document.getElementById('idPhotoInitial').textContent = d.full_name.charAt(0).toUpperCase();
+  }
+}
+
+function printIDCard(){
+  window.print();
+}
+
+/* ── Photo upload ── */
+async function uploadPhoto(input){
+  const file = input.files[0];
+  if(!file) return;
+  if(file.size > 3*1024*1024){ document.getElementById('photoMsg').textContent='⚠️ Max 3 MB'; return; }
+  document.getElementById('photoMsg').textContent='Uploading…';
+  const fd = new FormData();
+  fd.append('photo', file);
+  try{
+    const r = await fetch(API+'/auth/profile/photo',{method:'POST',headers:{'Authorization':'Bearer '+token},body:fd});
+    const d = await r.json();
+    if(r.ok){
+      document.getElementById('photoMsg').textContent='✅ Photo updated';
+      loadProfile();
+    } else {
+      document.getElementById('photoMsg').textContent='❌ '+d.message;
+    }
+  }catch(e){ document.getElementById('photoMsg').textContent='Upload failed'; }
+}
+
+/* ── Save profile ── */
+async function saveProfile(){
+  const body={
+    full_name:         document.getElementById('fullName').value,
+    phone:             document.getElementById('phone').value,
+    profile_notes:     document.getElementById('profileNotes').value,
+    gender:            document.getElementById('gender').value,
+    address:           document.getElementById('address').value,
+    emergency_contact: document.getElementById('emergencyContact').value
+  };
+  if(!body.full_name){ showMsg('msgBox','Full name is required','error'); return; }
+  const r = await ap('/auth/profile',{method:'PUT',body:JSON.stringify(body)});
+  showMsg('msgBox', r.message||'Saved', (r.message||'').toLowerCase().includes('success')?'success':'error');
+  const stored=JSON.parse(localStorage.getItem('user')||'{}');
+  stored.full_name=body.full_name; localStorage.setItem('user',JSON.stringify(stored));
+  loadProfile();
+}
+
+/* ── Bank details ── */
+function updateBankPreview(){
+  const acct = document.getElementById('accountNumber').value;
+  const masked = acct.length > 4 ? '•••• •••• •••• '+acct.slice(-4) : '•••• •••• •••• ••••';
+  document.getElementById('previewAcct').textContent  = masked;
+  document.getElementById('previewHolder').textContent= document.getElementById('accountHolder').value || '—';
+  document.getElementById('previewBank').textContent  = document.getElementById('bankName').value || '—';
+  document.getElementById('previewIFSC').textContent  = document.getElementById('ifscCode').value.toUpperCase() || '—';
+}
+
+function validateIFSC(input){
+  const val = input.value.toUpperCase();
+  input.value = val;
+  const ok = /^[A-Z]{4}0[A-Z0-9]{6}$/.test(val);
+  input.style.borderColor = val.length===11 ? (ok?'#16a34a':'#dc2626') : '#e2e8f0';
+}
+
+async function saveBankDetails(){
+  const acct  = document.getElementById('accountNumber').value.trim();
+  const acct2 = document.getElementById('accountNumberConfirm').value.trim();
+  const ifsc  = document.getElementById('ifscCode').value.trim().toUpperCase();
+  const bname = document.getElementById('bankName').value.trim();
+  const holder= document.getElementById('accountHolder').value.trim();
+  if(!holder||!bname||!acct||!ifsc){ showMsg('bankMsg','All bank fields are required','error'); return; }
+  if(acct!==acct2){ showMsg('bankMsg','Account numbers do not match','error'); return; }
+  if(!/^[A-Z]{4}0[A-Z0-9]{6}$/.test(ifsc)){ showMsg('bankMsg','Invalid IFSC code format','error'); return; }
+  if(!/^\d{9,18}$/.test(acct)){ showMsg('bankMsg','Account number must be 9-18 digits','error'); return; }
+  const body={
+    bank_name: bname, account_number: acct, ifsc_code: ifsc,
+    account_holder_name: holder, account_type: document.getElementById('accountType').value,
+    // Also pass through unchanged profile fields
+    full_name: _profileData?.full_name, phone: _profileData?.phone,
+    profile_notes: _profileData?.profile_notes, gender: _profileData?.gender,
+    address: _profileData?.address, emergency_contact: _profileData?.emergency_contact
+  };
+  const r = await ap('/auth/profile',{method:'PUT',body:JSON.stringify(body)});
+  showMsg('bankMsg', r.message||'Saved', (r.message||'').toLowerCase().includes('success')?'success':'error');
+  if((r.message||'').toLowerCase().includes('success')) loadProfile();
+}
+
+/* ── Change password ── */
+async function changePassword(){
+  const cur=document.getElementById('curPwd').value;
+  const np=document.getElementById('newPwd').value;
+  const cp=document.getElementById('confirmPwd').value;
+  if(!cur||!np){ showMsg('pwdMsg','All password fields are required','error'); return; }
+  if(np!==cp){ showMsg('pwdMsg','New passwords do not match','error'); return; }
+  const r=await ap('/auth/change-password',{method:'PUT',body:JSON.stringify({current_password:cur,new_password:np})});
+  showMsg('pwdMsg',r.message||'Error',(r.message||'').toLowerCase().includes('success')?'success':'error');
+  if((r.message||'').toLowerCase().includes('success')){
+    document.getElementById('curPwd').value='';
+    document.getElementById('newPwd').value='';
+    document.getElementById('confirmPwd').value='';
+  }
+}
+
+/* ── Salary advance ── */
+async function requestAdvance(){
+  const body={amount:document.getElementById('advAmount').value,reason:document.getElementById('advReason').value,repay_months:document.getElementById('advMonths').value};
+  if(!body.amount||body.amount<=0){ showMsg('advMsg','Enter a valid amount','error'); return; }
+  const r=await ap('/admin/salary-advances',{method:'POST',body:JSON.stringify(body)});
+  showMsg('advMsg',r.message||'Error',r.advance_id?'success':'error');
+}
+
+loadProfile();
+</script>
+</body>
+</html>

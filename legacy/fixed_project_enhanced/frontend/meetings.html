@@ -1,0 +1,1041 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Meeting Rooms — WorkforceIQ</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+:root{--ink:#0f172a;--blue:#2563eb;--cyan:#0891b2;--glass:rgba(255,255,255,.06)}
+*,*::before,*::after{box-sizing:border-box}
+body{background:#f0f4ff;font-family:'Segoe UI',Arial,sans-serif}
+.page{max-width:1280px;margin:0 auto;padding:80px 20px 40px}
+/* ── tab nav ── */
+.tab-nav{display:flex;gap:6px;background:#fff;border:1.5px solid #e2e8f0;border-radius:14px;padding:8px;margin-bottom:24px;flex-wrap:wrap;box-shadow:0 2px 8px rgba(0,0,0,.04)}
+.tab-btn{padding:9px 18px;border:none;border-radius:10px;cursor:pointer;font-size:.85rem;font-weight:600;background:transparent;color:#64748b;transition:all .2s}
+.tab-btn.active{background:linear-gradient(135deg,#2563eb,#0891b2);color:#fff;box-shadow:0 4px 12px rgba(37,99,235,.25)}
+.tab-btn:hover:not(.active){background:#f1f5f9;color:#334155}
+.tab-panel{display:none}.tab-panel.active{display:block}
+/* ── meeting cards ── */
+.meeting-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:16px}
+.meeting-card{background:#fff;border:1.5px solid #e2e8f0;border-radius:16px;overflow:hidden;transition:all .2s;cursor:pointer}
+.meeting-card:hover{border-color:#2563eb;box-shadow:0 8px 28px rgba(37,99,235,.12);transform:translateY(-2px)}
+.mcard-top{padding:16px 18px 12px;border-bottom:1px solid #f1f5f9}
+.mcard-title{font-size:.95rem;font-weight:800;color:#1e293b;margin-bottom:4px}
+.mcard-meta{display:flex;gap:8px;flex-wrap:wrap;font-size:.75rem;color:#64748b}
+.mcard-body{padding:14px 18px}
+.mcard-row{display:flex;align-items:center;gap:8px;font-size:.8rem;color:#475569;margin-bottom:5px}
+.mcard-footer{padding:10px 18px;background:#f8fafc;display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.mtype-badge{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:999px;font-size:.7rem;font-weight:700}
+.mt-internal{background:#dbeafe;color:#1d4ed8}
+.mt-client{background:#fce7f3;color:#9d174d}
+.mt-standup{background:#dcfce7;color:#15803d}
+.mt-review{background:#fef9c3;color:#854d0e}
+.mt-interview{background:#ede9fe;color:#6d28d9}
+.mt-training{background:#ffedd5;color:#c2410c}
+.mt-emergency{background:#fee2e2;color:#991b1b}
+.mstatus{font-size:.7rem;font-weight:700;padding:3px 8px;border-radius:999px}
+.ms-scheduled{background:#f1f5f9;color:#64748b}
+.ms-active{background:#dcfce7;color:#15803d;animation:activePulse 2s infinite}
+.ms-ended{background:#f1f5f9;color:#94a3b8}
+.ms-cancelled{background:#fee2e2;color:#991b1b}
+@keyframes activePulse{0%,100%{opacity:1}50%{opacity:.7}}
+/* ── schedule form ── */
+.sched-form{background:#fff;border:1.5px solid #e2e8f0;border-radius:16px;padding:28px;max-width:860px}
+.form-section{margin-bottom:22px}
+.form-section-title{font-size:.78rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#64748b;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid #e2e8f0}
+.form-grid-2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.form-grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+.fgroup label{display:block;font-size:.8rem;font-weight:600;color:#374151;margin-bottom:4px}
+.fgroup input,.fgroup select,.fgroup textarea{width:100%;padding:9px 12px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:.85rem;transition:border-color .2s;box-sizing:border-box}
+.fgroup input:focus,.fgroup select:focus,.fgroup textarea:focus{outline:none;border-color:#2563eb}
+.participant-chips{display:flex;flex-wrap:wrap;gap:6px;min-height:36px;padding:6px;border:1.5px solid #e2e8f0;border-radius:8px;background:#fafafa;cursor:text}
+.chip{display:inline-flex;align-items:center;gap:5px;background:#dbeafe;color:#1d4ed8;border-radius:999px;padding:3px 10px 3px 8px;font-size:.75rem;font-weight:600}
+.chip-x{cursor:pointer;color:#93c5fd;font-size:.8rem;line-height:1}
+.chip-x:hover{color:#1d4ed8}
+/* ── room video UI ── */
+#meetingRoom{display:none;position:fixed;inset:0;background:#0a0f1e;z-index:500;flex-direction:column}
+#meetingRoom.open{display:flex}
+.room-header{background:rgba(255,255,255,.04);border-bottom:1px solid rgba(255,255,255,.08);padding:12px 20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;flex-shrink:0}
+.room-title{font-size:1rem;font-weight:800;color:#fff}
+.room-meta{font-size:.75rem;color:#64748b}
+.room-timer{font-family:monospace;font-size:1.1rem;font-weight:700;color:#60a5fa;background:rgba(96,165,250,.1);padding:4px 12px;border-radius:8px}
+.room-body{flex:1;display:grid;grid-template-columns:1fr 300px;overflow:hidden}
+/* video grid */
+.video-area{padding:16px;overflow-y:auto;display:flex;flex-direction:column;gap:12px}
+.video-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px}
+.video-tile{background:linear-gradient(135deg,#1e293b,#0f172a);border-radius:14px;aspect-ratio:16/9;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;border:2px solid rgba(255,255,255,.06);overflow:hidden;transition:border-color .2s}
+.video-tile.speaking{border-color:#22c55e;box-shadow:0 0 0 2px rgba(34,197,94,.3)}
+.video-tile.self{border-color:#2563eb}
+.vtile-avatar{width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,#1e3a8a,#2563eb);display:flex;align-items:center;justify-content:center;font-size:1.3rem;font-weight:800;color:#fff;margin-bottom:8px}
+.vtile-name{font-size:.72rem;font-weight:700;color:#f1f5f9;text-align:center}
+.vtile-icons{position:absolute;bottom:8px;right:8px;display:flex;gap:4px}
+.vtile-icon{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.7rem}
+.vtile-icon.mic-off{background:rgba(220,38,38,.8)}
+.vtile-icon.mic-on{background:rgba(34,197,94,.8)}
+.vtile-icon.vid-off{background:rgba(100,116,139,.6)}
+.vtile-icon.vid-on{background:rgba(37,99,235,.8)}
+.video-tile video{width:100%;height:100%;object-fit:cover;position:absolute;inset:0;border-radius:12px}
+/* controls bar */
+.controls-bar{display:flex;align-items:center;justify-content:center;gap:12px;padding:14px 20px;background:rgba(255,255,255,.03);border-top:1px solid rgba(255,255,255,.06);flex-shrink:0;flex-wrap:wrap}
+.ctrl-btn{width:50px;height:50px;border-radius:50%;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1.2rem;transition:all .2s;flex-shrink:0}
+.ctrl-btn.active{background:rgba(255,255,255,.12);color:#fff}
+.ctrl-btn.active:hover{background:rgba(255,255,255,.2)}
+.ctrl-btn.danger{background:#dc2626;color:#fff}
+.ctrl-btn.danger:hover{background:#b91c1c}
+.ctrl-btn.off{background:rgba(220,38,38,.2);color:#fca5a5}
+/* side panel */
+.side-panel{border-left:1px solid rgba(255,255,255,.08);display:flex;flex-direction:column;background:rgba(255,255,255,.02);overflow:hidden}
+.side-tabs{display:flex;background:rgba(255,255,255,.04);border-bottom:1px solid rgba(255,255,255,.08);flex-shrink:0}
+.side-tab{flex:1;padding:10px;text-align:center;font-size:.75rem;font-weight:700;color:#64748b;cursor:pointer;transition:all .2s;border:none;background:transparent}
+.side-tab.active{color:#60a5fa;background:rgba(96,165,250,.08);border-bottom:2px solid #60a5fa}
+.side-panel-body{flex:1;overflow-y:auto;padding:12px;display:none}
+.side-panel-body.active{display:block}
+/* chat */
+.chat-messages{display:flex;flex-direction:column;gap:8px;margin-bottom:10px;max-height:calc(100% - 80px);overflow-y:auto}
+.chat-msg{padding:8px 10px;border-radius:10px;font-size:.78rem}
+.chat-msg.self{background:rgba(37,99,235,.2);color:#93c5fd;align-self:flex-end}
+.chat-msg.other{background:rgba(255,255,255,.06);color:#e2e8f0}
+.chat-msg.system{background:transparent;color:#475569;text-align:center;font-style:italic;font-size:.72rem}
+.chat-sender{font-size:.68rem;font-weight:700;margin-bottom:2px}
+.chat-input-row{display:flex;gap:6px;align-items:flex-end;position:sticky;bottom:0;background:rgba(10,15,30,.95);padding-top:8px}
+.chat-input{flex:1;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:8px;color:#f1f5f9;padding:8px 10px;font-size:.8rem;resize:none}
+.chat-input:focus{outline:none;border-color:#3b82f6}
+.chat-send{background:#2563eb;border:none;border-radius:8px;color:#fff;padding:8px 12px;cursor:pointer;font-size:.85rem}
+/* participants list */
+.participant-item{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.05)}
+.participant-item:last-child{border-bottom:none}
+.p-avatar{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#1e3a8a,#2563eb);display:flex;align-items:center;justify-content:center;font-size:.8rem;color:#fff;font-weight:700;flex-shrink:0}
+.p-name{font-size:.8rem;font-weight:600;color:#f1f5f9;flex:1}
+.p-role{font-size:.65rem;color:#64748b}
+.p-icons{display:flex;gap:4px}
+/* notes panel */
+.note-item{background:rgba(255,255,255,.04);border-radius:8px;padding:8px 10px;margin-bottom:6px;border-left:3px solid}
+.ni-note{border-color:#3b82f6}
+.ni-action{border-color:#f59e0b}
+.ni-decision{border-color:#22c55e}
+.ni-question{border-color:#a855f7}
+.ni-text{font-size:.78rem;color:#e2e8f0}
+.ni-meta{font-size:.65rem;color:#475569;margin-top:3px}
+.note-type-bar{display:flex;gap:4px;margin-bottom:8px;flex-wrap:wrap}
+.ntbtn{padding:4px 9px;border:1px solid rgba(255,255,255,.1);border-radius:6px;font-size:.68rem;font-weight:700;background:transparent;color:#64748b;cursor:pointer;transition:all .15s}
+.ntbtn.active{background:rgba(59,130,246,.2);color:#60a5fa;border-color:#3b82f6}
+/* report modal */
+.report-modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:600;align-items:center;justify-content:center;padding:20px}
+.report-modal.open{display:flex}
+.report-box{background:#fff;border-radius:20px;width:100%;max-width:780px;max-height:92vh;overflow-y:auto;box-shadow:0 40px 80px rgba(0,0,0,.4)}
+.report-header{background:linear-gradient(135deg,#1e3a8a,#0891b2);padding:24px 28px;border-radius:20px 20px 0 0;position:sticky;top:0;z-index:1}
+.report-title{font-size:1.2rem;font-weight:800;color:#fff}
+.report-sub{font-size:.8rem;color:#bfdbfe;margin-top:3px}
+.report-body{padding:24px 28px}
+.rep-section{margin-bottom:24px}
+.rep-section-title{font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#64748b;margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.rep-summary{background:#f0f9ff;border:1px solid #bae6fd;border-radius:10px;padding:14px;font-size:.88rem;color:#0c4a6e;line-height:1.7}
+.rep-list{list-style:none;display:flex;flex-direction:column;gap:8px}
+.rep-list li{display:flex;gap:10px;align-items:flex-start;font-size:.84rem;color:#1e293b}
+.rep-list li::before{content:'→';color:#2563eb;flex-shrink:0;font-weight:700;margin-top:1px}
+.action-card{background:#fff7ed;border:1px solid #fed7aa;border-radius:10px;padding:12px;display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+.ac-task{font-size:.84rem;font-weight:600;color:#9a3412}
+.ac-meta{font-size:.75rem;color:#c2410c;margin-top:3px}
+.decision-card{background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:12px}
+.dc-text{font-size:.84rem;color:#14532d;display:flex;gap:8px;align-items:flex-start}
+.dc-text::before{content:'✓';color:#16a34a;font-weight:800;flex-shrink:0}
+.print-btn{background:linear-gradient(135deg,#1a56db,#0891b2);color:#fff;border:none;border-radius:10px;padding:10px 20px;cursor:pointer;font-size:.85rem;font-weight:700;display:flex;align-items:center;gap:6px}
+.join-code-badge{background:linear-gradient(135deg,#1e3a8a,#0891b2);border-radius:12px;padding:16px 20px;text-align:center;margin-bottom:20px}
+.jc-label{font-size:.7rem;color:#93c5fd;text-transform:uppercase;letter-spacing:.1em;margin-bottom:4px}
+.jc-code{font-size:2rem;font-weight:900;color:#fff;letter-spacing:.3em}
+.jc-hint{font-size:.72rem;color:#60a5fa;margin-top:4px}
+/* quick-join banner */
+.quick-join-bar{background:linear-gradient(135deg,#1e3a8a,#2563eb);border-radius:14px;padding:18px 22px;margin-bottom:20px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.qj-title{font-size:.9rem;font-weight:700;color:#fff;flex:1}
+.qj-input{padding:9px 14px;border:none;border-radius:8px;font-size:.85rem;width:180px;outline:none}
+.qj-btn{background:#fff;color:#1a56db;border:none;border-radius:8px;padding:9px 18px;font-weight:700;font-size:.85rem;cursor:pointer;white-space:nowrap;transition:all .2s}
+.qj-btn:hover{background:#eff6ff}
+@media(max-width:768px){
+  .room-body{grid-template-columns:1fr}
+  .side-panel{display:none}
+  .form-grid-2,.form-grid-3{grid-template-columns:1fr}
+  .video-grid{grid-template-columns:1fr 1fr}
+  .ctrl-btn{width:42px;height:42px;font-size:1rem}
+}
+</style>
+</head>
+<body>
+<nav class="navbar">
+  <div class="nav-brand">⚡ WorkforceIQ — Meeting Rooms</div>
+  <div class="nav-info" style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+    <a href="admin-dashboard.html"    class="btn btn-sm btn-outline" id="navAdmin"    style="display:none">Admin</a>
+    <a href="manager.html"            class="btn btn-sm btn-outline" id="navManager"  style="display:none">Manager</a>
+    <a href="employee-dashboard.html" class="btn btn-sm btn-outline" id="navEmployee" style="display:none">Dashboard</a>
+    <span id="navUser" style="font-size:.82rem;color:#64748b"></span>
+    <button onclick="logout()" class="btn btn-sm btn-outline">Logout</button>
+  </div>
+</nav>
+
+<div class="page">
+  <!-- Quick Join Bar -->
+  <div class="quick-join-bar">
+    <div class="qj-title">🚀 Got a meeting code? Join instantly</div>
+    <input id="qjCode" class="qj-input" placeholder="Enter code e.g. WIP-ABC123" maxlength="12"
+      onkeydown="if(event.key==='Enter')quickJoin()">
+    <input id="qjPass" class="qj-input" placeholder="Password (if any)" type="password" style="width:140px"
+      onkeydown="if(event.key==='Enter')quickJoin()">
+    <button class="qj-btn" onclick="quickJoin()">Join Meeting →</button>
+  </div>
+
+  <div class="tab-nav">
+    <button class="tab-btn active" onclick="switchTab(this,'upcoming')">📅 Upcoming</button>
+    <button class="tab-btn" onclick="switchTab(this,'active')">🟢 Live Now</button>
+    <button class="tab-btn" onclick="switchTab(this,'past')">📁 Past</button>
+    <button class="tab-btn" onclick="switchTab(this,'schedule')">➕ Schedule</button>
+    <button class="tab-btn" onclick="switchTab(this,'rooms')">🏢 Rooms</button>
+  </div>
+
+  <!-- UPCOMING -->
+  <div id="tab-upcoming" class="tab-panel active">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:10px">
+      <div style="font-size:.85rem;color:#64748b">Your scheduled meetings</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <select id="filterType" onchange="loadMeetings('scheduled')" style="padding:7px 12px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:.82rem">
+          <option value="">All Types</option>
+          <option value="internal">Internal</option>
+          <option value="client">Client</option>
+          <option value="standup">Standup</option>
+          <option value="review">Review</option>
+          <option value="interview">Interview</option>
+          <option value="training">Training</option>
+        </select>
+        <button onclick="loadMeetings('scheduled')" class="btn btn-sm">🔄 Refresh</button>
+      </div>
+    </div>
+    <div id="upcomingGrid" class="meeting-grid"><p style="color:#94a3b8">Loading…</p></div>
+  </div>
+
+  <!-- LIVE -->
+  <div id="tab-active" class="tab-panel">
+    <div id="activeGrid" class="meeting-grid"><p style="color:#94a3b8">Loading…</p></div>
+  </div>
+
+  <!-- PAST -->
+  <div id="tab-past" class="tab-panel">
+    <div id="pastGrid" class="meeting-grid"><p style="color:#94a3b8">Loading…</p></div>
+  </div>
+
+  <!-- SCHEDULE -->
+  <div id="tab-schedule" class="tab-panel">
+    <div class="sched-form">
+      <h3 style="margin-top:0;margin-bottom:20px;color:#1e293b">📅 Schedule a Meeting</h3>
+      <p id="schedMsg" class="msg"></p>
+
+      <div class="form-section">
+        <div class="form-section-title">Basic Info</div>
+        <div class="fgroup" style="margin-bottom:12px"><label>Meeting Title *</label>
+          <input id="mTitle" placeholder="e.g. Q3 Sprint Planning"></div>
+        <div class="form-grid-2">
+          <div class="fgroup"><label>Meeting Type *</label>
+            <select id="mType">
+              <option value="internal">🏢 Internal</option>
+              <option value="standup">⚡ Daily Standup</option>
+              <option value="review">📊 Review</option>
+              <option value="client">🤝 Client Meeting</option>
+              <option value="interview">👤 Interview</option>
+              <option value="training">📚 Training</option>
+              <option value="emergency">🚨 Emergency</option>
+            </select>
+          </div>
+          <div class="fgroup"><label>Room</label>
+            <select id="mRoom"><option value="">Virtual Only</option></select></div>
+          <div class="fgroup"><label>Date & Time *</label>
+            <input id="mDateTime" type="datetime-local"></div>
+          <div class="fgroup"><label>Duration (minutes)</label>
+            <select id="mDuration">
+              <option value="15">15 min</option><option value="30">30 min</option>
+              <option value="45">45 min</option><option value="60" selected>1 hour</option>
+              <option value="90">1.5 hours</option><option value="120">2 hours</option>
+              <option value="180">3 hours</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-section" id="clientSection" style="display:none">
+        <div class="form-section-title">Client Details</div>
+        <div class="form-grid-2">
+          <div class="fgroup"><label>Client Name</label><input id="mClientName" placeholder="Company / Person name"></div>
+          <div class="fgroup"><label>Client Email</label><input id="mClientEmail" type="email" placeholder="client@company.com"></div>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <div class="form-section-title">Agenda & Details</div>
+        <div class="fgroup" style="margin-bottom:12px"><label>Agenda</label>
+          <textarea id="mAgenda" rows="3" placeholder="1. Project status update&#10;2. Blockers discussion&#10;3. Next sprint planning"></textarea></div>
+        <div class="fgroup" style="margin-bottom:12px"><label>Description</label>
+          <textarea id="mDesc" rows="2" placeholder="Optional meeting description…"></textarea></div>
+        <div class="form-grid-2">
+          <div class="fgroup"><label>Meeting Password (optional)</label>
+            <input id="mPassword" placeholder="Leave blank for no password"></div>
+          <div class="fgroup" style="display:flex;align-items:center;gap:8px;padding-top:22px">
+            <input type="checkbox" id="mAllowGuests" style="width:16px;height:16px">
+            <label style="margin:0;cursor:pointer" for="mAllowGuests">Allow external guests</label>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <div class="form-section-title">Invite Participants</div>
+        <div style="margin-bottom:8px">
+          <div style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap">
+            <input id="participantSearch" placeholder="Search employees…"
+              oninput="searchParticipants()"
+              style="padding:8px 12px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:.84rem;flex:1;min-width:180px">
+          </div>
+          <div id="searchResults" style="max-height:160px;overflow-y:auto;border:1px solid #e2e8f0;border-radius:8px;display:none;background:#fff;box-shadow:0 4px 12px rgba(0,0,0,.08)"></div>
+        </div>
+        <div style="margin-bottom:6px;font-size:.78rem;color:#64748b">Selected participants:</div>
+        <div id="selectedChips" class="participant-chips"></div>
+      </div>
+
+      <button onclick="scheduleMeeting()" class="btn btn-full" style="background:linear-gradient(135deg,#1a56db,#0891b2);font-size:.95rem;margin-top:4px">
+        📅 Schedule Meeting
+      </button>
+    </div>
+  </div>
+
+  <!-- ROOMS -->
+  <div id="tab-rooms" class="tab-panel">
+    <div id="roomsGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px">
+      <p style="color:#94a3b8">Loading rooms…</p>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ MEETING ROOM (FULLSCREEN) ══════════════ -->
+<div id="meetingRoom">
+  <div class="room-header">
+    <div>
+      <div class="room-title" id="roomTitle">Meeting Room</div>
+      <div class="room-meta" id="roomMeta">–</div>
+    </div>
+    <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+      <div class="room-timer" id="roomTimer">00:00</div>
+      <div id="roomCode" style="background:rgba(59,130,246,.15);border:1px solid rgba(59,130,246,.3);border-radius:8px;padding:5px 12px;font-size:.78rem;color:#93c5fd;font-weight:700;cursor:pointer" onclick="copyRoomCode()" title="Click to copy"></div>
+      <span id="participantCount" style="background:rgba(255,255,255,.06);border-radius:8px;padding:5px 10px;font-size:.78rem;color:#94a3b8">0 participants</span>
+      <button id="endMeetingBtn" onclick="endMeeting()" style="background:#dc2626;border:none;border-radius:8px;color:#fff;padding:7px 16px;cursor:pointer;font-size:.82rem;font-weight:700;display:none">⏹ End Meeting</button>
+    </div>
+  </div>
+
+  <div class="room-body">
+    <!-- VIDEO AREA -->
+    <div class="video-area">
+      <div class="video-grid" id="videoGrid"></div>
+      <!-- Screen share / whiteboard placeholder -->
+      <div id="screenShareArea" style="display:none;background:#0f172a;border:2px dashed rgba(59,130,246,.4);border-radius:12px;min-height:200px;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px;color:#475569;font-size:.85rem">
+        <span style="font-size:2rem">🖥️</span>
+        <span>Screen share active</span>
+      </div>
+    </div>
+
+    <!-- SIDE PANEL -->
+    <div class="side-panel">
+      <div class="side-tabs">
+        <button class="side-tab active" onclick="showSideTab(this,'sideChat')">💬 Chat</button>
+        <button class="side-tab" onclick="showSideTab(this,'sidePeople')">👥 People</button>
+        <button class="side-tab" onclick="showSideTab(this,'sideNotes')">📝 Notes</button>
+      </div>
+
+      <!-- CHAT -->
+      <div id="sideChat" class="side-panel-body active" style="display:flex;flex-direction:column;height:calc(100vh - 160px)">
+        <div id="chatMessages" class="chat-messages" style="flex:1;overflow-y:auto;padding-bottom:8px"></div>
+        <div class="chat-input-row">
+          <textarea id="chatInput" class="chat-input" rows="2" placeholder="Message everyone…"
+            onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendChat();}"></textarea>
+          <button class="chat-send" onclick="sendChat()">↑</button>
+        </div>
+      </div>
+
+      <!-- PEOPLE -->
+      <div id="sidePeople" class="side-panel-body" style="display:none">
+        <div id="peopleList" style="padding:4px 0"></div>
+      </div>
+
+      <!-- NOTES -->
+      <div id="sideNotes" class="side-panel-body" style="display:none;display:flex;flex-direction:column;height:calc(100vh - 160px)">
+        <div class="note-type-bar">
+          <button class="ntbtn active" data-type="note"     onclick="setNoteType(this)">📝 Note</button>
+          <button class="ntbtn"        data-type="action"   onclick="setNoteType(this)">✅ Action</button>
+          <button class="ntbtn"        data-type="decision" onclick="setNoteType(this)">⚖️ Decision</button>
+          <button class="ntbtn"        data-type="question" onclick="setNoteType(this)">❓ Question</button>
+        </div>
+        <textarea id="noteInput" placeholder="Type a note and press Enter…" rows="2" style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:8px;color:#f1f5f9;padding:8px;font-size:.8rem;resize:none;margin-bottom:8px"
+          onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();addNote();}"></textarea>
+        <div id="notesList" style="flex:1;overflow-y:auto"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CONTROLS -->
+  <div class="controls-bar">
+    <button id="btnMic"    class="ctrl-btn active" onclick="toggleMic()"    title="Toggle Mic">🎤</button>
+    <button id="btnVideo"  class="ctrl-btn active" onclick="toggleVideo()"  title="Toggle Camera">📷</button>
+    <button id="btnScreen" class="ctrl-btn active" onclick="toggleScreen()" title="Share Screen">🖥️</button>
+    <button id="btnHand"   class="ctrl-btn active" onclick="raiseHand()"    title="Raise Hand">✋</button>
+    <button id="btnRecord" class="ctrl-btn active" onclick="toggleRecord()" title="Record">⏺</button>
+    <div style="width:1px;height:36px;background:rgba(255,255,255,.1);margin:0 4px"></div>
+    <button class="ctrl-btn active" onclick="showSideTab(document.querySelector('.side-tab'),\'sideChat\')" title="Chat">💬</button>
+    <button class="ctrl-btn active" onclick="showSideTab(document.querySelectorAll(\'.side-tab\')[1],\'sidePeople\')" title="Participants">👥</button>
+    <div style="width:1px;height:36px;background:rgba(255,255,255,.1);margin:0 4px"></div>
+    <button class="ctrl-btn danger" onclick="leaveMeeting()" title="Leave">📵</button>
+  </div>
+</div>
+
+<!-- REPORT MODAL -->
+<div class="report-modal" id="reportModal">
+  <div class="report-box">
+    <div class="report-header">
+      <div class="report-title" id="reportTitle">📋 Meeting Report</div>
+      <div class="report-sub" id="reportSub"></div>
+      <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap">
+        <button class="print-btn" onclick="printReport()">🖨️ Print / Save PDF</button>
+        <button onclick="closeReportModal()" style="background:rgba(255,255,255,.15);border:none;border-radius:10px;color:#fff;padding:10px 16px;cursor:pointer;font-size:.82rem">✕ Close</button>
+      </div>
+    </div>
+    <div class="report-body" id="reportBody">Loading…</div>
+  </div>
+</div>
+
+<script src="app.js"></script>
+<script>
+/* ════════════════════════════════════════════════
+   MEETINGS PAGE — Full JS
+════════════════════════════════════════════════ */
+var _activeMeetingId = null;
+var _isHost = false;
+var _micOn  = true, _videoOn = true, _screenOn = false, _handUp = false, _recording = false;
+var _noteType = 'note';
+var _timerInterval = null, _timerStart = null;
+var _chatPoll = null, _peoplePoll = null;
+var _selectedParticipants = []; // [{user_id, full_name}]
+var _myStream = null;
+var _localVideoEl = null;
+
+/* ── Tabs ─────────────────────────────────────── */
+function switchTab(btn, name) {
+  document.querySelectorAll('.tab-btn').forEach(function(b){b.classList.remove('active');});
+  document.querySelectorAll('.tab-panel').forEach(function(p){p.classList.remove('active');});
+  btn.classList.add('active');
+  document.getElementById('tab-'+name).classList.add('active');
+  if(name==='upcoming') loadMeetings('scheduled');
+  if(name==='active')   loadMeetings('active');
+  if(name==='past')     loadMeetings('ended');
+  if(name==='schedule') loadScheduleOptions();
+  if(name==='rooms')    loadRooms();
+}
+
+function showSideTab(btn, panelId) {
+  document.querySelectorAll('.side-tab').forEach(function(b){b.classList.remove('active');});
+  document.querySelectorAll('.side-panel-body').forEach(function(p){p.style.display='none';});
+  if(btn) btn.classList.add('active');
+  var panel = document.getElementById(panelId);
+  if(panel) panel.style.display = 'flex';
+}
+
+/* ── Load meetings ────────────────────────────── */
+async function loadMeetings(status) {
+  var gridId = status==='scheduled'?'upcomingGrid':status==='active'?'activeGrid':'pastGrid';
+  var grid = document.getElementById(gridId);
+  if(!grid) return;
+  var type = (document.getElementById('filterType')||{}).value || '';
+  try {
+    var url = API+'/meetings?status='+status+(type?'&type='+type:'');
+    var r   = await fetch(url, {headers:authHeaders()});
+    var list = await r.json();
+    if(!list.length){ grid.innerHTML='<p style="color:#94a3b8;padding:20px">No '+status+' meetings.</p>'; return; }
+    grid.innerHTML = list.map(function(m){ return meetingCardHTML(m); }).join('');
+  } catch(e){ grid.innerHTML='<p style="color:#94a3b8">Could not load meetings.</p>'; }
+}
+
+function meetingCardHTML(m) {
+  var typeMap = {internal:'mt-internal',client:'mt-client',standup:'mt-standup',review:'mt-review',
+                 interview:'mt-interview',training:'mt-training',emergency:'mt-emergency'};
+  var typeIcons = {internal:'🏢',client:'🤝',standup:'⚡',review:'📊',interview:'👤',training:'📚',emergency:'🚨'};
+  var tClass = typeMap[m.meeting_type]||'mt-internal';
+  var sClass = 'ms-'+m.status;
+  var dt = new Date(m.scheduled_at);
+  var isToday = dt.toDateString()===new Date().toDateString();
+  return '<div class="meeting-card" onclick="openMeetingDetail('+m.meeting_id+')">'+
+    '<div class="mcard-top">'+
+      '<div class="mcard-title">'+escHtml(m.title)+'</div>'+
+      '<div class="mcard-meta">'+
+        '<span class="mtype-badge '+tClass+'">'+(typeIcons[m.meeting_type]||'🏢')+' '+escHtml(m.meeting_type)+'</span>'+
+        '<span class="mstatus '+sClass+'">'+m.status+'</span>'+
+        (m.report_generated?'<span style="background:#dcfce7;color:#15803d;font-size:.68rem;padding:2px 7px;border-radius:999px;font-weight:700">📋 Report</span>':'')+
+      '</div>'+
+    '</div>'+
+    '<div class="mcard-body">'+
+      '<div class="mcard-row">📅 '+(isToday?'<b style="color:#2563eb">Today</b>':'')+' '+dt.toLocaleDateString('en-IN',{weekday:'short',day:'numeric',month:'short'})+'</div>'+
+      '<div class="mcard-row">🕐 '+dt.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit',hour12:true})+' &nbsp;·&nbsp; ⏱ '+m.duration_mins+'min</div>'+
+      (m.room_name?'<div class="mcard-row">🏢 '+escHtml(m.room_name)+'</div>':'')+
+      '<div class="mcard-row">👤 '+escHtml(m.host_name)+' &nbsp;·&nbsp; 👥 '+(m.participant_count||0)+' invited</div>'+
+      (m.client_name?'<div class="mcard-row">🤝 '+escHtml(m.client_name)+'</div>':'')+
+    '</div>'+
+    '<div class="mcard-footer">'+
+      '<code style="font-size:.72rem;background:#f1f5f9;padding:3px 8px;border-radius:5px;color:#475569">'+escHtml(m.room_code)+'</code>'+
+      (m.status==='active'?
+        '<button onclick="event.stopPropagation();enterMeetingRoom('+m.meeting_id+')" class="btn btn-sm" style="background:#16a34a;color:#fff;padding:5px 12px">🟢 Join Now</button>':
+      m.status==='scheduled'?
+        '<button onclick="event.stopPropagation();enterMeetingRoom('+m.meeting_id+')" class="btn btn-sm" style="background:#2563eb;color:#fff;padding:5px 12px">Enter Room</button>':
+        '<button onclick="event.stopPropagation();viewReport('+m.meeting_id+')" class="btn btn-sm" style="background:#f0fdf4;color:#15803d;padding:5px 12px">📋 View Report</button>'
+      )+
+    '</div>'+
+  '</div>';
+}
+
+/* ── Quick join by code ───────────────────────── */
+async function quickJoin() {
+  var code = (document.getElementById('qjCode').value||'').trim().toUpperCase();
+  var pass = (document.getElementById('qjPass').value||'').trim();
+  if(!code) return alert('Enter a meeting code.');
+  try {
+    var r = await fetch(API+'/meetings/join-by-code',{method:'POST',headers:authHeaders(),body:JSON.stringify({room_code:code,password:pass})});
+    var d = await r.json();
+    if(!r.ok) return alert(d.message);
+    enterMeetingRoom(d.meeting_id);
+  } catch(e){ alert('Connection failed.'); }
+}
+
+/* ── Schedule form ────────────────────────────── */
+async function loadScheduleOptions() {
+  try {
+    var rooms = await (await fetch(API+'/meetings/rooms',{headers:authHeaders()})).json();
+    var rSel = document.getElementById('mRoom');
+    rSel.innerHTML = '<option value="">Virtual Only</option>';
+    rooms.forEach(function(r){ var o=document.createElement('option'); o.value=r.room_id; o.textContent=r.room_name+' ('+r.location+')'; rSel.appendChild(o); });
+  } catch(e){}
+  // Show/hide client section
+  document.getElementById('mType').addEventListener('change', function() {
+    document.getElementById('clientSection').style.display = this.value==='client'?'block':'none';
+  });
+  // Set default datetime to tomorrow 10am
+  var dt = new Date(); dt.setDate(dt.getDate()+1); dt.setHours(10,0,0,0);
+  document.getElementById('mDateTime').value = dt.toISOString().slice(0,16);
+}
+
+async function searchParticipants() {
+  var q = document.getElementById('participantSearch').value.trim();
+  var box = document.getElementById('searchResults');
+  if(q.length < 2){ box.style.display='none'; return; }
+  try {
+    var r = await fetch(API+'/admin/users?search='+encodeURIComponent(q),{headers:authHeaders()});
+    var users = await r.json();
+    box.style.display = 'block';
+    if(!users.length){ box.innerHTML='<div style="padding:10px;font-size:.82rem;color:#94a3b8">No results</div>'; return; }
+    box.innerHTML = users.slice(0,8).map(function(u){
+      return '<div onclick="addParticipant('+u.user_id+',\''+escHtml(u.full_name)+'\')" '+
+        'style="padding:8px 12px;cursor:pointer;font-size:.83rem;border-bottom:1px solid #f1f5f9;display:flex;align-items:center;gap:8px;transition:background .15s" '+
+        'onmouseover="this.style.background=\'#f0f4ff\'" onmouseout="this.style.background=\'\'">'+
+        '<div style="width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#2563eb,#0891b2);display:flex;align-items:center;justify-content:center;font-size:.7rem;color:#fff;font-weight:700;flex-shrink:0">'+
+          escHtml(u.full_name.split(' ').map(function(w){return w[0];}).join('').slice(0,2).toUpperCase())+
+        '</div>'+
+        '<div><b>'+escHtml(u.full_name)+'</b><br><span style="color:#94a3b8;font-size:.72rem">'+escHtml(u.email||u.role_name||'')+'</span></div>'+
+      '</div>';
+    }).join('');
+  } catch(e){ box.style.display='none'; }
+}
+
+function addParticipant(userId, name) {
+  if(_selectedParticipants.find(function(p){return p.user_id===userId;})) return;
+  _selectedParticipants.push({user_id:userId,full_name:name});
+  renderChips();
+  document.getElementById('participantSearch').value='';
+  document.getElementById('searchResults').style.display='none';
+}
+
+function removeParticipant(userId) {
+  _selectedParticipants = _selectedParticipants.filter(function(p){return p.user_id!==userId;});
+  renderChips();
+}
+
+function renderChips() {
+  document.getElementById('selectedChips').innerHTML = _selectedParticipants.map(function(p){
+    return '<span class="chip">'+escHtml(p.full_name)+'<span class="chip-x" onclick="removeParticipant('+p.user_id+')">✕</span></span>';
+  }).join('') || '<span style="font-size:.78rem;color:#94a3b8;padding:4px">No participants selected yet</span>';
+}
+
+async function scheduleMeeting() {
+  var title = document.getElementById('mTitle').value.trim();
+  var dt    = document.getElementById('mDateTime').value;
+  if(!title||!dt) return showMsg('schedMsg','Title and date/time required.',true);
+  var body = {
+    title,
+    meeting_type: document.getElementById('mType').value,
+    room_id:      document.getElementById('mRoom').value||null,
+    scheduled_at: dt+':00',
+    duration_mins:parseInt(document.getElementById('mDuration').value),
+    agenda:       document.getElementById('mAgenda').value.trim(),
+    description:  document.getElementById('mDesc').value.trim(),
+    password:     document.getElementById('mPassword').value.trim(),
+    allow_guests: document.getElementById('mAllowGuests').checked,
+    client_name:  document.getElementById('mClientName').value.trim(),
+    client_email: document.getElementById('mClientEmail').value.trim(),
+    participant_user_ids: _selectedParticipants.map(function(p){return p.user_id;})
+  };
+  try {
+    var r = await fetch(API+'/meetings',{method:'POST',headers:authHeaders(),body:JSON.stringify(body)});
+    var d = await r.json();
+    showMsg('schedMsg', d.message, !r.ok);
+    if(r.ok) {
+      _selectedParticipants=[];
+      renderChips();
+      document.getElementById('mTitle').value='';
+      document.getElementById('mAgenda').value='';
+      setTimeout(function(){ document.querySelectorAll('.tab-btn')[0].click(); },1500);
+    }
+  } catch(e){ showMsg('schedMsg','Failed.',true); }
+}
+
+/* ── Rooms tab ────────────────────────────────── */
+async function loadRooms() {
+  try {
+    var rooms = await (await fetch(API+'/meetings/rooms',{headers:authHeaders()})).json();
+    var grid  = document.getElementById('roomsGrid');
+    grid.innerHTML = rooms.map(function(r){
+      return '<div style="background:#fff;border:1.5px solid #e2e8f0;border-radius:14px;padding:20px;transition:all .2s" onmouseover="this.style.borderColor=\'#2563eb\'" onmouseout="this.style.borderColor=\'#e2e8f0\'">'+
+        '<div style="font-size:1.8rem;margin-bottom:8px">🏢</div>'+
+        '<div style="font-size:.95rem;font-weight:800;color:#1e293b;margin-bottom:4px">'+escHtml(r.room_name)+'</div>'+
+        '<div style="font-size:.75rem;color:#64748b;margin-bottom:12px">'+escHtml(r.location)+'</div>'+
+        '<div style="display:flex;flex-wrap:wrap;gap:6px">'+
+          '<span style="background:#dbeafe;color:#1d4ed8;border-radius:6px;padding:3px 8px;font-size:.7rem;font-weight:700">👥 '+r.capacity+' seats</span>'+
+          (r.has_video?'<span style="background:#dcfce7;color:#15803d;border-radius:6px;padding:3px 8px;font-size:.7rem;font-weight:700">📷 Video</span>':'')+
+          (r.has_audio?'<span style="background:#fef9c3;color:#854d0e;border-radius:6px;padding:3px 8px;font-size:.7rem;font-weight:700">🎤 Audio</span>':'')+
+          (r.has_screen?'<span style="background:#ede9fe;color:#6d28d9;border-radius:6px;padding:3px 8px;font-size:.7rem;font-weight:700">🖥️ Screen</span>':'')+
+          '<span style="background:#f1f5f9;color:#475569;border-radius:6px;padding:3px 8px;font-size:.7rem;font-weight:600">'+escHtml(r.room_code)+'</span>'+
+        '</div>'+
+      '</div>';
+    }).join('');
+  } catch(e){ document.getElementById('roomsGrid').innerHTML='<p style="color:#94a3b8">Could not load rooms.</p>'; }
+}
+
+/* ── Enter meeting room (full UI) ─────────────── */
+async function enterMeetingRoom(id) {
+  _activeMeetingId = id;
+  try {
+    // Join
+    var r = await fetch(API+'/meetings/'+id+'/join',{method:'POST',headers:authHeaders(),body:JSON.stringify({})});
+    if(!r.ok){ var d=await r.json(); return alert(d.message); }
+
+    // Get meeting details
+    var dr = await fetch(API+'/meetings/'+id,{headers:authHeaders()});
+    var mtg = await dr.json();
+
+    var u = getUser();
+    _isHost = mtg.host_id === u.user_id;
+
+    // Start meeting if host + scheduled
+    if(_isHost && mtg.status==='scheduled') {
+      await fetch(API+'/meetings/'+id+'/start',{method:'POST',headers:authHeaders()});
+    }
+
+    // Setup UI
+    document.getElementById('roomTitle').textContent = mtg.title;
+    document.getElementById('roomMeta').textContent  = (mtg.meeting_type||'').toUpperCase() + (mtg.client_name?' · '+mtg.client_name:'') + (mtg.room_name?' · '+mtg.room_name:'');
+    document.getElementById('roomCode').textContent  = '🔗 ' + mtg.room_code;
+    document.getElementById('endMeetingBtn').style.display = _isHost ? 'block' : 'none';
+
+    // Show room
+    document.getElementById('meetingRoom').classList.add('open');
+    document.body.style.overflow = 'hidden';
+
+    // Load initial data
+    refreshPeople(mtg.participants||[]);
+    refreshMessages(mtg.messages||[]);
+    refreshNotes(mtg.notes||[]);
+
+    // Start camera/mic
+    await startMedia();
+
+    // Start timer
+    _timerStart = new Date(mtg.scheduled_at||new Date());
+    if(_timerInterval) clearInterval(_timerInterval);
+    _timerInterval = setInterval(updateTimer, 1000);
+
+    // Poll chat + people
+    _chatPoll = setInterval(function(){ pollMessages(); }, 4000);
+    _peoplePoll = setInterval(function(){ pollPeople(); }, 8000);
+
+    // Add host's own tile
+    addVideoTile(u.user_id, u.full_name, true);
+
+  } catch(e){ alert('Could not join meeting: '+e.message); }
+}
+
+/* ── Media (WebRTC getUserMedia) ──────────────── */
+async function startMedia() {
+  try {
+    _myStream = await navigator.mediaDevices.getUserMedia({video:true,audio:true});
+    var tile = document.querySelector('.video-tile.self video');
+    if(!tile){ tile = document.createElement('video'); tile.autoplay=true; tile.muted=true; tile.playsInline=true; }
+    tile.srcObject = _myStream;
+    var selfTile = document.querySelector('.video-tile.self');
+    if(selfTile){ selfTile.innerHTML=''; selfTile.appendChild(tile); }
+    _localVideoEl = tile;
+  } catch(e) {
+    console.warn('Camera/mic not available:', e.message);
+    _micOn=false; _videoOn=false;
+    updateCtrlBtn('btnMic', false);
+    updateCtrlBtn('btnVideo', false);
+  }
+}
+
+function addVideoTile(userId, name, isSelf) {
+  var grid = document.getElementById('videoGrid');
+  var initials = name.split(' ').map(function(w){return w[0];}).join('').slice(0,2).toUpperCase();
+  var tile = document.createElement('div');
+  tile.className = 'video-tile' + (isSelf?' self':'');
+  tile.id = 'vtile-'+userId;
+  tile.innerHTML =
+    '<div class="vtile-avatar">'+escHtml(initials)+'</div>'+
+    '<div class="vtile-name">'+escHtml(name)+(isSelf?' (You)':'')+'</div>'+
+    '<div class="vtile-icons">'+
+      '<div class="vtile-icon '+(isSelf&&_micOn?'mic-on':'mic-off')+'">'+( _micOn?'🎤':'🔇')+'</div>'+
+      '<div class="vtile-icon '+(isSelf&&_videoOn?'vid-on':'vid-off')+'">'+(isSelf&&_videoOn?'📷':'📵')+'</div>'+
+    '</div>';
+  grid.appendChild(tile);
+}
+
+/* ── Timer ────────────────────────────────────── */
+function updateTimer() {
+  if(!_timerStart) return;
+  var secs = Math.floor((Date.now()-_timerStart)/1000);
+  var h=Math.floor(secs/3600), m=Math.floor((secs%3600)/60), s=secs%60;
+  document.getElementById('roomTimer').textContent =
+    (h>0?pad(h)+':':'')+pad(m)+':'+pad(s);
+}
+function pad(n){return n<10?'0'+n:String(n);}
+
+/* ── Controls ─────────────────────────────────── */
+function updateCtrlBtn(id, on) {
+  var btn = document.getElementById(id);
+  if(!btn) return;
+  btn.classList.toggle('off', !on);
+  if(id==='btnMic')   btn.textContent = on ? '🎤' : '🔇';
+  if(id==='btnVideo') btn.textContent = on ? '📷' : '📵';
+}
+
+function toggleMic() {
+  _micOn = !_micOn;
+  if(_myStream) _myStream.getAudioTracks().forEach(function(t){t.enabled=_micOn;});
+  updateCtrlBtn('btnMic', _micOn);
+  fetch(API+'/meetings/'+_activeMeetingId+'/media',{method:'PATCH',headers:authHeaders(),body:JSON.stringify({mic_on:_micOn})}).catch(function(){});
+}
+
+function toggleVideo() {
+  _videoOn = !_videoOn;
+  if(_myStream) _myStream.getVideoTracks().forEach(function(t){t.enabled=_videoOn;});
+  updateCtrlBtn('btnVideo', _videoOn);
+  fetch(API+'/meetings/'+_activeMeetingId+'/media',{method:'PATCH',headers:authHeaders(),body:JSON.stringify({video_on:_videoOn})}).catch(function(){});
+}
+
+async function toggleScreen() {
+  if(!_screenOn) {
+    try {
+      var screenStream = await navigator.mediaDevices.getDisplayMedia({video:true});
+      _screenOn = true;
+      document.getElementById('btnScreen').style.background='rgba(59,130,246,.3)';
+      screenStream.getVideoTracks()[0].onended = function(){ _screenOn=false; document.getElementById('btnScreen').style.background=''; };
+    } catch(e){ _screenOn=false; }
+  } else {
+    _screenOn = false;
+    document.getElementById('btnScreen').style.background='';
+  }
+}
+
+function raiseHand() {
+  _handUp = !_handUp;
+  document.getElementById('btnHand').style.background = _handUp ? 'rgba(234,179,8,.3)' : '';
+  fetch(API+'/meetings/'+_activeMeetingId+'/media',{method:'PATCH',headers:authHeaders(),body:JSON.stringify({hand_raised:_handUp})}).catch(function(){});
+  if(_handUp) appendSystemMsg('You raised your hand ✋');
+}
+
+function toggleRecord() {
+  _recording = !_recording;
+  document.getElementById('btnRecord').style.background = _recording ? 'rgba(220,38,38,.4)' : '';
+  document.getElementById('btnRecord').textContent = _recording ? '⏹' : '⏺';
+  appendSystemMsg(_recording ? '🔴 Recording started' : '⏹ Recording stopped');
+}
+
+/* ── Chat ─────────────────────────────────────── */
+async function sendChat() {
+  var inp = document.getElementById('chatInput');
+  var msg = inp.value.trim();
+  if(!msg) return;
+  inp.value = '';
+  try {
+    await fetch(API+'/meetings/'+_activeMeetingId+'/messages',{method:'POST',headers:authHeaders(),body:JSON.stringify({content:msg})});
+    pollMessages();
+  } catch(e){}
+}
+
+async function pollMessages() {
+  try {
+    var r = await fetch(API+'/meetings/'+_activeMeetingId+'/messages',{headers:authHeaders()});
+    var msgs = await r.json();
+    refreshMessages(msgs);
+  } catch(e){}
+}
+
+function refreshMessages(msgs) {
+  var u = getUser();
+  var c = document.getElementById('chatMessages');
+  var atBottom = c.scrollHeight - c.scrollTop - c.clientHeight < 60;
+  c.innerHTML = msgs.map(function(m){
+    var isSelf = m.sender_id === u.user_id;
+    var isSystem = m.msg_type === 'system';
+    return '<div class="chat-msg '+(isSystem?'system':isSelf?'self':'other')+'">'+
+      (!isSystem&&!isSelf?'<div class="chat-sender">'+escHtml(m.sender_name)+'</div>':'')+
+      escHtml(m.content)+
+      (!isSystem?'<div style="font-size:.62rem;color:rgba(255,255,255,.3);margin-top:2px;text-align:right">'+new Date(m.created_at).toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'})+'</div>':'')+
+    '</div>';
+  }).join('');
+  if(atBottom) c.scrollTop = c.scrollHeight;
+}
+
+function appendSystemMsg(text) {
+  var c = document.getElementById('chatMessages');
+  var el = document.createElement('div');
+  el.className = 'chat-msg system';
+  el.textContent = text;
+  c.appendChild(el);
+  c.scrollTop = c.scrollHeight;
+}
+
+/* ── People ───────────────────────────────────── */
+async function pollPeople() {
+  try {
+    var r = await fetch(API+'/meetings/'+_activeMeetingId,{headers:authHeaders()});
+    var mtg = await r.json();
+    refreshPeople(mtg.participants||[]);
+    var cnt = (mtg.participants||[]).filter(function(p){return p.status==='joined';}).length;
+    document.getElementById('participantCount').textContent = cnt + ' participants';
+  } catch(e){}
+}
+
+function refreshPeople(participants) {
+  var list = document.getElementById('peopleList');
+  var active = participants.filter(function(p){return p.status==='joined'||p.status==='left'||p.status==='accepted';});
+  if(!active.length){ list.innerHTML='<div style="color:#475569;font-size:.8rem;padding:8px">No participants yet.</div>'; return; }
+  list.innerHTML = active.map(function(p){
+    var initials = (p.full_name||p.guest_name||'?').split(' ').map(function(w){return w[0];}).join('').slice(0,2).toUpperCase();
+    var statusDot = p.status==='joined'?'#22c55e':'#64748b';
+    return '<div class="participant-item">'+
+      '<div class="p-avatar" style="position:relative">'+escHtml(initials)+
+        '<div style="position:absolute;bottom:-1px;right:-1px;width:9px;height:9px;border-radius:50%;background:'+statusDot+';border:1.5px solid #0a0f1e"></div>'+
+      '</div>'+
+      '<div style="flex:1">'+
+        '<div class="p-name">'+escHtml(p.full_name||p.guest_name||'Guest')+(p.role==='host'?' 👑':'')+'</div>'+
+        '<div class="p-role">'+p.role+' · '+p.status+'</div>'+
+      '</div>'+
+      '<div class="p-icons">'+
+        (p.mic_on  ?'<span title="Mic on"  style="font-size:.8rem">🎤</span>':'<span title="Muted" style="font-size:.8rem;opacity:.3">🔇</span>')+
+        (p.video_on?'<span title="Video on" style="font-size:.8rem">📷</span>':'<span title="Video off" style="font-size:.8rem;opacity:.3">📵</span>')+
+        (p.hand_raised?'<span title="Hand raised" style="font-size:.8rem">✋</span>':'')+
+      '</div>'+
+    '</div>';
+  }).join('');
+}
+
+/* ── Notes ────────────────────────────────────── */
+function setNoteType(btn) {
+  document.querySelectorAll('.ntbtn').forEach(function(b){b.classList.remove('active');});
+  btn.classList.add('active');
+  _noteType = btn.dataset.type;
+}
+
+async function addNote() {
+  var inp = document.getElementById('noteInput');
+  var text = inp.value.trim();
+  if(!text) return;
+  try {
+    await fetch(API+'/meetings/'+_activeMeetingId+'/notes',{method:'POST',headers:authHeaders(),body:JSON.stringify({content:text,note_type:_noteType})});
+    inp.value = '';
+    var r = await fetch(API+'/meetings/'+_activeMeetingId,{headers:authHeaders()});
+    var mtg = await r.json();
+    refreshNotes(mtg.notes||[]);
+  } catch(e){}
+}
+
+function refreshNotes(notes) {
+  var c = document.getElementById('notesList');
+  if(!notes.length){ c.innerHTML='<div style="color:#475569;font-size:.78rem">No notes yet. Type above and press Enter.</div>'; return; }
+  var icons = {note:'📝',action:'✅',decision:'⚖️',question:'❓'};
+  c.innerHTML = notes.map(function(n){
+    return '<div class="note-item ni-'+n.note_type+'">'+
+      '<div class="ni-text">'+(icons[n.note_type]||'📝')+' '+escHtml(n.content)+'</div>'+
+      '<div class="ni-meta">'+(n.author_name||'You')+' · '+new Date(n.created_at).toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'})+'</div>'+
+    '</div>';
+  }).join('');
+  c.scrollTop = c.scrollHeight;
+}
+
+/* ── Leave / End ──────────────────────────────── */
+async function leaveMeeting() {
+  if(!_activeMeetingId) return closeMeetingRoom();
+  if(!confirm('Leave this meeting?')) return;
+  try {
+    await fetch(API+'/meetings/'+_activeMeetingId+'/leave',{method:'POST',headers:authHeaders()});
+  } catch(e){}
+  stopMedia();
+  closeMeetingRoom();
+}
+
+async function endMeeting() {
+  if(!confirm('End meeting for everyone? A report will be generated automatically.')) return;
+  try {
+    var r = await fetch(API+'/meetings/'+_activeMeetingId+'/end',{method:'POST',headers:authHeaders()});
+    var d = await r.json();
+    stopMedia();
+    closeMeetingRoom();
+    setTimeout(function(){ viewReport(_activeMeetingId); loadMeetings('ended'); }, 600);
+  } catch(e){ alert('Failed to end meeting.'); }
+}
+
+function stopMedia() {
+  if(_myStream) { _myStream.getTracks().forEach(function(t){t.stop();}); _myStream=null; }
+  if(_timerInterval) clearInterval(_timerInterval);
+  if(_chatPoll)  clearInterval(_chatPoll);
+  if(_peoplePoll)clearInterval(_peoplePoll);
+}
+
+function closeMeetingRoom() {
+  document.getElementById('meetingRoom').classList.remove('open');
+  document.body.style.overflow = '';
+  document.getElementById('videoGrid').innerHTML = '';
+  document.getElementById('chatMessages').innerHTML = '';
+  _activeMeetingId = null;
+}
+
+function copyRoomCode() {
+  var txt = document.getElementById('roomCode').textContent.replace('🔗 ','');
+  navigator.clipboard.writeText(txt).then(function(){ alert('Room code copied: '+txt); }).catch(function(){});
+}
+
+/* ── Report modal ─────────────────────────────── */
+async function viewReport(meetingId) {
+  document.getElementById('reportModal').classList.add('open');
+  document.getElementById('reportBody').innerHTML = '<div style="text-align:center;padding:40px;color:#64748b">⏳ Generating report…</div>';
+  try {
+    var r = await fetch(API+'/meetings/'+meetingId+'/report',{headers:authHeaders()});
+    if(r.status===404) {
+      // Regenerate
+      var rr = await fetch(API+'/meetings/'+meetingId+'/report/regenerate',{method:'POST',headers:authHeaders()});
+      var dd = await rr.json();
+      r = await fetch(API+'/meetings/'+meetingId+'/report',{headers:authHeaders()});
+    }
+    var rpt = await r.json();
+    if(!r.ok) { document.getElementById('reportBody').innerHTML='<p style="color:#dc2626">'+rpt.message+'</p>'; return; }
+    ['key_points','action_items','decisions','attendee_list'].forEach(function(k){
+      try{ if(typeof rpt[k]==='string') rpt[k]=JSON.parse(rpt[k]); }catch(_){}
+    });
+    // Get meeting meta for header
+    var mr = await fetch(API+'/meetings/'+meetingId,{headers:authHeaders()});
+    var mtg = await mr.json();
+    document.getElementById('reportTitle').textContent = '📋 '+mtg.title;
+    document.getElementById('reportSub').textContent = new Date(mtg.scheduled_at).toLocaleDateString('en-IN',{weekday:'long',day:'numeric',month:'long',year:'numeric'})+
+      ' · '+( rpt.duration_actual||mtg.duration_mins)+' min · '+(rpt.attendee_list||[]).length+' attendees';
+    document.getElementById('reportBody').innerHTML = buildReportHTML(rpt, mtg);
+  } catch(e){ document.getElementById('reportBody').innerHTML='<p style="color:#dc2626">Could not load report: '+e.message+'</p>'; }
+}
+
+function buildReportHTML(rpt, mtg) {
+  var actions = Array.isArray(rpt.action_items)?rpt.action_items:[];
+  var decisions = Array.isArray(rpt.decisions)?rpt.decisions:[];
+  var keyPoints = Array.isArray(rpt.key_points)?rpt.key_points:[];
+  var attendees = Array.isArray(rpt.attendee_list)?rpt.attendee_list:[];
+  return (
+    // Summary
+    '<div class="rep-section">'+
+      '<div class="rep-section-title">📝 Executive Summary</div>'+
+      '<div class="rep-summary">'+(rpt.summary||'Summary not available.')+'</div>'+
+    '</div>'+
+    // Attendees
+    (attendees.length?
+    '<div class="rep-section">'+
+      '<div class="rep-section-title">👥 Attendees ('+attendees.length+')</div>'+
+      '<div style="display:flex;flex-wrap:wrap;gap:6px">'+
+        attendees.map(function(a){
+          return '<span style="background:#f1f5f9;border-radius:999px;padding:4px 12px;font-size:.78rem;color:#475569">'+escHtml(a)+'</span>';
+        }).join('')+
+      '</div>'+
+    '</div>':'') +
+    // Key points
+    (keyPoints.length?
+    '<div class="rep-section">'+
+      '<div class="rep-section-title">💡 Key Discussion Points</div>'+
+      '<ul class="rep-list">'+keyPoints.map(function(p){return '<li>'+escHtml(p)+'</li>';}).join('')+'</ul>'+
+    '</div>':'') +
+    // Decisions
+    (decisions.length?
+    '<div class="rep-section">'+
+      '<div class="rep-section-title">⚖️ Decisions Made</div>'+
+      decisions.map(function(d){return '<div class="decision-card"><div class="dc-text">'+escHtml(d)+'</div></div>';}).join('')+
+    '</div>':'') +
+    // Action items
+    (actions.length?
+    '<div class="rep-section">'+
+      '<div class="rep-section-title">✅ Action Items</div>'+
+      actions.map(function(a){
+        var task = typeof a==='string'?a:(a.task||String(a));
+        var owner= typeof a==='object'?a.owner:'TBD';
+        var due  = typeof a==='object'?a.due:'TBD';
+        return '<div class="action-card">'+
+          '<div><div class="ac-task">'+escHtml(task)+'</div>'+
+            '<div class="ac-meta">👤 '+escHtml(owner||'TBD')+' &nbsp;·&nbsp; 📅 '+(due||'TBD')+'</div></div>'+
+          '<span style="font-size:1.2rem">📌</span>'+
+        '</div>';
+      }).join('')+
+    '</div>':'') +
+    // Agenda reference
+    (mtg&&mtg.agenda?
+    '<div class="rep-section">'+
+      '<div class="rep-section-title">📋 Original Agenda</div>'+
+      '<div style="background:#f8fafc;border-radius:8px;padding:12px;font-size:.83rem;color:#475569;white-space:pre-line">'+escHtml(mtg.agenda)+'</div>'+
+    '</div>':'') +
+    // Footer
+    '<div style="text-align:center;padding:12px;border-top:1px solid #e2e8f0;margin-top:8px">'+
+      '<div style="font-size:.75rem;color:#94a3b8">Report generated by WorkforceIQ AI · '+new Date(rpt.generated_at).toLocaleString('en-IN')+'</div>'+
+      '<button onclick="viewReport('+mtg.meeting_id+')" style="margin-top:8px;background:#f1f5f9;border:1px solid #e2e8f0;border-radius:8px;padding:6px 14px;cursor:pointer;font-size:.78rem;color:#64748b">🔄 Regenerate Report</button>'+
+    '</div>'
+  );
+}
+
+function closeReportModal(){ document.getElementById('reportModal').classList.remove('open'); }
+function printReport(){ window.print(); }
+
+async function openMeetingDetail(id) {
+  // Simple: view the report if ended, else enter room
+  try {
+    var r = await fetch(API+'/meetings/'+id,{headers:authHeaders()});
+    var mtg = await r.json();
+    if(mtg.status==='ended') { viewReport(id); }
+    else { enterMeetingRoom(id); }
+  } catch(e){ enterMeetingRoom(id); }
+}
+
+/* ── Boot ─────────────────────────────────────── */
+document.addEventListener('DOMContentLoaded', function(){
+  var u = getUser(); if(!u){ window.location.href='login.html'; return; }
+  document.getElementById('navUser').textContent = '👤 '+u.full_name;
+  var role = u.role_id;
+  if(role===1||role===4) document.getElementById('navAdmin').style.display='inline-flex';
+  if(role===3)           document.getElementById('navManager').style.display='inline-flex';
+  if(role===2)           document.getElementById('navEmployee').style.display='inline-flex';
+  loadMeetings('scheduled');
+  loadScheduleOptions();
+  // Keyboard shortcut: Escape to leave
+  document.addEventListener('keydown', function(e){
+    if(e.key==='Escape' && document.getElementById('meetingRoom').classList.contains('open')) leaveMeeting();
+    if(e.key==='Escape' && document.getElementById('reportModal').classList.contains('open')) closeReportModal();
+  });
+});
+</script>
+</body>
+</html>

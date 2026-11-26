@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Employee Directory – WorkforceIQ v7</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+body{background:#f0f4f8;font-family:'Segoe UI',Arial,sans-serif;margin:0;color:#1e293b}
+.page-wrap{max-width:1300px;margin:0 auto;padding:24px 16px 60px}
+.page-title{font-size:1.3rem;font-weight:900;color:#1B4F8A;margin:0 0 6px}
+.page-sub{font-size:.82rem;color:#64748b;margin-bottom:20px}
+.toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;margin-bottom:18px}
+.toolbar input,.toolbar select{padding:9px 14px;border:1.5px solid #e2e8f0;border-radius:9px;font-size:.84rem;background:#fff}
+.toolbar input{min-width:220px}
+.toolbar input:focus,.toolbar select:focus{border-color:#2E86C1;outline:none}
+.view-btns{display:flex;gap:6px;margin-left:auto}
+.view-btn{padding:8px 14px;border-radius:8px;border:1.5px solid #e2e8f0;background:#fff;font-size:.8rem;font-weight:700;cursor:pointer;color:#64748b}
+.view-btn.active{background:#1B4F8A;color:#fff;border-color:#1B4F8A}
+.dir-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:14px}
+.emp-card{background:#fff;border-radius:14px;padding:20px;box-shadow:0 2px 10px rgba(0,0,0,.07);display:flex;flex-direction:column;align-items:center;text-align:center;cursor:pointer;transition:transform .15s,box-shadow .15s;position:relative}
+.emp-card:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,0,0,.12)}
+.emp-avatar{width:70px;height:70px;border-radius:50%;background:linear-gradient(135deg,#1B4F8A,#2E86C1);display:flex;align-items:center;justify-content:center;font-size:1.8rem;color:#fff;font-weight:700;margin-bottom:12px;overflow:hidden;border:3px solid #e2e8f0}
+.emp-avatar img{width:100%;height:100%;object-fit:cover}
+.emp-name{font-weight:800;font-size:.92rem;margin-bottom:2px;color:#1e293b}
+.emp-designation{font-size:.72rem;color:#2E86C1;font-weight:600;margin-bottom:4px}
+.emp-dept{font-size:.7rem;color:#64748b;margin-bottom:10px}
+.emp-code{font-size:.68rem;font-family:monospace;color:#94a3b8;background:#f8fafc;padding:2px 8px;border-radius:20px;margin-bottom:10px}
+.emp-contact{display:flex;flex-direction:column;gap:3px;font-size:.72rem;color:#64748b;width:100%}
+.emp-contact a{color:#1B4F8A;text-decoration:none;font-weight:600}
+.badge-active{background:#dcfce7;color:#15803d;padding:2px 9px;border-radius:20px;font-size:.65rem;font-weight:700;position:absolute;top:12px;right:12px}
+.badge-inactive{background:#fee2e2;color:#b91c1c;padding:2px 9px;border-radius:20px;font-size:.65rem;font-weight:700;position:absolute;top:12px;right:12px}
+/* List view */
+.dir-list{display:none;flex-direction:column;gap:8px}
+.dir-list.active{display:flex}
+.dir-grid.hidden{display:none}
+.list-row{background:#fff;border-radius:10px;padding:12px 18px;display:flex;align-items:center;gap:14px;box-shadow:0 1px 6px rgba(0,0,0,.06);cursor:pointer;transition:background .15s}
+.list-row:hover{background:#f8fafc}
+.list-avatar{width:42px;height:42px;border-radius:50%;background:linear-gradient(135deg,#1B4F8A,#2E86C1);display:flex;align-items:center;justify-content:center;font-size:1.1rem;color:#fff;font-weight:700;flex-shrink:0;overflow:hidden}
+.list-avatar img{width:100%;height:100%;object-fit:cover}
+.list-name{font-weight:700;font-size:.88rem;min-width:160px}
+.list-meta{font-size:.75rem;color:#64748b;flex:1}
+.count-badge{background:#1B4F8A;color:#fff;border-radius:20px;padding:2px 10px;font-size:.75rem;font-weight:700;margin-left:8px}
+.empty{text-align:center;padding:60px;color:#94a3b8;font-size:.9rem}
+</style>
+</head>
+<body>
+<nav class="navbar">
+  <div class="nav-brand">⚡ Workforce Intelligence</div>
+  <div class="nav-links">
+    <a href="javascript:history.back()" style="color:#fff">← Back</a>
+    <a href="login.html" onclick="localStorage.clear()" style="color:#fff;margin-left:16px">Logout</a>
+  </div>
+</nav>
+
+<div class="page-wrap">
+  <div class="page-title">👥 Employee Directory</div>
+  <div class="page-sub">All staff — search by name, department or role</div>
+
+  <div class="toolbar">
+    <input type="search" id="searchInput" placeholder="🔍 Search name, email, designation…" oninput="renderDir()">
+    <div>
+      <select id="filterDept" onchange="renderDir()"><option value="">All Departments</option></select>
+    </div>
+    <div>
+      <select id="filterRole" onchange="renderDir()">
+        <option value="">All Roles</option>
+        <option value="1">Admin</option>
+        <option value="2">Employee</option>
+        <option value="3">Manager</option>
+        <option value="4">HR</option>
+      </select>
+    </div>
+    <div>
+      <select id="filterStatus" onchange="renderDir()">
+        <option value="">All Status</option>
+        <option value="active">Active</option>
+        <option value="inactive">Inactive</option>
+      </select>
+    </div>
+    <span id="countBadge" class="count-badge">0</span>
+    <div class="view-btns">
+      <button class="view-btn active" id="gridBtn" onclick="setView('grid')">⊞ Grid</button>
+      <button class="view-btn" id="listBtn" onclick="setView('list')">☰ List</button>
+    </div>
+  </div>
+
+  <div class="dir-grid" id="dirGrid"></div>
+  <div class="dir-list" id="dirList"></div>
+</div>
+
+<script>
+var API   = 'http://localhost:5000/api';
+var token = localStorage.getItem('token');
+if (!token) location.href = 'login.html';
+function hdrs(){ return {'Authorization':'Bearer '+token}; }
+function escHtml(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+var _allUsers = [], _viewMode = 'grid';
+
+var ROLE_NAMES = {1:'Admin',2:'Employee',3:'Manager',4:'HR'};
+var ROLE_COLORS = {1:'#7c3aed',2:'#1B4F8A',3:'#15803d',4:'#d97706'};
+
+async function loadDir(){
+  try {
+    _allUsers = await fetch(API+'/auth/users', {headers:hdrs()}).then(r=>r.json());
+    // Load depts
+    try {
+      var depts = await fetch(API+'/admin/departments',{headers:hdrs()}).then(r=>r.json());
+      var sel = document.getElementById('filterDept');
+      depts.forEach(function(d){ var o=document.createElement('option');o.value=d.dept_id;o.textContent=d.dept_name;sel.appendChild(o); });
+    } catch(e){}
+    renderDir();
+  } catch(e){
+    document.getElementById('dirGrid').innerHTML='<div class="empty">Failed to load employees.</div>';
+  }
+}
+
+function renderDir(){
+  var q       = (document.getElementById('searchInput').value||'').toLowerCase();
+  var deptId  = document.getElementById('filterDept').value;
+  var roleId  = document.getElementById('filterRole').value;
+  var status  = document.getElementById('filterStatus').value;
+
+  var filtered = _allUsers.filter(function(u){
+    var matchQ = !q || (u.full_name||'').toLowerCase().includes(q) || (u.email||'').toLowerCase().includes(q) || (u.designation||'').toLowerCase().includes(q) || (u.employee_code||'').toLowerCase().includes(q);
+    var matchD = !deptId || String(u.department_id)===String(deptId);
+    var matchR = !roleId || String(u.role_id)===String(roleId);
+    var matchS = !status || (u.status||'active')===status;
+    return matchQ && matchD && matchR && matchS;
+  });
+
+  document.getElementById('countBadge').textContent = filtered.length+' employees';
+
+  if (_viewMode==='grid') {
+    document.getElementById('dirGrid').innerHTML = filtered.length ? filtered.map(function(u){
+      var initials = (u.full_name||'?').charAt(0).toUpperCase();
+      var roleColor = ROLE_COLORS[u.role_id]||'#64748b';
+      return '<div class="emp-card" onclick="openProfile('+u.user_id+')">'+
+        '<span class="badge-'+(u.status==='inactive'?'inactive':'active')+'">'+(u.status||'active').toUpperCase()+'</span>'+
+        '<div class="emp-avatar">'+(u.photo_url?'<img src="'+escHtml(u.photo_url)+'" alt="">':initials)+'</div>'+
+        '<div class="emp-name">'+escHtml(u.full_name||'Unknown')+'</div>'+
+        '<div class="emp-designation">'+escHtml(u.designation||ROLE_NAMES[u.role_id]||'Staff')+'</div>'+
+        '<div class="emp-dept">'+escHtml(u.dept_name||'—')+'</div>'+
+        '<div class="emp-code">'+escHtml(u.employee_code||'#'+u.user_id)+'</div>'+
+        '<div class="emp-contact">'+
+          (u.email?'<span>✉️ <a href="mailto:'+escHtml(u.email)+'">'+escHtml(u.email)+'</a></span>':'')+
+          (u.phone?'<span>📞 <a href="tel:'+escHtml(u.phone)+'">'+escHtml(u.phone)+'</a></span>':'')+
+        '</div>'+
+        '<div style="margin-top:10px;padding:4px 12px;border-radius:20px;font-size:.65rem;font-weight:700;background:'+roleColor+'22;color:'+roleColor+'">'+escHtml(ROLE_NAMES[u.role_id]||'Staff')+'</div>'+
+      '</div>';
+    }).join('') : '<div class="empty" style="grid-column:1/-1">No employees match your filters.</div>';
+  } else {
+    document.getElementById('dirList').innerHTML = filtered.length ? filtered.map(function(u){
+      var initials = (u.full_name||'?').charAt(0).toUpperCase();
+      var roleColor= ROLE_COLORS[u.role_id]||'#64748b';
+      return '<div class="list-row" onclick="openProfile('+u.user_id+')">'+
+        '<div class="list-avatar">'+(u.photo_url?'<img src="'+escHtml(u.photo_url)+'" alt="">':initials)+'</div>'+
+        '<div class="list-name">'+escHtml(u.full_name||'Unknown')+'<div style="font-size:.68rem;font-family:monospace;color:#94a3b8">'+escHtml(u.employee_code||'#'+u.user_id)+'</div></div>'+
+        '<div class="list-meta">'+escHtml(u.designation||ROLE_NAMES[u.role_id]||'Staff')+' · '+escHtml(u.dept_name||'—')+'</div>'+
+        '<div style="font-size:.75rem;color:#475569">'+escHtml(u.email||'—')+'</div>'+
+        '<div style="font-size:.75rem;color:#475569;min-width:110px">'+escHtml(u.phone||'—')+'</div>'+
+        '<div style="padding:3px 10px;border-radius:20px;font-size:.65rem;font-weight:700;background:'+roleColor+'22;color:'+roleColor+'">'+escHtml(ROLE_NAMES[u.role_id]||'Staff')+'</div>'+
+        '<span style="padding:2px 8px;border-radius:20px;font-size:.62rem;font-weight:700;background:'+(u.status==='inactive'?'#fee2e2':'#dcfce7')+';color:'+(u.status==='inactive'?'#b91c1c':'#15803d')+';">'+(u.status||'active').toUpperCase()+'</span>'+
+      '</div>';
+    }).join('') : '<div class="empty">No employees match your filters.</div>';
+  }
+}
+
+function setView(mode){
+  _viewMode = mode;
+  var grid = document.getElementById('dirGrid');
+  var list = document.getElementById('dirList');
+  document.getElementById('gridBtn').classList.toggle('active', mode==='grid');
+  document.getElementById('listBtn').classList.toggle('active', mode==='list');
+  grid.classList.toggle('hidden', mode!=='grid');
+  list.classList.toggle('active', mode==='list');
+  renderDir();
+}
+
+function openProfile(userId){
+  // Only open own profile or admin can see all
+  var u = JSON.parse(localStorage.getItem('user')||'{}');
+  if (u.user_id===userId || u.role_id===1) location.href='profile.html';
+}
+
+loadDir();
+</script>
+</body>
+</html>

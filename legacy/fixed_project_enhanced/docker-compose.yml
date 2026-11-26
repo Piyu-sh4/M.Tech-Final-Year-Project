@@ -1,0 +1,118 @@
+# ═══════════════════════════════════════════════════════════════════════
+# docker-compose.yml — Workforce Intelligence Platform v7.0
+# 4th Semester: Full container stack: API + MySQL 8 + Redis
+#
+# Usage:
+#   Start all services:  docker-compose up -d
+#   View logs:           docker-compose logs -f api
+#   Stop all:            docker-compose down
+#   Wipe data volumes:   docker-compose down -v
+# ═══════════════════════════════════════════════════════════════════════
+version: "3.9"
+
+services:
+
+  # ── MySQL 8.0 Database ─────────────────────────────────────────────
+  db:
+    image: mysql:8.0
+    container_name: wip_mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-WIProot@2025!}
+      MYSQL_DATABASE:      ${DB_NAME:-workforce_intelligence}
+      MYSQL_USER:          ${DB_USER:-wip_user}
+      MYSQL_PASSWORD:      ${DB_PASSWORD:-WIPdb@2025!}
+      MYSQL_CHARSET:       utf8mb4
+    ports:
+      - "3306:3306"
+    volumes:
+      # Persistent data — survives container restart
+      - mysql_data:/var/lib/mysql
+      # Auto-run SQL files on first start (alphabetical order)
+      - ./database/schema.sql:/docker-entrypoint-initdb.d/01_schema.sql
+      - ./database/seed_admin.sql:/docker-entrypoint-initdb.d/02_seed_admin.sql
+      - ./database/seed_all_employees.sql:/docker-entrypoint-initdb.d/03_seed_employees.sql
+      - ./database/sem4_migrations.sql:/docker-entrypoint-initdb.d/04_sem4.sql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost",
+             "-u", "root", "-p${DB_ROOT_PASSWORD:-WIProot@2025!}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+    networks:
+      - wip_network
+
+  # ── Redis Cache (analytics + leaderboard caching) ──────────────────
+  redis:
+    image: redis:7-alpine
+    container_name: wip_redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: >
+      redis-server
+        --maxmemory 256mb
+        --maxmemory-policy allkeys-lru
+        --save 60 1
+        --loglevel warning
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    networks:
+      - wip_network
+
+  # ── Node.js API Server ─────────────────────────────────────────────
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: wip_api
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      NODE_ENV:          production
+      PORT:              5000
+      # DB — uses the db service hostname (Docker DNS)
+      DB_HOST:           db
+      DB_USER:           ${DB_USER:-wip_user}
+      DB_PASSWORD:       ${DB_PASSWORD:-WIPdb@2025!}
+      DB_NAME:           ${DB_NAME:-workforce_intelligence}
+      # Auth
+      JWT_SECRET:        ${JWT_SECRET:-WIP@JWT#Secret_ChangeThis!}
+      # AI
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+      # CORS
+      CORS_ORIGIN:       ${CORS_ORIGIN:-*}
+      # Redis
+      REDIS_URL:         redis://redis:6379
+    ports:
+      - "5000:5000"
+    volumes:
+      - uploads_data:/app/backend/uploads
+    networks:
+      - wip_network
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:5000/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+# ── Named volumes ──────────────────────────────────────────────────────
+volumes:
+  mysql_data:    # MySQL data persists across restarts
+  redis_data:    # Redis RDB snapshot
+  uploads_data:  # File uploads (CSV/PDF/XLSX)
+
+# ── Custom bridge network ──────────────────────────────────────────────
+networks:
+  wip_network:
+    driver: bridge

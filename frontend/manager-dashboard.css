@@ -1,0 +1,39 @@
+.manager-summary {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 180px), 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+.manager-summary > div {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 22px;
+  background: var(--wfi-surface);
+  border: 1px solid var(--wfi-line);
+  border-radius: 16px;
+}
+.manager-summary strong {
+  font-size: 30px;
+  color: var(--wfi-brand);
+}
+.manager-tools {
+  margin-top: 24px;
+  padding: 24px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.manager-tools h2 {
+  flex: 0 0 100%;
+}
+.manager-tools a {
+  padding: 12px 16px;
+  border: 1px solid var(--wfi-line);
+  border-radius: 10px;
+  text-decoration: none;
+  color: var(--wfi-ink);
+}
+.manager-tools a:hover {
+  background: var(--wfi-accent);
+}

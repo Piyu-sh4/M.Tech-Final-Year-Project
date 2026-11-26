@@ -1,0 +1,15 @@
+const r = require('express').Router(), c = require('../controllers/dependentController');
+const p = require('../middleware/authMiddleware');
+const { hrOrAbove } = require('../middleware/authMiddleware');
+r.get('/my',                   p, c.getMyDependents);
+r.post('/my',                  p, c.addDependent);
+r.patch('/my/:id',             p, c.updateDependent);
+r.delete('/my/:id',            p, c.deleteDependent);
+r.get('/insurance-plans',      p, c.getInsurancePlans);
+r.post('/insurance/enroll',    p, c.enroll);
+r.get('/insurance/my',         p, c.getMyInsurance);
+r.get('/health-card',          p, c.generateHealthCard);
+r.get('/health-card/my',       p, c.getMyHealthCards);
+r.get('/health-card/:user_id', p, hrOrAbove, c.generateHealthCard);
+r.get('/renewal-alerts',       p, hrOrAbove, c.getRenewalAlerts);
+module.exports = r;

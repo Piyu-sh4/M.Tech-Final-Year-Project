@@ -1,0 +1,886 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Cab Live Tracking — WorkforceIQ</title>
+<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<style>
+:root{--dark:#0a0f1e;--blue:#2563eb;--cyan:#0891b2;--green:#16a34a;--red:#dc2626;--amber:#d97706}
+*{box-sizing:border-box}
+body{background:var(--dark);color:#f1f5f9;font-family:'Segoe UI',Arial,sans-serif;margin:0}
+.track-wrap{max-width:1180px;margin:0 auto;padding:80px 16px 40px}
+
+/* ── BOOKING CONFIRMATION BANNER ── */
+.confirm-banner{background:linear-gradient(135deg,#16a34a,#0891b2);border-radius:18px;padding:20px 24px;margin-bottom:20px;display:none}
+.confirm-banner.show{display:block;animation:slideDown .5s ease}
+@keyframes slideDown{from{opacity:0;transform:translateY(-16px)}to{opacity:1;transform:translateY(0)}}
+.cb-title{font-size:1.1rem;font-weight:900;color:#fff;margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.cb-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px}
+.cb-item{background:rgba(255,255,255,.12);border-radius:10px;padding:10px 14px}
+.cb-label{font-size:.65rem;color:#a7f3d0;text-transform:uppercase;letter-spacing:.07em;font-weight:700;margin-bottom:2px}
+.cb-val{font-size:.88rem;font-weight:700;color:#fff}
+.otp-badge{background:rgba(255,255,255,.2);border:2px solid rgba(255,255,255,.4);border-radius:10px;padding:10px 16px;text-align:center}
+.otp-label{font-size:.65rem;color:#a7f3d0;text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px}
+.otp-num{font-size:2rem;font-weight:900;color:#fff;letter-spacing:.35em}
+
+/* ── MAIN GRID ── */
+.main-grid{display:grid;grid-template-columns:340px 1fr;gap:18px;align-items:start}
+
+/* ── MAP ── */
+#trackMap{height:480px;border-radius:16px;border:1.5px solid rgba(255,255,255,.1)}
+
+/* ── PANELS ── */
+.panel{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.09);border-radius:16px;padding:18px;margin-bottom:14px}
+.panel-title{font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#64748b;margin-bottom:12px}
+
+/* ── DRIVER CARD ── */
+.driver-wrap{display:flex;gap:12px;align-items:flex-start}
+.d-avatar{width:60px;height:60px;border-radius:12px;background:linear-gradient(135deg,#1e3a8a,#2563eb);display:flex;align-items:center;justify-content:center;font-size:1.6rem;flex-shrink:0;border:2px solid rgba(59,130,246,.4)}
+.d-name{font-size:1rem;font-weight:800;color:#f1f5f9;margin-bottom:2px}
+.d-code{font-size:.7rem;color:#64748b;background:rgba(255,255,255,.06);border-radius:5px;padding:1px 7px;display:inline-block;margin-bottom:6px}
+.d-row{font-size:.78rem;color:#94a3b8;display:flex;align-items:center;gap:6px;margin-bottom:3px}
+.d-row a{color:#60a5fa;text-decoration:none;font-weight:600}
+.stars{color:#fbbf24;font-size:.85rem}
+.stars .e{color:#334155}
+
+/* ── JOURNEY STATUS ── */
+.j-status{display:flex;align-items:center;gap:10px;padding:12px 14px;border-radius:10px;font-size:.85rem;font-weight:700;margin-bottom:10px}
+.js-waiting  {background:rgba(234,179,8,.08);border:1px solid rgba(234,179,8,.25);color:#fde047}
+.js-transit  {background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.25);color:#86efac}
+.js-completed{background:rgba(99,102,241,.08);border:1px solid rgba(99,102,241,.25);color:#a5b4fc}
+.js-sos      {background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.3);color:#fca5a5;animation:sosPulse 1s infinite}
+@keyframes sosPulse{0%,100%{opacity:1}50%{opacity:.5}}
+.speed-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+.speed-box{background:rgba(255,255,255,.04);border-radius:8px;padding:10px;text-align:center}
+.speed-num{font-size:1.5rem;font-weight:900;color:#60a5fa}
+.speed-unit{font-size:.65rem;color:#475569;margin-top:1px}
+
+/* ── BOOKING DETAILS ── */
+.bk-row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.05);font-size:.8rem}
+.bk-row:last-child{border:none}
+.bk-lbl{color:#64748b}.bk-val{color:#f1f5f9;font-weight:600;text-align:right}
+
+/* ── PING LOG ── */
+.ping-log{display:flex;flex-direction:column;gap:5px;max-height:130px;overflow-y:auto}
+.ping-row{display:flex;justify-content:space-between;font-size:.7rem;color:#475569;padding:3px 0;border-bottom:1px solid rgba(255,255,255,.04)}
+
+/* ── SOS BIG BUTTON ── */
+.sos-btn{width:100%;padding:15px;background:linear-gradient(135deg,#dc2626,#991b1b);border:none;border-radius:14px;color:#fff;font-size:1rem;font-weight:900;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:all .2s;letter-spacing:.03em}
+.sos-btn:hover{transform:scale(1.02);box-shadow:0 8px 24px rgba(220,38,38,.4)}
+
+/* ── EMERGENCY SERVICES SECTION ── */
+.emergency-section{margin-top:14px}
+.emergency-tabs{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap}
+.etab{padding:7px 14px;border:1.5px solid rgba(255,255,255,.1);border-radius:999px;background:transparent;color:#64748b;font-size:.75rem;font-weight:700;cursor:pointer;transition:all .2s}
+.etab.active{background:linear-gradient(135deg,#dc2626,#991b1b);color:#fff;border-color:transparent}
+.etab.police.active{background:linear-gradient(135deg,#1e3a8a,#2563eb)}
+.etab.hospital.active{background:linear-gradient(135deg,#dc2626,#b91c1c)}
+.etab.restaurant.active{background:linear-gradient(135deg,#d97706,#b45309)}
+.etab.pharmacy.active{background:linear-gradient(135deg,#16a34a,#0d9488)}
+.service-list{display:flex;flex-direction:column;gap:8px;max-height:300px;overflow-y:auto}
+.service-card{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:12px 14px;display:flex;gap:12px;align-items:flex-start;transition:border-color .2s;cursor:pointer}
+.service-card:hover{border-color:rgba(59,130,246,.4)}
+.svc-icon{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0}
+.svc-police{background:rgba(37,99,235,.2)}
+.svc-hospital{background:rgba(220,38,38,.2)}
+.svc-restaurant{background:rgba(217,119,6,.2)}
+.svc-pharmacy{background:rgba(22,163,74,.2)}
+.svc-name{font-size:.84rem;font-weight:700;color:#f1f5f9;margin-bottom:2px}
+.svc-addr{font-size:.72rem;color:#64748b;margin-bottom:4px;line-height:1.4}
+.svc-meta{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.svc-dist{font-size:.7rem;color:#60a5fa;font-weight:700}
+.svc-phone{font-size:.72rem;color:#86efac;font-weight:700;text-decoration:none}
+.svc-phone:hover{text-decoration:underline}
+.svc-open{font-size:.68rem;padding:2px 7px;border-radius:999px;font-weight:700}
+.open-yes{background:rgba(34,197,94,.15);color:#86efac}
+.open-no{background:rgba(239,68,68,.12);color:#fca5a5}
+.loading-services{color:#475569;font-size:.8rem;padding:12px;text-align:center;animation:pulse 1.5s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.no-location-msg{background:rgba(217,119,6,.1);border:1px solid rgba(217,119,6,.3);border-radius:10px;padding:12px;font-size:.78rem;color:#fde047;line-height:1.6}
+
+/* ── RATING ── */
+.star-row{display:flex;gap:6px;justify-content:center;margin:8px 0}
+.star-row span{font-size:1.6rem;cursor:pointer;color:#334155;transition:color .1s}
+.star-row span.lit{color:#fbbf24}
+
+/* ── LIVE DOT ── */
+.live-dot{width:8px;height:8px;background:#22c55e;border-radius:50%;animation:sosPulse 1.5s infinite}
+
+/* ── NOTIFICATION BANNER (approval confirmation) ── */
+.notif-bar{background:linear-gradient(135deg,#1e3a8a,#0891b2);border-radius:12px;padding:12px 18px;margin-bottom:16px;font-size:.85rem;color:#fff;display:none;align-items:center;gap:10px}
+.notif-bar.show{display:flex;animation:slideDown .4s ease}
+
+@media(max-width:768px){
+  .main-grid{grid-template-columns:1fr}
+  #trackMap{height:300px}
+  .cb-grid{grid-template-columns:1fr 1fr}
+}
+</style>
+</head>
+<body>
+<nav class="navbar">
+  <div class="nav-brand">⚡ WorkforceIQ — Live Tracking</div>
+  <div class="nav-info" style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+    <div style="display:flex;align-items:center;gap:5px;background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.3);border-radius:999px;padding:4px 12px;font-size:.75rem;color:#86efac">
+      <span class="live-dot"></span> Live
+    </div>
+    <a href="employee-dashboard.html" class="btn btn-sm btn-outline">← Dashboard</a>
+    <button onclick="logout()" class="btn btn-sm btn-outline">Logout</button>
+  </div>
+</nav>
+
+<div class="track-wrap">
+
+  <!-- Approval notification bar (shown when just approved) -->
+  <div class="notif-bar" id="approvalBar">
+    <span style="font-size:1.3rem">✅</span>
+    <div id="approvalMsg">Your cab booking has been approved!</div>
+  </div>
+
+  <!-- Booking confirmation card (shown after approval) -->
+  <div class="confirm-banner" id="confirmBanner">
+    <div class="cb-title">🎉 Cab Booking Confirmed!</div>
+    <div class="cb-grid" id="confirmGrid"></div>
+  </div>
+
+  <!-- Booking selector -->
+  <div style="display:flex;gap:10px;margin-bottom:18px;align-items:center;flex-wrap:wrap">
+    <div style="flex:1;min-width:200px">
+      <select id="bookingSelector" onchange="loadBooking(this.value)"
+        style="width:100%;padding:10px 14px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:10px;color:#f1f5f9;font-size:.84rem">
+        <option value="">Select your booking…</option>
+      </select>
+    </div>
+    <div style="font-size:.78rem;color:#64748b">Booking #<b id="tBookingId" style="color:#60a5fa">–</b></div>
+  </div>
+
+  <div class="main-grid">
+    <!-- ══ LEFT PANEL ══ -->
+    <div>
+
+      <!-- Journey status -->
+      <div class="panel">
+        <div class="panel-title">Journey Status</div>
+        <div id="journeyStatusBadge" class="j-status js-waiting">⏳ Waiting for pickup</div>
+        <div class="speed-row">
+          <div class="speed-box"><div class="speed-num" id="liveSpeed">0</div><div class="speed-unit">km/h</div></div>
+          <div class="speed-box"><div class="speed-num" id="distOffice" style="font-size:1.3rem">–</div><div class="speed-unit">km from office</div></div>
+        </div>
+      </div>
+
+      <!-- Driver card -->
+      <div class="panel">
+        <div class="panel-title">Your Driver</div>
+        <div id="driverCard"><div style="color:#475569;font-size:.82rem;text-align:center;padding:12px">Loading driver details…</div></div>
+      </div>
+
+      <!-- OTP -->
+      <div id="otpPanel" class="panel" style="display:none;text-align:center">
+        <div class="panel-title">Share OTP with Driver</div>
+        <div class="otp-badge">
+          <div class="otp-label">Journey OTP</div>
+          <div class="otp-num" id="otpDisplay">──────</div>
+          <div style="font-size:.7rem;color:#a7f3d0;margin-top:6px">Show this to driver to start/end trip</div>
+        </div>
+      </div>
+
+      <!-- Booking details -->
+      <div class="panel">
+        <div class="panel-title">Booking Details</div>
+        <div id="bookingDetails"><div style="color:#475569;font-size:.82rem;text-align:center;padding:10px">Select a booking above</div></div>
+      </div>
+
+      <!-- SOS -->
+      <button class="sos-btn" id="sosBtn" onclick="triggerSOS()" style="display:none;margin-bottom:14px">
+        🚨 SOS — Emergency Alert
+      </button>
+
+      <!-- Rate driver -->
+      <div class="panel" id="ratingPanel" style="display:none">
+        <div class="panel-title">Rate Your Driver</div>
+        <div class="star-row" id="starRow">
+          <span onclick="setRating(1)">★</span><span onclick="setRating(2)">★</span>
+          <span onclick="setRating(3)">★</span><span onclick="setRating(4)">★</span>
+          <span onclick="setRating(5)">★</span>
+        </div>
+        <textarea id="ratingFeedback" placeholder="Optional feedback…" rows="2"
+          style="width:100%;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:8px;color:#f1f5f9;font-size:.8rem;resize:none;margin-bottom:8px"></textarea>
+        <button onclick="submitRating()" class="btn btn-full" style="background:#1a56db">Submit Rating ⭐</button>
+        <p id="ratingMsg" class="msg" style="margin-top:6px"></p>
+      </div>
+
+      <!-- EMERGENCY SERVICES -->
+      <div class="panel emergency-section">
+        <div class="panel-title">🆘 Nearby Emergency Services</div>
+
+        <!-- Location status -->
+        <div id="locationStatus" class="no-location-msg" style="display:none">
+          📍 Enable location to see nearby services automatically.
+          <br>Or we'll show services for <b>Patna, Bihar</b> by default.
+        </div>
+
+        <!-- Type filter tabs -->
+        <div class="emergency-tabs">
+          <button class="etab police active" data-type="police"     onclick="filterServices(this,'police')">🚔 Police</button>
+          <button class="etab hospital"      data-type="hospital"   onclick="filterServices(this,'hospital')">🏥 Hospital</button>
+          <button class="etab restaurant"    data-type="restaurant" onclick="filterServices(this,'restaurant')">🍽️ Food</button>
+          <button class="etab pharmacy"      data-type="pharmacy"   onclick="filterServices(this,'pharmacy')">💊 Pharmacy</button>
+        </div>
+
+        <!-- Static emergency numbers always visible -->
+        <div id="emergencyNumbers" style="background:rgba(220,38,38,.08);border:1px solid rgba(220,38,38,.2);border-radius:10px;padding:10px 14px;margin-bottom:10px">
+          <div style="font-size:.72rem;font-weight:700;color:#fca5a5;margin-bottom:8px;text-transform:uppercase;letter-spacing:.06em">📞 National Emergency Numbers</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
+            <a href="tel:100" style="background:rgba(37,99,235,.15);border-radius:8px;padding:7px 10px;text-decoration:none;display:flex;align-items:center;gap:6px">
+              <span>🚔</span><div><div style="font-size:.72rem;font-weight:800;color:#93c5fd">100</div><div style="font-size:.65rem;color:#64748b">Police</div></div>
+            </a>
+            <a href="tel:102" style="background:rgba(220,38,38,.15);border-radius:8px;padding:7px 10px;text-decoration:none;display:flex;align-items:center;gap:6px">
+              <span>🚑</span><div><div style="font-size:.72rem;font-weight:800;color:#fca5a5">102</div><div style="font-size:.65rem;color:#64748b">Ambulance</div></div>
+            </a>
+            <a href="tel:101" style="background:rgba(234,179,8,.15);border-radius:8px;padding:7px 10px;text-decoration:none;display:flex;align-items:center;gap:6px">
+              <span>🚒</span><div><div style="font-size:.72rem;font-weight:800;color:#fde047">101</div><div style="font-size:.65rem;color:#64748b">Fire</div></div>
+            </a>
+            <a href="tel:112" style="background:rgba(22,163,74,.15);border-radius:8px;padding:7px 10px;text-decoration:none;display:flex;align-items:center;gap:6px">
+              <span>🆘</span><div><div style="font-size:.72rem;font-weight:800;color:#86efac">112</div><div style="font-size:.65rem;color:#64748b">Emergency</div></div>
+            </a>
+            <a href="tel:1098" style="background:rgba(124,58,237,.15);border-radius:8px;padding:7px 10px;text-decoration:none;display:flex;align-items:center;gap:6px">
+              <span>👶</span><div><div style="font-size:.72rem;font-weight:800;color:#c4b5fd">1098</div><div style="font-size:.65rem;color:#64748b">Child Helpline</div></div>
+            </a>
+            <a href="tel:1091" style="background:rgba(219,39,119,.15);border-radius:8px;padding:7px 10px;text-decoration:none;display:flex;align-items:center;gap=6px">
+              <span>👩</span><div><div style="font-size:.72rem;font-weight:800;color:#f9a8d4">1091</div><div style="font-size:.65rem;color:#64748b">Women Helpline</div></div>
+            </a>
+          </div>
+        </div>
+
+        <!-- Company helpline -->
+        <div style="background:rgba(37,99,235,.1);border:1px solid rgba(37,99,235,.25);border-radius:10px;padding:10px 14px;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;gap:10px">
+          <div>
+            <div style="font-size:.72rem;font-weight:700;color:#93c5fd;margin-bottom:2px">🏢 WorkforceIQ Cab Helpline</div>
+            <div style="font-size:.7rem;color:#64748b">24×7 support for all cab emergencies</div>
+          </div>
+          <a href="tel:+919876543210" style="background:#2563eb;color:#fff;border-radius:9px;padding:8px 14px;text-decoration:none;font-size:.8rem;font-weight:800;white-space:nowrap">📞 +91-9876543210</a>
+        </div>
+
+        <!-- Nearby places list -->
+        <div id="nearbyList" class="service-list">
+          <div class="loading-services">📍 Detecting your location…</div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ══ MAP + PING LOG ══ -->
+    <div>
+      <!-- Map legend -->
+      <div id="mapLegend" style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:8px;font-size:.72rem;color:#94a3b8">
+        <span style="display:flex;align-items:center;gap:5px"><span style="display:inline-block;width:12px;height:12px;border-radius:50%;background:#1a56db"></span> Office</span>
+        <span id="legendPickup" style="display:none;align-items:center;gap:5px"><span style="display:inline-block;width:12px;height:12px;border-radius:50%;background:#f59e0b"></span> Pickup Stop</span>
+        <span style="display:flex;align-items:center;gap:5px"><span style="display:inline-block;width:12px;height:12px;border-radius:50%;background:#16a34a"></span> You</span>
+        <span style="display:flex;align-items:center;gap:5px"><span style="display:inline-block;width:12px;height:12px;border-radius:50%;background:#3b82f6"></span> Driver</span>
+        <span id="legendRoute" style="display:none;align-items:center;gap:5px"><span style="display:inline-block;width:20px;height:3px;background:#f59e0b;border-radius:2px"></span> Route</span>
+      </div>
+      <div id="trackMap"></div>
+      <!-- Map action buttons -->
+      <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
+        <button onclick="fitMapToRoute()" class="btn btn-sm btn-outline" style="font-size:.72rem;padding:5px 12px">🗺️ Fit Route</button>
+        <button onclick="centerOnDriver()" class="btn btn-sm btn-outline" style="font-size:.72rem;padding:5px 12px">🚗 Center Driver</button>
+        <button onclick="centerOnMe()" class="btn btn-sm btn-outline" style="font-size:.72rem;padding:5px 12px">📍 Center Me</button>
+        <button onclick="openInGoogleMaps()" class="btn btn-sm btn-outline" style="font-size:.72rem;padding:5px 12px;color:#4ade80;border-color:rgba(74,222,128,.3)">↗ Google Maps</button>
+      </div>
+      <div class="panel" style="margin-top:14px;background:rgba(255,255,255,.02)">
+        <div class="panel-title">📡 Location Pings</div>
+        <div class="ping-log" id="pingLog"><div style="color:#475569;font-size:.78rem">No pings yet.</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="app.js"></script>
+<script>
+/* ════════════════════════════════════════════
+   CAB TRACKING v2 — with Emergency Services
+════════════════════════════════════════════ */
+var _map, _driverMarker, _employeeMarker, _routeLine;
+var _pickupMarker, _plannedRouteLine, _boundsGroup;
+var _bookingId, _driverId, _pollTimer;
+var _currentBooking = null;
+var _selectedRating = 0;
+var _userLat = null, _userLng = null;
+var _currentServiceType = 'police';
+var _nearbyCache = {};
+
+var OFFICE = {lat: 25.6093, lng: 85.1376};
+
+// Fallback pickup coords keyed by route_id (matches migrate_route_coords.sql)
+var ROUTE_COORDS = {
+  1: {lat: 25.6205, lng: 85.1310, stop: 'Rajiv Nagar Bus Stop'},
+  2: {lat: 25.6012, lng: 85.1482, stop: 'Kankarbagh Crossing'},
+  3: {lat: 25.6097, lng: 85.1121, stop: 'Boring Road Petrol Pump'},
+  4: {lat: 25.6214, lng: 85.1268, stop: 'Patliputra Colony Gate'},
+  5: {lat: 25.6093, lng: 85.1376, stop: 'Office Main Gate'}
+};
+
+/* ── Map init ─────────────────────────────── */
+function initMap() {
+  _map = L.map('trackMap', {zoomControl:true}).setView([OFFICE.lat, OFFICE.lng], 13);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+    {attribution:'© OpenStreetMap', maxZoom:19}).addTo(_map);
+
+  // Office marker
+  L.marker([OFFICE.lat, OFFICE.lng], {
+    icon: L.divIcon({
+      className:'',
+      html:'<div style="background:#1a56db;color:#fff;padding:5px 10px;border-radius:8px;font-size:.7rem;font-weight:700;white-space:nowrap;box-shadow:0 4px 12px rgba(0,0,0,.4)">🏢 Office</div>',
+      iconAnchor:[40,18]
+    })
+  }).bindPopup('<b>Office</b><br>WorkforceIQ HQ').addTo(_map);
+}
+
+/* ── Draw planned route: pickup stop → office ─ */
+function drawPlannedRoute(booking) {
+  // Get coords from booking (DB) or fallback to ROUTE_COORDS
+  var pickupLat = parseFloat(booking.pickup_lat) || (ROUTE_COORDS[booking.route_id]||{}).lat || null;
+  var pickupLng = parseFloat(booking.pickup_lng) || (ROUTE_COORDS[booking.route_id]||{}).lng || null;
+  var dropLat   = parseFloat(booking.drop_lat)   || OFFICE.lat;
+  var dropLng   = parseFloat(booking.drop_lng)   || OFFICE.lng;
+
+  if(!pickupLat || !pickupLng) return;
+
+  // Remove old planned markers/line
+  if(_pickupMarker)    { _map.removeLayer(_pickupMarker);    _pickupMarker=null; }
+  if(_plannedRouteLine){ _map.removeLayer(_plannedRouteLine);_plannedRouteLine=null; }
+
+  // Pickup stop marker
+  var stopName = booking.pickup_stop || 'Pickup Stop';
+  _pickupMarker = L.marker([pickupLat, pickupLng], {
+    icon: L.divIcon({
+      className:'',
+      html:'<div style="background:#f59e0b;color:#fff;padding:5px 10px;border-radius:8px;font-size:.7rem;font-weight:700;white-space:nowrap;box-shadow:0 4px 12px rgba(0,0,0,.4)">🚏 '+escHtml(stopName)+'</div>',
+      iconAnchor:[50,18]
+    })
+  }).bindPopup('<b>Pickup Stop</b><br>'+escHtml(stopName)+'<br><span style="font-size:.75rem;color:#666">Pickup: '+String(booking.pickup_time||'').slice(0,5)+'</span>').addTo(_map);
+
+  // Show legend items
+  var lp = document.getElementById('legendPickup');
+  var lr = document.getElementById('legendRoute');
+  if(lp) lp.style.display='flex';
+  if(lr) lr.style.display='flex';
+
+  // Try OSRM for real road route, fallback to straight line
+  fetchOSRMRoute(pickupLat, pickupLng, dropLat, dropLng, stopName);
+
+  // Fit map to show both pickup & office
+  try {
+    var bounds = L.latLngBounds([[pickupLat,pickupLng],[dropLat,dropLng]]);
+    if(_userLat) bounds.extend([_userLat,_userLng]);
+    _map.fitBounds(bounds, {padding:[40,40]});
+  } catch(e) {}
+}
+
+/* ── OSRM route fetcher (free, no API key) ─── */
+async function fetchOSRMRoute(fromLat, fromLng, toLat, toLng, stopName) {
+  try {
+    var url = 'https://router.project-osrm.org/route/v1/driving/'+fromLng+','+fromLat+';'+toLng+','+toLat+'?overview=full&geometries=geojson';
+    var r = await fetch(url, {signal: AbortSignal.timeout(6000)});
+    var data = await r.json();
+    if(data.code==='Ok' && data.routes && data.routes[0]) {
+      var coords = data.routes[0].geometry.coordinates.map(function(c){return [c[1],c[0]];});
+      if(_plannedRouteLine) _map.removeLayer(_plannedRouteLine);
+      _plannedRouteLine = L.polyline(coords, {
+        color:'#f59e0b', weight:4, opacity:.8, dashArray:'10,6'
+      }).bindPopup('<b>Route to Office</b><br>'+escHtml(stopName||'Pickup')+'→ Office<br>~'+
+        (data.routes[0].distance/1000).toFixed(1)+' km · '+Math.ceil(data.routes[0].duration/60)+' min'
+      ).addTo(_map);
+    } else {
+      drawStraightRoute(fromLat, fromLng, toLat, toLng);
+    }
+  } catch(e) {
+    drawStraightRoute(fromLat, fromLng, toLat, toLng);
+  }
+}
+
+/* ── Straight-line fallback ───────────────── */
+function drawStraightRoute(fromLat, fromLng, toLat, toLng) {
+  if(_plannedRouteLine) _map.removeLayer(_plannedRouteLine);
+  _plannedRouteLine = L.polyline([[fromLat,fromLng],[toLat,toLng]], {
+    color:'#f59e0b', weight:3, opacity:.7, dashArray:'8,6'
+  }).bindPopup('Estimated route (road data unavailable)').addTo(_map);
+}
+
+/* ── Map utility buttons ──────────────────── */
+function fitMapToRoute() {
+  var pts = [[OFFICE.lat, OFFICE.lng]];
+  if(_pickupMarker)   pts.push(_pickupMarker.getLatLng());
+  if(_driverMarker)   pts.push(_driverMarker.getLatLng());
+  if(_employeeMarker) pts.push(_employeeMarker.getLatLng());
+  if(pts.length > 1) _map.fitBounds(L.latLngBounds(pts), {padding:[40,40]});
+}
+
+function centerOnDriver() {
+  if(_driverMarker) _map.setView(_driverMarker.getLatLng(), 15);
+  else showToast('No driver location yet.');
+}
+
+function centerOnMe() {
+  if(_employeeMarker) _map.setView(_employeeMarker.getLatLng(), 15);
+  else if(_userLat)   _map.setView([_userLat, _userLng], 15);
+  else showToast('Location not detected.');
+}
+
+function openInGoogleMaps() {
+  var b = _currentBooking;
+  if(!b) { showToast('Select a booking first.'); return; }
+  var pLat = parseFloat(b.pickup_lat) || (ROUTE_COORDS[b.route_id]||{}).lat || OFFICE.lat;
+  var pLng = parseFloat(b.pickup_lng) || (ROUTE_COORDS[b.route_id]||{}).lng || OFFICE.lng;
+  var url = 'https://www.google.com/maps/dir/'+pLat+','+pLng+'/'+OFFICE.lat+','+OFFICE.lng;
+  window.open(url, '_blank');
+}
+
+function showToast(msg) {
+  var t = document.createElement('div');
+  t.textContent = msg;
+  t.style.cssText = 'position:fixed;bottom:30px;left:50%;transform:translateX(-50%);background:#1e293b;color:#f1f5f9;padding:10px 20px;border-radius:8px;font-size:.82rem;z-index:9999;box-shadow:0 4px 16px rgba(0,0,0,.5)';
+  document.body.appendChild(t);
+  setTimeout(function(){t.remove();},2500);
+}
+
+/* ── Distance (Haversine) ─────────────────── */
+function haversine(lat1,lng1,lat2,lng2){
+  var R=6371, dLat=(lat2-lat1)*Math.PI/180, dLng=(lng2-lng1)*Math.PI/180;
+  var a=Math.sin(dLat/2)*Math.sin(dLat/2)+Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLng/2)*Math.sin(dLng/2);
+  return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));
+}
+
+/* ── Load bookings selector ───────────────── */
+async function loadMyBookingsForSelector() {
+  try {
+    var r = await fetch(API+'/cab/my',{headers:authHeaders()});
+    var list = await r.json();
+    var sel = document.getElementById('bookingSelector');
+    var active = list.filter(function(b){ return ['pending','approved'].includes(b.status); });
+    active.forEach(function(b){
+      var opt = document.createElement('option');
+      opt.value = b.booking_id;
+      opt.textContent = '#'+b.booking_id+' · '+b.route_name+' · '+formatDate(b.booking_date)+' · '+b.status.toUpperCase();
+      sel.appendChild(opt);
+    });
+    // Auto-select first approved
+    var approved = list.filter(function(b){return b.status==='approved';});
+    if(approved.length) { sel.value=approved[0].booking_id; loadBooking(approved[0].booking_id); }
+  } catch(e){ console.error(e); }
+}
+
+/* ── Load booking detail ──────────────────── */
+async function loadBooking(id) {
+  if(!id) return;
+  _bookingId = id;
+  setInner('tBookingId', id);
+  try {
+    var r = await fetch(API+'/cab/my',{headers:authHeaders()});
+    var list = await r.json();
+    _currentBooking = list.find(function(b){return b.booking_id==id;});
+    if(!_currentBooking) return;
+
+    // Show confirmation banner if approved
+    if(_currentBooking.status === 'approved') showConfirmationBanner(_currentBooking);
+
+    // OTP
+    if(_currentBooking.otp && _currentBooking.status==='approved'){
+      document.getElementById('otpPanel').style.display='block';
+      setInner('otpDisplay', _currentBooking.otp);
+    }
+
+    // SOS button
+    var sosBtn = document.getElementById('sosBtn');
+    if(sosBtn) sosBtn.style.display = _currentBooking.status==='approved'?'block':'none';
+
+    // Journey status
+    updateJourneyStatus(_currentBooking.journey_status||'waiting');
+
+    // Booking details
+    renderBookingDetails(_currentBooking);
+
+    // Driver card
+    if(_currentBooking.driver_name) renderDriverCard(_currentBooking);
+
+    // Draw planned route on map (pickup stop → office)
+    drawPlannedRoute(_currentBooking);
+
+    // Rating form if completed
+    if(_currentBooking.journey_status==='completed' && _currentBooking.driver_id)
+      document.getElementById('ratingPanel').style.display='block';
+
+    // Start tracking
+    if(_currentBooking.status==='approved') startTracking(id);
+
+  } catch(e){ console.error(e); }
+}
+
+/* ── Confirmation banner ──────────────────── */
+function showConfirmationBanner(b) {
+  var banner = document.getElementById('confirmBanner');
+  var grid   = document.getElementById('confirmGrid');
+  banner.classList.add('show');
+  var vIcon = b.vehicle_type==='Bus'?'🚌':b.vehicle_type==='Car'?'🚗':'🏍️';
+  grid.innerHTML =
+    cbItem('📅 Date',       formatDate(b.booking_date))+
+    cbItem('📍 Route',      b.route_name)+
+    cbItem('🚏 Pickup Stop',b.pickup_stop)+
+    cbItem('🕗 Pickup Time',String(b.pickup_time||'').slice(0,5))+
+    cbItem(vIcon+' Vehicle',b.vehicle_label)+
+    cbItem('💺 Seat',       b.seat_number?'#'+b.seat_number:'Auto')+
+    (b.driver_name?cbItem('🧑‍✈️ Driver', b.driver_name + (b.driver_mobile?' · '+b.driver_mobile:'')):'')+
+    (b.otp?'<div class="cb-item otp-badge" style="grid-column:span 2;text-align:center"><div class="otp-label">Journey OTP</div><div class="otp-num">'+escHtml(b.otp)+'</div></div>':'');
+}
+function cbItem(label,val){
+  return '<div class="cb-item"><div class="cb-label">'+escHtml(label)+'</div><div class="cb-val">'+escHtml(String(val||'–'))+'</div></div>';
+}
+
+/* ── Journey status ───────────────────────── */
+function updateJourneyStatus(status){
+  var badge = document.getElementById('journeyStatusBadge');
+  if(!badge) return;
+  var cfg={
+    waiting:   {cls:'js-waiting',  text:'⏳ Waiting for driver'},
+    in_transit:{cls:'js-transit',  text:'🚗 Journey in progress'},
+    completed: {cls:'js-completed',text:'✅ Journey complete'},
+    sos:       {cls:'js-sos',      text:'🚨 SOS ACTIVE'}
+  };
+  var c=cfg[status]||cfg.waiting;
+  badge.className='j-status '+c.cls;
+  badge.textContent=c.text;
+}
+
+/* ── Booking detail rows ──────────────────── */
+function renderBookingDetails(b){
+  var vIcon=b.vehicle_type==='Bus'?'🚌':b.vehicle_type==='Car'?'🚗':'🏍️';
+  document.getElementById('bookingDetails').innerHTML=[
+    bRow('📅 Date',       formatDate(b.booking_date)),
+    bRow('📍 Route',      b.route_name),
+    bRow('🚏 Stop',       b.pickup_stop),
+    bRow('🕗 Pickup',     String(b.pickup_time||'').slice(0,5)),
+    bRow('🏠 Drop',       String(b.drop_time||'').slice(0,5)),
+    bRow(vIcon+' Vehicle',b.vehicle_label),
+    bRow('💺 Seat',       b.seat_number?'#'+b.seat_number:'–'),
+    bRow('🔄 Trip Type',  b.trip_type||'both'),
+    b.shift_name?bRow('⏰ Shift',b.shift_name):'',
+    b.distance_km?bRow('📏 Distance',b.distance_km+' km'):'',
+    b.night_cab?bRow('🌙 Night Cab','Yes'):'',
+  ].join('');
+}
+function bRow(lbl,val){
+  return '<div class="bk-row"><span class="bk-lbl">'+escHtml(lbl)+'</span><span class="bk-val">'+escHtml(String(val||'–'))+'</span></div>';
+}
+
+/* ── Driver card ──────────────────────────── */
+function renderDriverCard(b){
+  var rt = parseFloat(b.driver_rating||b.avg_rating||5);
+  var stars=''; for(var i=1;i<=5;i++) stars+='<span class="'+(i<=Math.round(rt)?'':' e')+'">★</span>';
+  document.getElementById('driverCard').innerHTML=
+    '<div class="driver-wrap">'+
+      '<div class="d-avatar">🧑‍✈️</div>'+
+      '<div>'+
+        '<div class="d-name">'+escHtml(b.driver_name)+'</div>'+
+        '<span class="d-code">'+escHtml(b.driver_code||b.driver_id||'')+'</span>'+
+        '<div class="stars">'+stars+' <span style="font-size:.72rem;color:#64748b">'+rt.toFixed(1)+'</span></div>'+
+        '<div class="d-row">📞 <a href="tel:'+escHtml(b.driver_mobile||'')+'">'+escHtml(b.driver_mobile||'–')+'</a></div>'+
+        (b.vehicle_label?'<div class="d-row">'+(b.vehicle_type==='Bus'?'🚌':b.vehicle_type==='Car'?'🚗':'🏍️')+' '+escHtml(b.vehicle_label)+'</div>':'')+
+        (b.driver_acknowledged?'<div style="background:rgba(34,197,94,.1);border-radius:6px;padding:3px 8px;font-size:.7rem;color:#86efac;font-weight:700;margin-top:4px;display:inline-block">✓ Responsibility Accepted</div>':'')+
+      '</div>'+
+    '</div>';
+}
+
+/* ── Tracking poll ────────────────────────── */
+function startTracking(bookingId){
+  if(_pollTimer) clearInterval(_pollTimer);
+  pollTracking(bookingId);
+  _pollTimer=setInterval(function(){pollTracking(bookingId);},10000);
+}
+
+async function pollTracking(bookingId){
+  try {
+    var r=await fetch(API+'/cab/track/'+bookingId,{headers:authHeaders()});
+    var pings=await r.json();
+    if(!pings.length) return;
+    var latest=pings[0];
+    var lat=parseFloat(latest.latitude), lng=parseFloat(latest.longitude);
+
+    // Driver marker
+    if(_driverMarker) _map.removeLayer(_driverMarker);
+    _driverMarker=L.marker([lat,lng],{
+      icon:L.divIcon({className:'',
+        html:'<div style="background:#1a56db;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.1rem;box-shadow:0 4px 12px rgba(0,0,0,.5)">🚗</div>',
+        iconSize:[36,36],iconAnchor:[18,18]})
+    }).bindPopup('<b>Driver</b><br>'+lat.toFixed(5)+', '+lng.toFixed(5)).addTo(_map);
+
+    // Trail
+    if(_routeLine) _map.removeLayer(_routeLine);
+    var coords=pings.slice(0,10).map(function(p){return[parseFloat(p.latitude),parseFloat(p.longitude)];});
+    _routeLine=L.polyline(coords,{color:'#3b82f6',weight:3,opacity:.6,dashArray:'6,4'}).addTo(_map);
+
+    setInner('liveSpeed',Math.round(parseFloat(latest.speed_kmh||0)));
+    var dist=haversine(OFFICE.lat,OFFICE.lng,lat,lng);
+    setInner('distOffice',dist.toFixed(1));
+    _map.setView([lat,lng],14);
+
+    // Ping log
+    document.getElementById('pingLog').innerHTML=pings.slice(0,8).map(function(p){
+      return '<div class="ping-row">'+
+        '<span>'+parseFloat(p.latitude).toFixed(4)+', '+parseFloat(p.longitude).toFixed(4)+'</span>'+
+        '<span>'+new Date(p.recorded_at).toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit',second:'2-digit'})+'</span>'+
+      '</div>';
+    }).join('');
+
+    // Update nearby services if user location changed significantly
+    if(_userLat && Math.abs(_userLat-lat)>0.01) loadNearbyServices(_userLat, _userLng, _currentServiceType);
+  } catch(e){}
+}
+
+/* ══════════════════════════════════════════
+   EMERGENCY SERVICES
+══════════════════════════════════════════ */
+function filterServices(btn, type){
+  document.querySelectorAll('.etab').forEach(function(b){b.classList.remove('active');});
+  btn.classList.add('active');
+  _currentServiceType = type;
+  if(_userLat) loadNearbyServices(_userLat, _userLng, type);
+  else loadNearbyServices(OFFICE.lat, OFFICE.lng, type);
+}
+
+function detectLocation(){
+  if(!navigator.geolocation){
+    document.getElementById('locationStatus').style.display='block';
+    loadNearbyServices(OFFICE.lat, OFFICE.lng, _currentServiceType);
+    return;
+  }
+  navigator.geolocation.getCurrentPosition(
+    function(pos){
+      _userLat = pos.coords.latitude;
+      _userLng = pos.coords.longitude;
+      // Add "You" marker
+      if(_employeeMarker) _map.removeLayer(_employeeMarker);
+      _employeeMarker = L.marker([_userLat,_userLng],{
+        icon:L.divIcon({className:'',
+          html:'<div style="background:#16a34a;color:#fff;padding:5px 10px;border-radius:8px;font-size:.7rem;font-weight:700;box-shadow:0 4px 12px rgba(0,0,0,.4)">📍 You</div>',
+          iconAnchor:[20,18]})
+      }).addTo(_map);
+      _map.setView([_userLat, _userLng], 14);
+      loadNearbyServices(_userLat, _userLng, _currentServiceType);
+    },
+    function(){
+      document.getElementById('locationStatus').style.display='block';
+      loadNearbyServices(OFFICE.lat, OFFICE.lng, _currentServiceType);
+    },
+    {timeout:6000}
+  );
+}
+
+/* ── Fetch nearby from Overpass OSM API ───── */
+async function loadNearbyServices(lat, lng, type){
+  var list = document.getElementById('nearbyList');
+  list.innerHTML='<div class="loading-services">🔍 Finding nearby '+type+' …</div>';
+
+  // OSM Overpass query mapping
+  var queries = {
+    police:     'amenity=police',
+    hospital:   'amenity=hospital|amenity=clinic',
+    restaurant: 'amenity=restaurant|amenity=fast_food|amenity=cafe',
+    pharmacy:   'amenity=pharmacy|amenity=chemist'
+  };
+  var osmTag = queries[type] || 'amenity=police';
+
+  // Cache key
+  var cacheKey = type+'_'+lat.toFixed(2)+'_'+lng.toFixed(2);
+  if(_nearbyCache[cacheKey]){
+    renderServices(_nearbyCache[cacheKey], lat, lng, type);
+    return;
+  }
+
+  // Overpass QL — 3km radius
+  var radius = 3000;
+  var tags = osmTag.split('|');
+  var tagFilters = tags.map(function(t){
+    var parts = t.split('=');
+    return 'node["'+parts[0]+'"="'+parts[1]+'"]';
+  }).join('');
+
+  var query = '[out:json][timeout:10];('+
+    tags.map(function(t){
+      var p=t.split('=');
+      return 'node["'+p[0]+'"="'+p[1]+'"](around:'+radius+','+lat+','+lng+');';
+    }).join('')+
+  ');out body 10;';
+
+  try {
+    var resp = await fetch('https://overpass-api.de/api/interpreter?data='+encodeURIComponent(query));
+    if(!resp.ok) throw new Error('Overpass error');
+    var data = await resp.json();
+    var places = (data.elements||[]).slice(0,8).map(function(el){
+      return {
+        name:    el.tags.name || el.tags['name:en'] || capitalise(type),
+        address: [el.tags['addr:street'], el.tags['addr:city']].filter(Boolean).join(', ') || 'See map',
+        phone:   el.tags.phone || el.tags['contact:phone'] || null,
+        lat:     el.lat, lng: el.lon,
+        opening: el.tags.opening_hours || null
+      };
+    });
+    _nearbyCache[cacheKey] = places;
+    renderServices(places, lat, lng, type);
+  } catch(e){
+    // Fallback to static Patna data
+    renderServices(getStaticServices(type), lat, lng, type);
+  }
+}
+
+function renderServices(places, userLat, userLng, type){
+  var list = document.getElementById('nearbyList');
+  if(!places.length){
+    list.innerHTML='<div style="color:#475569;font-size:.8rem;padding:12px;text-align:center">No nearby '+type+' found.</div>';
+    return;
+  }
+  var icons = {police:'🚔',hospital:'🏥',restaurant:'🍽️',pharmacy:'💊'};
+  var classes = {police:'svc-police',hospital:'svc-hospital',restaurant:'svc-restaurant',pharmacy:'svc-pharmacy'};
+  var icon = icons[type]||'📍';
+  var cls  = classes[type]||'svc-police';
+
+  // Sort by distance
+  places.forEach(function(p){
+    p._dist = p.lat ? haversine(userLat,userLng,p.lat,p.lng) : 99;
+  });
+  places.sort(function(a,b){return a._dist-b._dist;});
+
+  list.innerHTML = places.map(function(p){
+    var distText = p._dist<90 ? (p._dist<1?(p._dist*1000).toFixed(0)+'m':p._dist.toFixed(1)+' km') : '';
+    var isOpen = p.opening ? (p.opening.toLowerCase().includes('24/7')||p.opening.toLowerCase().includes('open')) : null;
+    return '<div class="service-card" onclick="flyToService('+p.lat+','+p.lng+',\''+escHtml(p.name)+'\')">'+
+      '<div class="svc-icon '+cls+'">'+icon+'</div>'+
+      '<div style="flex:1">'+
+        '<div class="svc-name">'+escHtml(p.name)+'</div>'+
+        '<div class="svc-addr">'+escHtml(p.address)+'</div>'+
+        '<div class="svc-meta">'+
+          (distText?'<span class="svc-dist">📏 '+distText+'</span>':'')+
+          (p.phone?'<a href="tel:'+escHtml(p.phone)+'" class="svc-phone" onclick="event.stopPropagation()">📞 '+escHtml(p.phone)+'</a>':'')+
+          (isOpen!==null?'<span class="svc-open '+(isOpen?'open-yes':'open-no')+'">'+(isOpen?'Open':'Closed')+'</span>':'')+
+        '</div>'+
+      '</div>'+
+    '</div>';
+  }).join('');
+}
+
+function flyToService(lat, lng, name){
+  if(!lat || !lng) return;
+  _map.flyTo([lat,lng],16,{duration:1});
+  L.popup().setLatLng([lat,lng]).setContent('<b>'+escHtml(name)+'</b>').openOn(_map);
+}
+
+function capitalise(str){ return str.charAt(0).toUpperCase()+str.slice(1); }
+
+// Static fallback for Patna, Bihar
+function getStaticServices(type){
+  var data = {
+    police:[
+      {name:'Patna Sahib Police Station',address:'Patna Sahib, Patna',phone:'0612-2223456',lat:25.615,lng:85.155},
+      {name:'Kankarbagh Police Station',address:'Kankarbagh, Patna',phone:'0612-2351234',lat:25.600,lng:85.148},
+      {name:'Rajiv Nagar Police Outpost',address:'Rajiv Nagar, Patna',phone:'0612-2601234',lat:25.620,lng:85.130},
+      {name:'Boring Road Police Station',address:'Boring Road, Patna',phone:'0612-2223344',lat:25.610,lng:85.110}
+    ],
+    hospital:[
+      {name:'PMCH – Patna Medical College',address:'Ashok Rajpath, Patna',phone:'0612-2300123',lat:25.618,lng:85.137},
+      {name:'AIIMS Patna',address:'Phulwari, Patna',phone:'0612-2451070',lat:25.556,lng:85.097},
+      {name:'Ruban Memorial Hospital',address:'Judges Court Rd, Patna',phone:'0612-2200305',lat:25.614,lng:85.140},
+      {name:'Paras HMRI Hospital',address:'Raja Bazar, Patna',phone:'0612-3069000',lat:25.608,lng:85.150}
+    ],
+    restaurant:[
+      {name:'Bihar Club Restaurant',address:'Beer Chand Patel Path, Patna',phone:'0612-2230456',lat:25.617,lng:85.144},
+      {name:'Tandoor Hut',address:'Frazer Road, Patna',phone:'0612-2220789',lat:25.611,lng:85.145},
+      {name:'Spicy Affair',address:'Boring Road, Patna',phone:'0612-2601456',lat:25.609,lng:85.112},
+      {name:'Hotel Chanakya Restaurant',address:'Beer Chand Patel Path, Patna',phone:'0612-2231071',lat:25.616,lng:85.142}
+    ],
+    pharmacy:[
+      {name:'Apollo Pharmacy',address:'Patliputra Colony, Patna',phone:'1860-500-0101',lat:25.621,lng:85.127},
+      {name:'MedPlus Pharmacy',address:'Kankarbagh, Patna',phone:'040-67006700',lat:25.601,lng:85.147},
+      {name:'Jan Aushadhi Kendra',address:'Rajiv Nagar, Patna',phone:'1800-180-8080',lat:25.619,lng:85.131},
+      {name:'Fortis Pharmacy',address:'Bailey Road, Patna',phone:'0612-3046666',lat:25.618,lng:85.118}
+    ]
+  };
+  return data[type]||[];
+}
+
+/* ── SOS ──────────────────────────────────── */
+async function triggerSOS(){
+  if(!_bookingId) return;
+  if(!confirm('🚨 EMERGENCY ALERT — This will notify Admin & Manager immediately with your location. Confirm?')) return;
+  var pos=null;
+  try{ pos=await new Promise(function(rs,rj){navigator.geolocation.getCurrentPosition(rs,rj,{timeout:3000});}); }catch(_){}
+  try{
+    var r=await fetch(API+'/cab/sos',{method:'POST',headers:authHeaders(),body:JSON.stringify({
+      booking_id:_bookingId,
+      latitude: pos?pos.coords.latitude:null,
+      longitude:pos?pos.coords.longitude:null,
+      message:'Passenger SOS from tracking page'
+    })});
+    var d=await r.json();
+    alert(d.message);
+    updateJourneyStatus('sos');
+  } catch(e){ alert('SOS failed. Call 112 or +91-9876543210'); }
+}
+
+/* ── Rating ───────────────────────────────── */
+function setRating(n){
+  _selectedRating=n;
+  document.querySelectorAll('#starRow span').forEach(function(s,i){s.classList.toggle('lit',i<n);});
+}
+async function submitRating(){
+  if(!_selectedRating) return showMsg('ratingMsg','Please select stars.',true);
+  try{
+    var r=await fetch(API+'/cab/rate',{method:'POST',headers:authHeaders(),
+      body:JSON.stringify({booking_id:_bookingId,rating:_selectedRating,feedback:document.getElementById('ratingFeedback').value})});
+    var d=await r.json();
+    showMsg('ratingMsg',d.message,!r.ok);
+    if(r.ok) document.getElementById('ratingPanel').style.display='none';
+  }catch(e){showMsg('ratingMsg','Failed.',true);}
+}
+
+/* ── Socket listener (approval notification) ── */
+function initSocket(){
+  if(typeof io==='undefined') return;
+  var tok=getToken(); if(!tok) return;
+  try{
+    var sock=io(window.location.origin,{auth:{token:tok},transports:['websocket','polling']});
+    sock.on('wip:notification',function(data){
+      if(data.type==='cab_approved'){
+        var bar=document.getElementById('approvalBar');
+        var msg=document.getElementById('approvalMsg');
+        if(bar&&msg){
+          msg.textContent=data.message||'Your cab booking has been approved!';
+          bar.classList.add('show');
+          setTimeout(function(){bar.classList.remove('show');},8000);
+        }
+        // Reload booking
+        if(data.data&&data.data.booking_id) loadBooking(data.data.booking_id);
+      }
+      if(data.type==='cab_complete') updateJourneyStatus('completed');
+    });
+  }catch(e){}
+}
+
+/* ── Boot ─────────────────────────────────── */
+document.addEventListener('DOMContentLoaded',function(){
+  var u=getUser(); if(!u){window.location.href='login.html';return;}
+  initMap();
+  loadMyBookingsForSelector();
+  detectLocation();
+  initSocket();
+  // URL param ?booking=ID
+  var params=new URLSearchParams(window.location.search);
+  var bParam=params.get('booking');
+  if(bParam) setTimeout(function(){
+    var sel=document.getElementById('bookingSelector');
+    sel.value=bParam; loadBooking(bParam);
+  }, 600);
+});
+</script>
+</body>
+</html>

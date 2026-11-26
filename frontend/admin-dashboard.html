@@ -1,0 +1,2064 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<style id="slideRightStyle">
+.navbar{display:flex;align-items:center;padding:0 16px;height:56px;background:#fff;border-bottom:1px solid #e2e8f0;position:sticky;top:0;z-index:100;gap:12px;flex-wrap:nowrap!important;overflow:hidden}
+.nav-brand{font-weight:900;font-size:.9rem;color:#1e3a5f;white-space:nowrap;flex-shrink:0}
+.nav-info{display:flex;align-items:center;gap:8px;flex-shrink:0;margin-left:auto}
+
+/* ── TOPBAR FIXES  ─────────────────────────────── */
+.navbar,.wiq-topbar,nav.topbar{
+  display:flex!important;align-items:center!important;
+  padding:0 20px!important;height:54px!important;
+  background:#fff!important;
+  border-bottom:2px solid #e8f0ff!important;
+  position:sticky!important;top:0!important;z-index:100!important;
+  gap:12px!important;flex-wrap:nowrap!important;
+  box-shadow:0 1px 8px rgba(37,99,235,.08)!important;
+}
+.nav-brand{
+  font-size:.88rem!important;font-weight:900!important;
+  color:#1E3A5F!important;white-space:nowrap!important;
+  display:flex!important;align-items:center!important;gap:6px!important;
+  flex-shrink:0!important;letter-spacing:-.01em!important;
+}
+.nav-brand .logo-icon{
+  width:28px!important;height:28px!important;
+  background:linear-gradient(135deg,#2563EB,#7C3AED)!important;
+  border-radius:7px!important;display:inline-flex!important;
+  align-items:center!important;justify-content:center!important;
+  font-size:.9rem!important;flex-shrink:0!important;
+}
+.nav-brand .logo-text{
+  font-size:.85rem!important;font-weight:900!important;color:#1E3A5F!important;
+}
+.nav-brand .logo-version{
+  font-size:.55rem!important;font-weight:700!important;
+  color:#2563EB!important;background:#EFF6FF!important;
+  padding:1px 5px!important;border-radius:4px!important;
+  border:1px solid #BFDBFE!important;
+}
+.nav-info{
+  display:flex!important;align-items:center!important;
+  gap:8px!important;flex-shrink:0!important;margin-left:auto!important;
+}
+.nav-divider{width:1px!important;height:20px!important;background:#E2E8F0!important}
+
+/* ── CARD COLOR SHADOWS ─────────────────────────────── */
+.card,.wiq-card,[class*="-card"]{
+  transition:all .25s cubic-bezier(.34,1.56,.64,1)!important;
+  border-radius:12px!important;
+}
+.card:hover,.wiq-card:hover{
+  transform:translateY(-4px) scale(1.006)!important;
+  box-shadow:0 12px 32px rgba(37,99,235,.18),
+             0 2px 8px rgba(37,99,235,.1)!important;
+}
+/* Module-specific card shadows */
+.card-payroll:hover{box-shadow:0 12px 32px rgba(5,150,105,.18)!important}
+.card-leave:hover{box-shadow:0 12px 32px rgba(245,158,11,.18)!important}
+.card-alert:hover{box-shadow:0 12px 32px rgba(220,38,38,.18)!important}
+
+/* ── BUTTON SYSTEM ─────────────────────────────────── */
+.btn{
+  display:inline-flex!important;align-items:center!important;
+  gap:5px!important;padding:7px 16px!important;
+  border-radius:8px!important;font-size:.76rem!important;
+  font-weight:700!important;cursor:pointer!important;
+  border:none!important;transition:all .2s!important;
+  white-space:nowrap!important;font-family:var(--wfi-font);
+}
+.btn-primary{
+  background:linear-gradient(135deg,#2563EB,#1D4ED8)!important;
+  color:#fff!important;
+  box-shadow:0 2px 8px rgba(37,99,235,.3)!important;
+}
+.btn-primary:hover{
+  background:linear-gradient(135deg,#1D4ED8,#1E40AF)!important;
+  box-shadow:0 4px 14px rgba(37,99,235,.4)!important;
+  transform:translateY(-1px)!important;
+}
+.btn-outline,.btn-sm.btn-outline{
+  background:#fff!important;color:#2563EB!important;
+  border:1.5px solid #BFDBFE!important;
+  padding:5px 13px!important;font-size:.72rem!important;
+}
+.btn-outline:hover{
+  background:#EFF6FF!important;
+  border-color:#2563EB!important;
+  box-shadow:0 2px 8px rgba(37,99,235,.15)!important;
+}
+.btn-danger{
+  background:linear-gradient(135deg,#DC2626,#B91C1C)!important;
+  color:#fff!important;
+}
+.btn-danger:hover{box-shadow:0 4px 14px rgba(220,38,38,.35)!important}
+.btn-success{
+  background:linear-gradient(135deg,#059669,#047857)!important;
+  color:#fff!important;
+}
+.btn-success:hover{box-shadow:0 4px 14px rgba(5,150,105,.35)!important}
+.btn-sm{padding:5px 12px!important;font-size:.7rem!important}
+.btn-lg{padding:10px 22px!important;font-size:.82rem!important}
+
+/* ── STATUS BADGES ─────────────────────────────────── */
+.badge,.status-badge,[class*=badge]{
+  display:inline-flex!important;align-items:center!important;
+  padding:3px 10px!important;border-radius:999px!important;
+  font-size:.62rem!important;font-weight:800!important;
+  text-transform:uppercase!important;letter-spacing:.04em!important;
+}
+
+/* ── SIDEBAR BRAND ─────────────────────────────────── */
+.wiq-logo{
+  display:flex!important;align-items:center!important;
+  gap:8px!important;padding:0 4px!important;
+}
+.wiq-logo .logo-mark{
+  width:32px!important;height:32px!important;
+  background:linear-gradient(135deg,#2563EB,#7C3AED)!important;
+  border-radius:9px!important;display:flex!important;
+  align-items:center!important;justify-content:center!important;
+  font-size:1rem!important;flex-shrink:0!important;
+  box-shadow:0 4px 12px rgba(37,99,235,.35)!important;
+}
+.wiq-logo span{
+  font-weight:900!important;font-size:.82rem!important;
+  color:#F8FAFC!important;letter-spacing:-.01em!important;
+}
+
+/* ═══ DARK/LIGHT MODE  ════════════════════════════════════ */
+:root{--dm-bg:#F8FAFC;--dm-card:#ffffff;--dm-text:#1e293b;--dm-muted:#64748b;--dm-border:#e2e8f0;--dm-sidebar:#0a1220;--dm-topbar:#ffffff;--dm-input:#ffffff;--dm-hover:#f1f5f9}
+body.dark-mode{--dm-bg:#0B1120;--dm-card:#111827;--dm-text:#e2e8f0;--dm-muted:#94a3b8;--dm-border:#1e2d4a;--dm-sidebar:#060d18;--dm-topbar:#111827;--dm-input:#1e2d4a;--dm-hover:#1e293b}
+body{background:var(--dm-bg)!important;color:var(--dm-text)!important;transition:background .25s,color .25s}
+.wiq-sidebar,aside{background:var(--dm-sidebar)!important}
+.navbar,.wiq-topbar,nav{background:var(--dm-topbar)!important;border-bottom-color:var(--dm-border)!important}
+.card,.wiq-card,.stat-card,.kpi-card{background:var(--dm-card)!important;border-color:var(--dm-border)!important}
+main,.main-content,.wiq-content,.page-wrap{background:var(--dm-bg)!important}
+input:not([type=checkbox]):not([type=radio]),select,textarea,.form-input{background:var(--dm-input)!important;border-color:var(--dm-border)!important;color:var(--dm-text)!important}
+table{background:var(--dm-card)!important}thead tr{background:#1e3a5f!important}tbody tr:hover{background:var(--dm-hover)!important}
+h1,h2,h3,h4,h5,h6,p,span,label,li,td,th{color:inherit}
+.dm-toggle{width:40px;height:22px;border-radius:999px;border:none;cursor:pointer;position:relative;background:#e2e8f0;transition:background .3s;flex-shrink:0;outline:none}
+.dm-toggle.on{background:linear-gradient(135deg,#4f46e5,#7c3aed)}
+.dm-toggle::after{content:'';position:absolute;top:2px;left:2px;width:18px;height:18px;border-radius:50%;background:#fff;transition:transform .3s;box-shadow:0 1px 4px rgba(0,0,0,.2)}
+.dm-toggle.on::after{transform:translateX(18px)}
+.dm-icon{font-size:.85rem;cursor:pointer}
+
+
+/* ═══ COOKIE CONSENT BANNER ════════════════════════════════ */
+#cookieBanner{
+  position:fixed;bottom:0;left:0;right:0;z-index:9998;
+  background:linear-gradient(135deg,#0F172A,#1E293B);
+  border-top:2px solid #2563EB;
+  padding:16px 32px;
+  display:flex;align-items:center;justify-content:space-between;
+  flex-wrap:wrap;gap:12px;
+  box-shadow:0 -4px 24px rgba(0,0,0,.3);
+  transform:translateY(100%);transition:transform .4s ease;
+}
+#cookieBanner.visible{transform:translateY(0)}
+.cookie-text{font-size:.78rem;color:#CBD5E1;line-height:1.6;max-width:700px}
+.cookie-text a{color:#60A5FA;text-decoration:none;font-weight:600}
+.cookie-text a:hover{text-decoration:underline}
+.cookie-actions{display:flex;gap:8px;flex-shrink:0}
+.cookie-btn-accept{
+  background:linear-gradient(135deg,#2563EB,#4F46E5);color:#fff;
+  border:none;border-radius:8px;padding:8px 20px;font-size:.74rem;
+  font-weight:700;cursor:pointer;font-family:var(--wfi-font);
+  box-shadow:0 4px 12px rgba(37,99,235,.4);transition:all .2s;
+}
+.cookie-btn-accept:hover{transform:translateY(-1px);box-shadow:0 6px 16px rgba(37,99,235,.5)}
+.cookie-btn-settings{
+  background:transparent;color:#94A3B8;
+  border:1.5px solid #334155;border-radius:8px;padding:8px 16px;font-size:.74rem;
+  font-weight:700;cursor:pointer;font-family:var(--wfi-font);transition:all .2s;
+}
+.cookie-btn-settings:hover{color:#F1F5F9;border-color:#64748B}
+.cookie-btn-decline{
+  background:transparent;color:#64748B;border:none;
+  font-size:.7rem;cursor:pointer;font-family:var(--wfi-font);padding:4px 8px;
+}
+
+</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard – Workforce Intelligence</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="chat.css">
+  <style>
+
+/* ── UNIVERSAL SIDEBAR NAV ── */
+.wiq-wrap{display:flex;min-height:100vh}
+.wiq-sidebar{width:220px;min-width:220px;background:#0a1220;border-right:1px solid rgba(255,255,255,.07);position:sticky;top:0;height:100vh;overflow-y:auto;flex-shrink:0;transition:width .2s;z-index:200}
+.wiq-sidebar::-webkit-scrollbar{width:3px}.wiq-sidebar::-webkit-scrollbar-thumb{background:#1e3a5f}
+.wiq-sidebar-header{padding:14px 14px 10px;border-bottom:1px solid rgba(255,255,255,.07)}
+.wiq-logo{font-size:.9rem;font-weight:900;color:#fff;display:flex;align-items:center;gap:7px}
+.wiq-user-pill{display:flex;align-items:center;gap:7px;padding:8px 10px;margin:8px 0 4px;background:rgba(255,255,255,.04);border-radius:8px;font-size:.7rem;color:#64748b}
+.wiq-user-name{font-weight:700;color:#cbd5e1;font-size:.72rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:120px}
+.wiq-logout-btn{display:flex;align-items:center;gap:6px;padding:7px 10px;margin:0 6px 6px;background:rgba(220,38,38,.1);border:1px solid rgba(220,38,38,.2);border-radius:7px;color:#f87171;font-size:.72rem;font-weight:700;cursor:pointer;width:calc(100% - 12px);text-decoration:none;transition:all .15s}
+.wiq-logout-btn:hover{background:rgba(220,38,38,.2)}
+.wiq-nav-group{margin-bottom:2px}
+.wiq-nav-label{font-size:.59rem;font-weight:800;color:#1e3a5f;text-transform:uppercase;letter-spacing:.09em;padding:8px 14px 3px;cursor:pointer;display:flex;align-items:center;justify-content:space-between}
+.wiq-nav-label:hover{color:#334155}
+.wiq-nav-label .arr{font-size:.6rem;transition:.2s;color:#1e3a5f}
+.wiq-nav-items{display:flex;flex-direction:column;gap:1px;padding:0 6px 4px}
+.wiq-nav-item{display:flex;align-items:center;gap:7px;padding:5px 8px;border-radius:6px;font-size:.71rem;font-weight:600;color:#475569;text-decoration:none;transition:all .15s;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.wiq-nav-item:hover{background:rgba(37,99,235,.12);color:#60a5fa}
+.wiq-nav-item.active{background:rgba(37,99,235,.18);color:#60a5fa;font-weight:800}
+.wiq-nav-item .ico{font-size:.8rem;flex-shrink:0;width:16px;text-align:center}
+.wiq-main{flex:1;min-width:0;overflow-x:hidden}
+.wiq-collapsed .wiq-sidebar{width:48px}
+.wiq-collapsed .wiq-nav-item span,.wiq-collapsed .wiq-nav-label span:first-child,.wiq-collapsed .wiq-user-name,.wiq-collapsed .wiq-logo span,.wiq-collapsed .wiq-logout-btn span{display:none}
+.wiq-collapsed .wiq-nav-items{padding:0 3px}
+.wiq-collapsed .wiq-nav-item{justify-content:center;padding:6px}
+.wiq-collapsed .wiq-logout-btn{justify-content:center;padding:7px;margin:0 3px 4px}
+.wiq-toggle{background:none;border:none;color:#475569;cursor:pointer;padding:4px 8px;font-size:.75rem;display:flex;align-items:center;gap:4px;margin-left:auto}
+.wiq-toggle:hover{color:#60a5fa}
+@media(max-width:768px){.wiq-sidebar{position:fixed;left:-220px;top:0;transition:left .2s}.wiq-sidebar.open{left:0;box-shadow:4px 0 20px rgba(0,0,0,.5)}.wiq-mob-toggle{display:flex!important}}
+.wiq-mob-toggle{display:none;position:fixed;top:12px;left:12px;z-index:300;background:#1e3a5f;border:none;border-radius:8px;padding:7px 10px;color:#fff;font-size:.8rem;cursor:pointer}
+
+    .tab-nav { display:flex; gap:6px; flex-wrap:wrap; margin-bottom:20px; background:#f1f5f9; padding:8px; border-radius:14px; }
+    .tab-btn { padding:8px 16px; border:none; border-radius:10px; cursor:pointer; font-size:.85rem; font-weight:600; background:transparent; color:#64748b; transition:all .2s; }
+    .tab-btn.active { background:#fff; color:#2563eb; box-shadow:0 2px 8px rgba(37,99,235,.15); }
+    .tab-btn:hover:not(.active) { background:#e2e8f0; color:#334155; }
+    .tab-panel { display:none; } .tab-panel.active { display:block; }
+    .user-table { width:100%; border-collapse:collapse; font-size:.84rem; }
+    .user-table th { background:#f8fafc; padding:10px 12px; text-align:left; font-weight:700; color:#475569; border-bottom:2px solid #e2e8f0; }
+    .user-table td { padding:10px 12px; border-bottom:1px solid #f1f5f9; vertical-align:middle; }
+    .user-table tr:hover td { background:#f8fafc; }
+    .action-btn { padding:4px 10px; border:none; border-radius:6px; cursor:pointer; font-size:.78rem; font-weight:600; margin:2px; }
+    .btn-approve { background:#dcfce7; color:#15803d; }
+    .btn-suspend { background:#fef9c3; color:#854d0e; }
+    .btn-delete  { background:#fee2e2; color:#991b1b; }
+    .btn-edit    { background:#dbeafe; color:#1d4ed8; }
+    .btn-perms   { background:#ede9fe; color:#6d28d9; }
+    .btn-reset   { background:#f1f5f9; color:#475569; }
+    .pill { display:inline-block; padding:3px 10px; border-radius:999px; font-size:.75rem; font-weight:700; }
+    .pill-active   { background:#dcfce7; color:#15803d; }
+    .pill-pending  { background:#fef9c3; color:#854d0e; }
+    .pill-suspended{ background:#fee2e2; color:#991b1b; }
+    .dept-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(250px,1fr)); gap:14px; }
+    .dept-card { border:1.5px solid #e2e8f0; border-radius:14px; padding:18px; }
+    .dept-card:hover { border-color:#2563eb; box-shadow:0 4px 16px rgba(37,99,235,.1); }
+    .dept-count { font-size:2rem; font-weight:800; color:#2563eb; }
+    .modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,.5); z-index:999; align-items:center; justify-content:center; }
+    .modal-overlay.open { display:flex; }
+    .modal-box { background:#fff; border-radius:18px; padding:28px; width:min(520px,95vw); max-height:90vh; overflow-y:auto; box-shadow:0 20px 60px rgba(0,0,0,.2); }
+    .modal-title { font-size:1.1rem; font-weight:800; margin-bottom:18px; color:#1e293b; }
+    .modal-footer { display:flex; gap:8px; justify-content:flex-end; margin-top:20px; }
+    .perm-row { display:flex; align-items:center; justify-content:space-between; padding:10px 0; border-bottom:1px solid #f1f5f9; }
+    .perm-row:last-child { border-bottom:none; }
+    .toggle-switch { position:relative; display:inline-block; width:42px; height:24px; }
+    .toggle-switch input { opacity:0; width:0; height:0; }
+    .toggle-slider { position:absolute; cursor:pointer; top:0;left:0;right:0;bottom:0; background:#cbd5e1; border-radius:24px; transition:.3s; }
+    .toggle-slider:before { position:absolute; content:""; height:18px; width:18px; left:3px; bottom:3px; background:white; border-radius:50%; transition:.3s; }
+    input:checked + .toggle-slider { background:#2563eb; }
+    input:checked + .toggle-slider:before { transform:translateX(18px); }
+
+    /* ── DateTime/Weather Widget ── */
+    .dt-weather-bar{display:flex;align-items:center;gap:16px;background:linear-gradient(135deg,#1e3a8a,#2563eb);border-radius:16px;padding:14px 22px;margin-bottom:20px;flex-wrap:wrap;justify-content:space-between;box-shadow:0 4px 20px rgba(37,99,235,.3)}
+    .dt-left{display:flex;flex-direction:column}
+    .dt-time{font-size:2rem;font-weight:900;color:#fff;letter-spacing:1px;line-height:1}
+    .dt-date{font-size:.88rem;color:#93c5fd;margin-top:4px;font-weight:600}
+    .dt-right{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+    .weather-block{display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.12);border-radius:12px;padding:10px 16px}
+    .weather-icon{font-size:2rem}
+    .weather-info{display:flex;flex-direction:column}
+    .weather-temp{font-size:1.5rem;font-weight:800;color:#fff}
+    .weather-desc{font-size:.78rem;color:#bfdbfe;text-transform:capitalize}
+    .weather-city{font-size:.75rem;color:#93c5fd;margin-top:2px}
+    .weather-loading{color:#93c5fd;font-size:.85rem;animation:dtpulse 1.5s infinite}
+    @keyframes dtpulse{0%,100%{opacity:1}50%{opacity:.4}}
+    @media(max-width:600px){ .stats-row{grid-template-columns:1fr 1fr;} .tab-btn{font-size:.75rem;padding:6px 8px;} }
+  .toast{position:fixed;bottom:24px;right:24px;background:#1e293b;color:#fff;padding:13px 22px;border-radius:12px;font-size:.87rem;font-weight:600;z-index:9999;transform:translateY(80px);opacity:0;transition:all .3s;max-width:360px;word-break:break-word;box-shadow:0 8px 30px rgba(0,0,0,.25)}
+.toast.show{transform:translateY(0);opacity:1}
+.toast.success{background:#16a34a}
+.toast.error{background:#dc2626}
+.toast.warn{background:#d97706}
+</style>
+
+<style id="wfi-card-fix">
+.card,.stat-card,.kpi-card{margin-bottom:12px}
+.grid,.stats-grid{gap:14px}
+.export-bar{padding:10px 0;margin-bottom:12px}
+.tab-panel{padding:4px 0}
+.wiq-main{padding:16px 20px}
+@media(max-width:768px){.wiq-main{padding:12px}}
+/* Dark mode button always visible */
+#dmt,#dmToggle{display:flex!important;opacity:1!important;visibility:visible!important}
+/* Print improvements */
+@media print{
+  .wiq-sidebar,.navbar,.topbar,.export-bar,.wiq-mob-toggle{display:none!important}
+  .wiq-main,.main{margin:0!important;padding:20px!important;max-width:100%!important}
+  table{page-break-inside:avoid}
+  .card{page-break-inside:avoid;border:1px solid #e2e8f0!important}
+}
+</style>
+
+<style id="wiq-sb-css">
+
+
+/* ── UNIVERSAL SIDEBAR NAV ── */
+.wiq-wrap{display:flex;min-height:100vh}
+.wiq-sidebar{width:220px;min-width:220px;background:#0a1220;border-right:1px solid rgba(255,255,255,.07);position:sticky;top:0;height:100vh;overflow-y:auto;flex-shrink:0;transition:width .2s;z-index:200}
+.wiq-sidebar::-webkit-scrollbar{width:3px}.wiq-sidebar::-webkit-scrollbar-thumb{background:#1e3a5f}
+.wiq-sidebar-header{padding:14px 14px 10px;border-bottom:1px solid rgba(255,255,255,.07)}
+.wiq-logo{font-size:.9rem;font-weight:900;color:#fff;display:flex;align-items:center;gap:7px}
+.wiq-user-pill{display:flex;align-items:center;gap:7px;padding:8px 10px;margin:8px 0 4px;background:rgba(255,255,255,.04);border-radius:8px;font-size:.7rem;color:#64748b}
+.wiq-user-name{font-weight:700;color:#cbd5e1;font-size:.72rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:120px}
+.wiq-logout-btn{display:flex;align-items:center;gap:6px;padding:7px 10px;margin:0 6px 6px;background:rgba(220,38,38,.1);border:1px solid rgba(220,38,38,.2);border-radius:7px;color:#f87171;font-size:.72rem;font-weight:700;cursor:pointer;width:calc(100% - 12px);text-decoration:none;transition:all .15s}
+.wiq-logout-btn:hover{background:rgba(220,38,38,.2)}
+.wiq-nav-group{margin-bottom:2px}
+.wiq-nav-label{font-size:.59rem;font-weight:800;color:#1e3a5f;text-transform:uppercase;letter-spacing:.09em;padding:8px 14px 3px;cursor:pointer;display:flex;align-items:center;justify-content:space-between}
+.wiq-nav-label:hover{color:#334155}
+.wiq-nav-label .arr{font-size:.6rem;transition:.2s;color:#1e3a5f}
+.wiq-nav-items{display:flex;flex-direction:column;gap:1px;padding:0 6px 4px}
+.wiq-nav-item{display:flex;align-items:center;gap:7px;padding:5px 8px;border-radius:6px;font-size:.71rem;font-weight:600;color:#475569;text-decoration:none;transition:all .15s;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.wiq-nav-item:hover{background:rgba(37,99,235,.12);color:#60a5fa}
+.wiq-nav-item.active{background:rgba(37,99,235,.18);color:#60a5fa;font-weight:800}
+.wiq-nav-item .ico{font-size:.8rem;flex-shrink:0;width:16px;text-align:center}
+.wiq-main{flex:1;min-width:0;overflow-x:hidden}
+.wiq-collapsed .wiq-sidebar{width:48px}
+.wiq-collapsed .wiq-nav-item span,.wiq-collapsed .wiq-nav-label span:first-child,.wiq-collapsed .wiq-user-name,.wiq-collapsed .wiq-logo span,.wiq-collapsed .wiq-logout-btn span{display:none}
+.wiq-collapsed .wiq-nav-items{padding:0 3px}
+.wiq-collapsed .wiq-nav-item{justify-content:center;padding:6px}
+.wiq-collapsed .wiq-logout-btn{justify-content:center;padding:7px;margin:0 3px 4px}
+.wiq-toggle{background:none;border:none;color:#475569;cursor:pointer;padding:4px 8px;font-size:.75rem;display:flex;align-items:center;gap:4px;margin-left:auto}
+.wiq-toggle:hover{color:#60a5fa}
+@media(max-width:768px){.wiq-sidebar{position:fixed;left:-220px;top:0;transition:left .2s}.wiq-sidebar.open{left:0;box-shadow:4px 0 20px rgba(0,0,0,.5)}.wiq-mob-toggle{display:flex!important}}
+.wiq-mob-toggle{display:none;position:fixed;top:12px;left:12px;z-index:300;background:#1e3a5f;border:none;border-radius:8px;padding:7px 10px;color:#fff;font-size:.8rem;cursor:pointer}
+
+  body{background:#F0F4F8}
+  .page-wrap{max-width:1200px;margin:0 auto;padding:24px}
+  .card{background:#fff;border-radius:12px;padding:24px;margin-bottom:24px;box-shadow:0 2px 12px rgba(0,0,0,.08)}
+  .card h3{margin-top:0;color:#1B4F8A;font-size:1.1rem;margin-bottom:16px}
+  .btn{padding:9px 22px;border:none;border-radius:7px;font-weight:600;cursor:pointer;font-size:14px;transition:.15s}
+  .btn-primary{background:#1B4F8A;color:#fff} .btn-primary:hover{background:#1a3f72}
+  .btn-success{background:#27AE60;color:#fff} .btn-success:hover{background:#1e8449}
+  .btn-danger{background:#C0392B;color:#fff}  .btn-danger:hover{background:#a93226}
+  .btn-sm{padding:5px 14px;font-size:12px;border-radius:5px;border:none;font-weight:600;cursor:pointer}
+  .btn-outline{background:#fff;border:1.5px solid #1B4F8A;color:#1B4F8A}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+  .grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+  @media(max-width:700px){.grid2,.grid4{grid-template-columns:1fr}}
+  table{width:100%;border-collapse:collapse;font-size:13px}
+  th{background:#1B4F8A;color:#fff;padding:10px 12px;text-align:left;white-space:nowrap}
+  td{padding:9px 12px;border-bottom:1px solid #EEF2F7;vertical-align:middle}
+  tr:hover td{background:#F8FAFB}
+  .badge{padding:3px 10px;border-radius:12px;font-size:11px;font-weight:700}
+  .badge.present{background:#D5F5E3;color:#1E8449}
+  .badge.absent{background:#FADBD8;color:#C0392B}
+  .badge.late{background:#FEF9E7;color:#D4AC0D}
+  .badge.half_day{background:#D6EAF8;color:#1B4F8A}
+  .badge.leave{background:#EEF2F7;color:#5D6D7E}
+  #msg{padding:11px 16px;border-radius:8px;margin-bottom:16px;display:none;font-weight:600}
+  #msg.success{background:#D5F5E3;color:#1E8449;display:block}
+  #msg.error{background:#FADBD8;color:#C0392B;display:block}
+  .tabs{display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap}
+  .tab{padding:9px 22px;border-radius:8px;border:2px solid #BDC3C7;background:#fff;color:#5D6D7E;font-weight:600;cursor:pointer;font-size:14px}
+  .tab.active{background:#1B4F8A;color:#fff;border-color:#1B4F8A}
+  /* Clock widget */
+  .clock-card{background:linear-gradient(135deg,#1B4F8A,#2563eb);border-radius:12px;padding:28px;color:#fff;text-align:center}
+  .clock-time{font-size:3rem;font-weight:800;letter-spacing:2px;font-family:var(--wfi-font);margin-bottom:6px}
+  .clock-date{font-size:.95rem;opacity:.8;margin-bottom:20px}
+  .clock-status{background:rgba(255,255,255,.15);border-radius:8px;padding:10px 16px;font-size:.95rem;margin-bottom:20px}
+  .clock-status.clocked-in{background:rgba(39,174,96,.3)}
+  .clock-status.clocked-out{background:rgba(192,57,43,.2)}
+  .clock-btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+  .clock-btn{padding:12px 28px;border:none;border-radius:8px;font-size:15px;font-weight:700;cursor:pointer;transition:.15s}
+  .clock-btn.in{background:#27AE60;color:#fff} .clock-btn.in:hover{background:#1e8449}
+  .clock-btn.out{background:#C0392B;color:#fff} .clock-btn.out:hover{background:#a93226}
+  .clock-btn:disabled{opacity:.4;cursor:not-allowed}
+  /* Stat cards */
+  .stat-card{background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:10px;padding:16px;text-align:center}
+  .stat-num{font-size:2rem;font-weight:800;color:#1B4F8A}
+  .stat-label{font-size:.8rem;font-weight:700;color:#64748b;margin-top:3px;text-transform:uppercase;letter-spacing:.05em}
+  .stat-sub{font-size:.75rem;color:#94a3b8;margin-top:3px}
+  /* Today dot */
+  .today-dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px}
+  .dot-present{background:#27AE60}
+  .dot-absent{background:#C0392B}
+  .dot-late{background:#D4AC0D}
+  /* Form */
+  .form-group{margin-bottom:14px}
+  .form-group label{display:block;font-weight:600;color:#1B4F8A;margin-bottom:5px;font-size:13px}
+  .form-group input,.form-group select,.form-group textarea{width:100%;padding:9px 12px;border:1px solid #BDC3C7;border-radius:7px;font-size:14px;box-sizing:border-box}
+  .pbar{height:8px;background:#e2e8f0;border-radius:4px;overflow:hidden;margin-top:6px}
+  .pfill{height:100%;border-radius:4px;transition:width 1s ease}
+.toast{position:fixed;bottom:24px;right:24px;background:#1e293b;color:#fff;padding:13px 22px;border-radius:12px;font-size:.87rem;font-weight:600;z-index:9999;transform:translateY(80px);opacity:0;transition:all .3s;max-width:360px;word-break:break-word;box-shadow:0 8px 30px rgba(0,0,0,.25)}
+.toast.show{transform:translateY(0);opacity:1}
+.toast.success{background:#16a34a}
+.toast.error{background:#dc2626}
+.toast.warn{background:#d97706}
+
+/* ── TOPBAR FIXES  ─────────────────────────────── */
+.navbar,.wiq-topbar,nav.topbar{
+  display:flex!important;align-items:center!important;
+  padding:0 20px!important;height:54px!important;
+  background:#fff!important;
+  border-bottom:2px solid #e8f0ff!important;
+  position:sticky!important;top:0!important;z-index:100!important;
+  gap:12px!important;flex-wrap:nowrap!important;
+  box-shadow:0 1px 8px rgba(37,99,235,.08)!important;
+}
+.nav-brand{
+  font-size:.88rem!important;font-weight:900!important;
+  color:#1E3A5F!important;white-space:nowrap!important;
+  display:flex!important;align-items:center!important;gap:6px!important;
+  flex-shrink:0!important;letter-spacing:-.01em!important;
+}
+.nav-brand .logo-icon{
+  width:28px!important;height:28px!important;
+  background:linear-gradient(135deg,#2563EB,#7C3AED)!important;
+  border-radius:7px!important;display:inline-flex!important;
+  align-items:center!important;justify-content:center!important;
+  font-size:.9rem!important;flex-shrink:0!important;
+}
+.nav-brand .logo-text{
+  font-size:.85rem!important;font-weight:900!important;color:#1E3A5F!important;
+}
+.nav-brand .logo-version{
+  font-size:.55rem!important;font-weight:700!important;
+  color:#2563EB!important;background:#EFF6FF!important;
+  padding:1px 5px!important;border-radius:4px!important;
+  border:1px solid #BFDBFE!important;
+}
+.nav-info{
+  display:flex!important;align-items:center!important;
+  gap:8px!important;flex-shrink:0!important;margin-left:auto!important;
+}
+.nav-divider{width:1px!important;height:20px!important;background:#E2E8F0!important}
+
+/* ── CARD COLOR SHADOWS ─────────────────────────────── */
+.card,.wiq-card,[class*="-card"]{
+  transition:all .25s cubic-bezier(.34,1.56,.64,1)!important;
+  border-radius:12px!important;
+}
+.card:hover,.wiq-card:hover{
+  transform:translateY(-4px) scale(1.006)!important;
+  box-shadow:0 12px 32px rgba(37,99,235,.18),
+             0 2px 8px rgba(37,99,235,.1)!important;
+}
+/* Module-specific card shadows */
+.card-payroll:hover{box-shadow:0 12px 32px rgba(5,150,105,.18)!important}
+.card-leave:hover{box-shadow:0 12px 32px rgba(245,158,11,.18)!important}
+.card-alert:hover{box-shadow:0 12px 32px rgba(220,38,38,.18)!important}
+
+/* ── BUTTON SYSTEM ─────────────────────────────────── */
+.btn{
+  display:inline-flex!important;align-items:center!important;
+  gap:5px!important;padding:7px 16px!important;
+  border-radius:8px!important;font-size:.76rem!important;
+  font-weight:700!important;cursor:pointer!important;
+  border:none!important;transition:all .2s!important;
+  white-space:nowrap!important;font-family:var(--wfi-font);
+}
+.btn-primary{
+  background:linear-gradient(135deg,#2563EB,#1D4ED8)!important;
+  color:#fff!important;
+  box-shadow:0 2px 8px rgba(37,99,235,.3)!important;
+}
+.btn-primary:hover{
+  background:linear-gradient(135deg,#1D4ED8,#1E40AF)!important;
+  box-shadow:0 4px 14px rgba(37,99,235,.4)!important;
+  transform:translateY(-1px)!important;
+}
+.btn-outline,.btn-sm.btn-outline{
+  background:#fff!important;color:#2563EB!important;
+  border:1.5px solid #BFDBFE!important;
+  padding:5px 13px!important;font-size:.72rem!important;
+}
+.btn-outline:hover{
+  background:#EFF6FF!important;
+  border-color:#2563EB!important;
+  box-shadow:0 2px 8px rgba(37,99,235,.15)!important;
+}
+.btn-danger{
+  background:linear-gradient(135deg,#DC2626,#B91C1C)!important;
+  color:#fff!important;
+}
+.btn-danger:hover{box-shadow:0 4px 14px rgba(220,38,38,.35)!important}
+.btn-success{
+  background:linear-gradient(135deg,#059669,#047857)!important;
+  color:#fff!important;
+}
+.btn-success:hover{box-shadow:0 4px 14px rgba(5,150,105,.35)!important}
+.btn-sm{padding:5px 12px!important;font-size:.7rem!important}
+.btn-lg{padding:10px 22px!important;font-size:.82rem!important}
+
+/* ── STATUS BADGES ─────────────────────────────────── */
+.badge,.status-badge,[class*=badge]{
+  display:inline-flex!important;align-items:center!important;
+  padding:3px 10px!important;border-radius:999px!important;
+  font-size:.62rem!important;font-weight:800!important;
+  text-transform:uppercase!important;letter-spacing:.04em!important;
+}
+
+/* ── SIDEBAR BRAND ─────────────────────────────────── */
+.wiq-logo{
+  display:flex!important;align-items:center!important;
+  gap:8px!important;padding:0 4px!important;
+}
+.wiq-logo .logo-mark{
+  width:32px!important;height:32px!important;
+  background:linear-gradient(135deg,#2563EB,#7C3AED)!important;
+  border-radius:9px!important;display:flex!important;
+  align-items:center!important;justify-content:center!important;
+  font-size:1rem!important;flex-shrink:0!important;
+  box-shadow:0 4px 12px rgba(37,99,235,.35)!important;
+}
+.wiq-logo span{
+  font-weight:900!important;font-size:.82rem!important;
+  color:#F8FAFC!important;letter-spacing:-.01em!important;
+}
+
+/* ═══ DARK/LIGHT MODE  ════════════════════════════════════ */
+:root{--dm-bg:#F8FAFC;--dm-card:#ffffff;--dm-text:#1e293b;--dm-muted:#64748b;--dm-border:#e2e8f0;--dm-sidebar:#0a1220;--dm-topbar:#ffffff;--dm-input:#ffffff;--dm-hover:#f1f5f9}
+body.dark-mode{--dm-bg:#0B1120;--dm-card:#111827;--dm-text:#e2e8f0;--dm-muted:#94a3b8;--dm-border:#1e2d4a;--dm-sidebar:#060d18;--dm-topbar:#111827;--dm-input:#1e2d4a;--dm-hover:#1e293b}
+body{background:var(--dm-bg)!important;color:var(--dm-text)!important;transition:background .25s,color .25s}
+.wiq-sidebar,aside{background:var(--dm-sidebar)!important}
+.navbar,.wiq-topbar,nav{background:var(--dm-topbar)!important;border-bottom-color:var(--dm-border)!important}
+.card,.wiq-card,.stat-card,.kpi-card{background:var(--dm-card)!important;border-color:var(--dm-border)!important}
+main,.main-content,.wiq-content,.page-wrap{background:var(--dm-bg)!important}
+input:not([type=checkbox]):not([type=radio]),select,textarea,.form-input{background:var(--dm-input)!important;border-color:var(--dm-border)!important;color:var(--dm-text)!important}
+table{background:var(--dm-card)!important}thead tr{background:#1e3a5f!important}tbody tr:hover{background:var(--dm-hover)!important}
+h1,h2,h3,h4,h5,h6,p,span,label,li,td,th{color:inherit}
+.dm-toggle{width:40px;height:22px;border-radius:999px;border:none;cursor:pointer;position:relative;background:#e2e8f0;transition:background .3s;flex-shrink:0;outline:none}
+.dm-toggle.on{background:linear-gradient(135deg,#4f46e5,#7c3aed)}
+.dm-toggle::after{content:'';position:absolute;top:2px;left:2px;width:18px;height:18px;border-radius:50%;background:#fff;transition:transform .3s;box-shadow:0 1px 4px rgba(0,0,0,.2)}
+.dm-toggle.on::after{transform:translateX(18px)}
+.dm-icon{font-size:.85rem;cursor:pointer}
+
+
+/* ═══ COOKIE CONSENT BANNER ════════════════════════════════ */
+#cookieBanner{
+  position:fixed;bottom:0;left:0;right:0;z-index:9998;
+  background:linear-gradient(135deg,#0F172A,#1E293B);
+  border-top:2px solid #2563EB;
+  padding:16px 32px;
+  display:flex;align-items:center;justify-content:space-between;
+  flex-wrap:wrap;gap:12px;
+  box-shadow:0 -4px 24px rgba(0,0,0,.3);
+  transform:translateY(100%);transition:transform .4s ease;
+}
+#cookieBanner.visible{transform:translateY(0)}
+.cookie-text{font-size:.78rem;color:#CBD5E1;line-height:1.6;max-width:700px}
+.cookie-text a{color:#60A5FA;text-decoration:none;font-weight:600}
+.cookie-text a:hover{text-decoration:underline}
+.cookie-actions{display:flex;gap:8px;flex-shrink:0}
+.cookie-btn-accept{
+  background:linear-gradient(135deg,#2563EB,#4F46E5);color:#fff;
+  border:none;border-radius:8px;padding:8px 20px;font-size:.74rem;
+  font-weight:700;cursor:pointer;font-family:var(--wfi-font);
+  box-shadow:0 4px 12px rgba(37,99,235,.4);transition:all .2s;
+}
+.cookie-btn-accept:hover{transform:translateY(-1px);box-shadow:0 6px 16px rgba(37,99,235,.5)}
+.cookie-btn-settings{
+  background:transparent;color:#94A3B8;
+  border:1.5px solid #334155;border-radius:8px;padding:8px 16px;font-size:.74rem;
+  font-weight:700;cursor:pointer;font-family:var(--wfi-font);transition:all .2s;
+}
+.cookie-btn-settings:hover{color:#F1F5F9;border-color:#64748B}
+.cookie-btn-decline{
+  background:transparent;color:#64748B;border:none;
+  font-size:.7rem;cursor:pointer;font-family:var(--wfi-font);padding:4px 8px;
+}
+
+
+/* ── Dropdown nav groups ── */
+.wiq-nav-group-label{cursor:pointer;user-select:none;display:flex;align-items:center;justify-content:space-between;padding:7px 16px;font-size:.67rem;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:#64748B}
+.wiq-dropdown-toggle:hover{color:#93C5FD;background:rgba(37,99,235,.07);border-radius:8px}
+.wiq-arrow{font-size:.6rem;transition:transform .2s;flex-shrink:0}
+.wiq-dropdown-body{max-height:0;overflow:hidden;transition:max-height .3s ease}
+.wiq-dropdown-body.open{max-height:800px}
+/* ── Nav icons ── */
+.wiq-nav-item a .ico{width:20px;text-align:center;font-size:.88rem;flex-shrink:0}
+/* ── Active link highlight ── */
+.wiq-nav-item a.active,.wiq-nav-item a:has(.ico):hover{background:rgba(37,99,235,.15);color:#93C5FD}
+/* ── Logo ── */
+.wiq-logo-icon{width:32px;height:32px;background:linear-gradient(135deg,#1D4ED8,#6D28D9);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0}
+.wiq-logo-name{font-size:.78rem;font-weight:900;color:#E2E8F0;line-height:1.2}
+.wiq-logo-badge{font-size:.55rem;color:#60A5FA;background:rgba(37,99,235,.2);padding:1px 7px;border-radius:999px;margin-top:3px;display:inline-block;font-weight:700;letter-spacing:.05em}
+/* ── Card & Margin global fixes ── */
+.card,.stat-card,.kpi-card,.metric-card{margin-bottom:14px!important;border-radius:12px!important}
+.grid,.stats-grid,.kpi-grid{gap:14px!important}
+.wiq-main{padding:20px 24px!important;display:flex;flex-direction:column;min-height:100vh}
+.export-bar{padding:10px 0!important;margin-bottom:12px!important;display:flex;gap:8px;flex-wrap:wrap}
+@media(max-width:768px){
+  .wiq-mob-toggle{display:flex!important;align-items:center;justify-content:center}
+  .wiq-sidebar{position:fixed!important;left:-270px;top:0;height:100vh;z-index:500;transition:left .3s;overflow-y:auto}
+  .wiq-sidebar.open{left:0!important;box-shadow:4px 0 20px rgba(0,0,0,.5)}
+  .wiq-wrap{flex-direction:column}
+  .wiq-main{margin-left:0!important;padding:14px 16px!important}
+}
+/* ── Print ── */
+@media print{.wiq-sidebar,.wiq-mob-toggle,.export-bar,.cookie-banner,#ckb,#cookieBanner{display:none!important}.wiq-main{margin:0!important;padding:20px!important;max-width:100%!important}.card{page-break-inside:avoid;border:1px solid #e2e8f0!important}}
+</style>
+  <link rel="stylesheet" href="/workspace.css">
+  <script src="/workspace.js" defer></script>
+  <link rel="stylesheet" href="/navigation.css">
+  <script src="/navigation.js" defer></script>
+
+<script src="/appearance.js" defer></script>
+
+<link rel="stylesheet" href="/preferences.css">
+<link rel="stylesheet" href="/theme.css">
+</head>
+<body><button class="wiq-mob-toggle" onclick="openMobSidebar()" id="mobToggleBtn" style="display:none;position:fixed;top:14px;left:14px;z-index:600;background:#2563EB;color:#fff;border:none;border-radius:9px;padding:9px 13px;cursor:pointer;font-size:1rem;box-shadow:0 4px 16px rgba(37,99,235,.45)">&#9776;</button>
+<div class="wiq-wrap">
+<div class="wiq-sidebar" id="wiqSidebar">
+  <div class="wiq-sidebar-header">
+    <div class="wiq-logo">
+      <div class="wiq-logo-icon">&#9889;</div>
+      <div class="wiq-logo-text">
+        <span class="wiq-logo-name">Workforce<br>Intelligence</span>
+        <span class="wiq-logo-badge">Enterprise HRMS</span>
+      </div>
+    </div>
+    <div class="wiq-user-pill">
+      <span class="wiq-user-avatar">&#128100;</span>
+      <span class="wiq-user-name" id="sidebarUserName">Loading...</span>
+      <button class="wiq-tog" onclick="window.tdm&&window.tdm()" id="dmt" title="Toggle dark mode" style="width:28px;height:16px;border-radius:8px;border:none;background:#334155;cursor:pointer;flex-shrink:0"></button>
+    </div>
+  </div>
+  <nav class="wiq-nav">
+
+    <!-- DASHBOARDS -->
+    <div class="wiq-nav-group">
+      <div class="wiq-nav-group-label">Dashboards</div>
+      <div class="wiq-nav-item"><a href="admin-dashboard.html"><span class="ico">&#9711;</span><span>Admin Dashboard</span></a></div>
+      <div class="wiq-nav-item"><a href="employee-dashboard.html"><span class="ico">&#128100;</span><span>Employee Dashboard</span></a></div>
+      <div class="wiq-nav-item"><a href="manager.html"><span class="ico">&#128084;</span><span>Manager Dashboard</span></a></div>
+      <div class="wiq-nav-item"><a href="activity-history.html"><span class="ico">&#128203;</span><span>Activity History</span></a></div>
+    </div>
+
+    <!-- HR MANAGEMENT (dropdown) -->
+    <div class="wiq-nav-group">
+      <div class="wiq-nav-group-label wiq-dropdown-toggle" onclick="toggleGroup('grp-hr')">
+        &#128101; HR Management <span class="wiq-arrow" id="arr-hr">&#9660;</span>
+      </div>
+      <div id="grp-hr" class="wiq-dropdown-body">
+        <div class="wiq-nav-item"><a href="attendance.html"><span class="ico">&#128336;</span><span>Attendance</span></a></div>
+        <div class="wiq-nav-item"><a href="leave.html"><span class="ico">&#127964;</span><span>Leave Management</span></a></div>
+        <div class="wiq-nav-item"><a href="hiring.html"><span class="ico">&#127919;</span><span>Hiring & ATS</span></a></div>
+        <div class="wiq-nav-item"><a href="onboarding.html"><span class="ico">&#128640;</span><span>Onboarding</span></a></div>
+        <div class="wiq-nav-item"><a href="performance.html"><span class="ico">&#128202;</span><span>Performance</span></a></div>
+        <div class="wiq-nav-item"><a href="training.html"><span class="ico">&#127891;</span><span>Training & LMS</span></a></div>
+        <div class="wiq-nav-item"><a href="goals-okr.html"><span class="ico">&#127942;</span><span>Goals & OKR</span></a></div>
+        <div class="wiq-nav-item"><a href="exit.html"><span class="ico">&#128682;</span><span>Exit Management</span></a></div>
+        <div class="wiq-nav-item"><a href="employee-directory.html"><span class="ico">&#128101;</span><span>Employee Directory</span></a></div>
+        <div class="wiq-nav-item"><a href="org-chart.html"><span class="ico">&#127961;</span><span>Org Chart</span></a></div>
+        <div class="wiq-nav-item"><a href="shift-roster.html"><span class="ico">&#128197;</span><span>Shift Roster</span></a></div>
+        <div class="wiq-nav-item"><a href="shift-bidding.html"><span class="ico">&#128260;</span><span>Shift Bidding</span></a></div>
+        <div class="wiq-nav-item"><a href="wfh-tracker.html"><span class="ico">&#127968;</span><span>WFH Tracker</span></a></div>
+        <div class="wiq-nav-item"><a href="time-tracker.html"><span class="ico">&#9201;</span><span>Time Tracker</span></a></div>
+        <div class="wiq-nav-item"><a href="regularization.html"><span class="ico">&#128393;</span><span>Regularisation</span></a></div>
+      </div>
+    </div>
+
+    <!-- PAYROLL & FINANCE (dropdown) -->
+    <div class="wiq-nav-group">
+      <div class="wiq-nav-group-label wiq-dropdown-toggle" onclick="toggleGroup('grp-pay')">
+        &#128176; Payroll & Finance <span class="wiq-arrow" id="arr-pay">&#9660;</span>
+      </div>
+      <div id="grp-pay" class="wiq-dropdown-body">
+        <div class="wiq-nav-item"><a href="salary.html"><span class="ico">&#128176;</span><span>Payroll Processing</span></a></div>
+        <div class="wiq-nav-item"><a href="payslip-portal.html"><span class="ico">&#128196;</span><span>Payslip Portal</span></a></div>
+        <div class="wiq-nav-item"><a href="salary-revision.html"><span class="ico">&#128200;</span><span>Salary Revision</span></a></div>
+        <div class="wiq-nav-item"><a href="salary-advance.html"><span class="ico">&#128179;</span><span>Salary Advance</span></a></div>
+        <div class="wiq-nav-item"><a href="tax-portal.html"><span class="ico">&#129534;</span><span>TDS / Tax Portal</span></a></div>
+        <div class="wiq-nav-item"><a href="investment-declaration.html"><span class="ico">&#128209;</span><span>IT Declaration</span></a></div>
+        <div class="wiq-nav-item"><a href="form-24q.html"><span class="ico">&#127963;</span><span>Form 24Q</span></a></div>
+        <div class="wiq-nav-item"><a href="statutory-bonus.html"><span class="ico">&#127873;</span><span>Statutory Bonus</span></a></div>
+        <div class="wiq-nav-item"><a href="lwf-tracker.html"><span class="ico">&#127963;</span><span>LWF Tracker</span></a></div>
+        <div class="wiq-nav-item"><a href="benefits.html"><span class="ico">&#127973;</span><span>Benefits & Perks</span></a></div>
+        <div class="wiq-nav-item"><a href="loan-portal.html"><span class="ico">&#127991;</span><span>Loan Portal</span></a></div>
+        <div class="wiq-nav-item"><a href="banking.html"><span class="ico">&#127970;</span><span>Banking</span></a></div>
+      </div>
+    </div>
+
+    <!-- COMPLIANCE (dropdown) -->
+    <div class="wiq-nav-group">
+      <div class="wiq-nav-group-label wiq-dropdown-toggle" onclick="toggleGroup('grp-comp')">
+        &#9878;&#65039; Compliance <span class="wiq-arrow" id="arr-comp">&#9660;</span>
+      </div>
+      <div id="grp-comp" class="wiq-dropdown-body">
+        <div class="wiq-nav-item"><a href="compliance.html"><span class="ico">&#9878;&#65039;</span><span>Statutory Compliance</span></a></div>
+        <div class="wiq-nav-item"><a href="posh-complaints.html"><span class="ico">&#128737;</span><span>POSH / ICC</span></a></div>
+        <div class="wiq-nav-item"><a href="privacy-policy.html"><span class="ico">&#128274;</span><span>Privacy Policy</span></a></div>
+        <div class="wiq-nav-item"><a href="cookie-policy.html"><span class="ico">&#127850;</span><span>Cookie Policy</span></a></div>
+        <div class="wiq-nav-item"><a href="security-policy.html"><span class="ico">&#128737;</span><span>Security Policy</span></a></div>
+        <div class="wiq-nav-item"><a href="company-policies.html"><span class="ico">&#128220;</span><span>Company Policies</span></a></div>
+      </div>
+    </div>
+
+    <!-- AI & INTELLIGENCE -->
+    <div class="wiq-nav-group">
+      <div class="wiq-nav-group-label wiq-dropdown-toggle" onclick="toggleGroup('grp-ai')">
+        &#129302; AI & Intelligence <span class="wiq-arrow" id="arr-ai">&#9660;</span>
+      </div>
+      <div id="grp-ai" class="wiq-dropdown-body">
+        <div class="wiq-nav-item"><a href="ai-assistant.html"><span class="ico">&#129302;</span><span>AI Assistant</span></a></div>
+        <div class="wiq-nav-item"><a href="hr-copilot.html"><span class="ico">&#129504;</span><span>HR Copilot</span></a></div>
+        <div class="wiq-nav-item"><a href="ai-insights.html"><span class="ico">&#128202;</span><span>AI Insights</span></a></div>
+      </div>
+    </div>
+
+    <!-- SECURITY (dropdown) -->
+    <div class="wiq-nav-group">
+      <div class="wiq-nav-group-label wiq-dropdown-toggle" onclick="toggleGroup('grp-sec')">
+        &#128737; Security <span class="wiq-arrow" id="arr-sec">&#9660;</span>
+      </div>
+      <div id="grp-sec" class="wiq-dropdown-body">
+        <div class="wiq-nav-item"><a href="fraud-detection.html"><span class="ico">&#128269;</span><span>Fraud Detection</span></a></div>
+        <div class="wiq-nav-item"><a href="cybersecurity.html"><span class="ico">&#128737;</span><span>Cybersecurity</span></a></div>
+        <div class="wiq-nav-item"><a href="threat-monitor.html"><span class="ico">&#128308;</span><span>Threat Monitor</span></a></div>
+        <div class="wiq-nav-item"><a href="audit-log.html"><span class="ico">&#128196;</span><span>Audit Log</span></a></div>
+        <div class="wiq-nav-item"><a href="session-management.html"><span class="ico">&#128273;</span><span>Session Mgmt</span></a></div>
+      </div>
+    </div>
+
+    <!-- ANALYTICS (dropdown) -->
+    <div class="wiq-nav-group">
+      <div class="wiq-nav-group-label wiq-dropdown-toggle" onclick="toggleGroup('grp-ana')">
+        &#128202; Analytics <span class="wiq-arrow" id="arr-ana">&#9660;</span>
+      </div>
+      <div id="grp-ana" class="wiq-dropdown-body">
+        <div class="wiq-nav-item"><a href="analytics.html"><span class="ico">&#128200;</span><span>Analytics Dashboard</span></a></div>
+        <div class="wiq-nav-item"><a href="reports.html"><span class="ico">&#128209;</span><span>Reports Center</span></a></div>
+        <div class="wiq-nav-item"><a href="workforce-planning.html"><span class="ico">&#128202;</span><span>Workforce Planning</span></a></div>
+        <div class="wiq-nav-item"><a href="real-time-monitor.html"><span class="ico">&#128225;</span><span>Real-Time Monitor</span></a></div>
+        <div class="wiq-nav-item"><a href="headcount.html"><span class="ico">&#128101;</span><span>Headcount</span></a></div>
+        <div class="wiq-nav-item"><a href="diversity.html"><span class="ico">&#127752;</span><span>Diversity & DEI</span></a></div>
+      </div>
+    </div>
+
+    <!-- SAFETY & WELFARE (dropdown) -->
+    <div class="wiq-nav-group">
+      <div class="wiq-nav-group-label wiq-dropdown-toggle" onclick="toggleGroup('grp-safe')">
+        &#10084;&#65039; Welfare & Safety <span class="wiq-arrow" id="arr-safe">&#9660;</span>
+      </div>
+      <div id="grp-safe" class="wiq-dropdown-body">
+        <div class="wiq-nav-item"><a href="mental-health.html"><span class="ico">&#128156;</span><span>Mental Health & EAP</span></a></div>
+        <div class="wiq-nav-item"><a href="112-emergency.html"><span class="ico">&#128680;</span><span>112 Emergency & SOS</span></a></div>
+        <div class="wiq-nav-item"><a href="women-safety-policy.html"><span class="ico">&#127800;</span><span>Women Safety</span></a></div>
+        <div class="wiq-nav-item"><a href="cab-booking.html"><span class="ico">&#128663;</span><span>Cab & Transport</span></a></div>
+        <div class="wiq-nav-item"><a href="visitor-management.html"><span class="ico">&#127970;</span><span>Visitor Management</span></a></div>
+        <div class="wiq-nav-item"><a href="welfare.html"><span class="ico">&#10084;&#65039;</span><span>Welfare Hub</span></a></div>
+        <div class="wiq-nav-item"><a href="pulse-survey.html"><span class="ico">&#128202;</span><span>Pulse Survey</span></a></div>
+      </div>
+    </div>
+
+    <!-- EMPLOYEE SELF-SERVICE (dropdown) -->
+    <div class="wiq-nav-group">
+      <div class="wiq-nav-group-label wiq-dropdown-toggle" onclick="toggleGroup('grp-ess')">
+        &#128111; Self-Service <span class="wiq-arrow" id="arr-ess">&#9660;</span>
+      </div>
+      <div id="grp-ess" class="wiq-dropdown-body">
+        <div class="wiq-nav-item"><a href="employee-self-service.html"><span class="ico">&#128111;</span><span>Self-Service Portal</span></a></div>
+        <div class="wiq-nav-item"><a href="profile.html"><span class="ico">&#128100;</span><span>My Profile</span></a></div>
+        <div class="wiq-nav-item"><a href="document-vault.html"><span class="ico">&#128193;</span><span>Document Vault</span></a></div>
+        <div class="wiq-nav-item"><a href="expenses.html"><span class="ico">&#128184;</span><span>Expenses</span></a></div>
+        <div class="wiq-nav-item"><a href="tasks.html"><span class="ico">&#9989;</span><span>My Tasks</span></a></div>
+        <div class="wiq-nav-item"><a href="helpdesk.html"><span class="ico">&#127916;</span><span>IT Helpdesk</span></a></div>
+        <div class="wiq-nav-item"><a href="announcements.html"><span class="ico">&#128226;</span><span>Announcements</span></a></div>
+        <div class="wiq-nav-item"><a href="notifications.html"><span class="ico">&#128276;</span><span>Notifications</span></a></div>
+        <div class="wiq-nav-item"><a href="festival-calendar.html"><span class="ico">&#127881;</span><span>Festival Calendar</span></a></div>
+      </div>
+    </div>
+
+    <!-- BIOMETRICS (dropdown) -->
+    <div class="wiq-nav-group">
+      <div class="wiq-nav-group-label wiq-dropdown-toggle" onclick="toggleGroup('grp-bio')">
+        &#128272; Biometrics <span class="wiq-arrow" id="arr-bio">&#9660;</span>
+      </div>
+      <div id="grp-bio" class="wiq-dropdown-body">
+        <div class="wiq-nav-item"><a href="face-recognition.html"><span class="ico">&#128065;&#65039;</span><span>Face Recognition</span></a></div>
+        <div class="wiq-nav-item"><a href="biometric-enrollment.html"><span class="ico">&#128272;</span><span>Biometric Enrollment</span></a></div>
+      </div>
+    </div>
+
+    <!-- ADMIN (dropdown) -->
+    <div class="wiq-nav-group">
+      <div class="wiq-nav-group-label wiq-dropdown-toggle" onclick="toggleGroup('grp-adm')">
+        &#9881;&#65039; Administration <span class="wiq-arrow" id="arr-adm">&#9660;</span>
+      </div>
+      <div id="grp-adm" class="wiq-dropdown-body">
+        <div class="wiq-nav-item"><a href="settings.html"><span class="ico">&#9881;&#65039;</span><span>Settings</span></a></div>
+        <div class="wiq-nav-item"><a href="employee-grades.html"><span class="ico">&#127885;</span><span>Employee Grades</span></a></div>
+        <div class="wiq-nav-item"><a href="assets.html"><span class="ico">&#127963;</span><span>Assets</span></a></div>
+        <div class="wiq-nav-item"><a href="data-export.html"><span class="ico">&#128228;</span><span>Data Export</span></a></div>
+        <div class="wiq-nav-item"><a href="registration-tracker.html"><span class="ico">&#128203;</span><span>Registration Tracker</span></a></div>
+      </div>
+    </div>
+
+    <!-- LOGOUT -->
+    <div class="wiq-nav-group" style="margin-top:auto;padding-top:8px;border-top:1px solid rgba(255,255,255,.07)">
+      <div class="wiq-nav-item"><a href="#" onclick="window.logout&&window.logout();return false;" style="color:#EF4444!important"><span class="ico">&#128682;</span><span>Logout</span></a></div>
+    </div>
+
+  </nav>
+</div>
+
+<div class="wiq-main">
+
+  <nav class="navbar" style="display:flex;align-items:center;padding:0 16px;height:56px;background:#fff;border-bottom:1px solid #e2e8f0;position:sticky;top:0;z-index:100;gap:12px">
+    <div class="nav-brand" style="font-weight:900;font-size:.9rem;color:#1e3a5f;white-space:nowrap;flex-shrink:0">
+      <span style="font-size:1rem">⚡</span> Workforce Intelligence
+    </div>
+    <div style="flex:1"></div>
+    <div class="nav-info" style="display:flex;align-items:center;gap:8px;flex-shrink:0">
+      <a href="analytics.html" class="btn btn-sm btn-outline" style="font-size:.72rem;padding:5px 10px;white-space:nowrap">&#128202; Analytics</a>
+      <a href="reports.html" class="btn btn-sm btn-outline" style="font-size:.72rem;padding:5px 10px;white-space:nowrap">&#128202; Reports</a>
+      <a href="chat.html" class="btn btn-sm" style="background:linear-gradient(135deg,#6ee7f7,#a78bfa);color:#000;font-size:.72rem;padding:5px 10px;white-space:nowrap">&#129302; AI Chat</a>
+      <span id="adminUserName" style="font-weight:700;font-size:.8rem;color:#1e293b;white-space:nowrap">Admin Test</span>
+      <span style="background:#dcfce7;color:#16a34a;font-size:.62rem;font-weight:800;padding:2px 8px;border-radius:999px">ADMIN</span>
+      <button onclick="logout()" class="btn btn-outline" style="font-size:.72rem;padding:5px 12px">Logout</button>
+    </div>
+  </nav>
+
+  <div class="dashboard">
+    <section class="wfi-dashboard-heading wfi-page-lead" aria-labelledby="wfi-dashboard-title">
+      <div>
+        <p id="wfi-dashboard-context" class="wfi-kicker">Administration</p>
+        <h1 id="wfi-dashboard-title">Admin dashboard</h1>
+        <p data-workspace-greeting hidden></p>
+        <p>Manage employee records, tasks, attendance, and payroll.</p>
+      </div>
+      <div class="wfi-dashboard-actions"><a class="wfi-lead-primary" href="/modules.html">Browse live modules <span aria-hidden="true">↗</span></a>
+      <a id="build-requests-link" href="/build-requests.html" hidden>Build requests</a>
+      <a id="feedback-history-link" href="/feedback-history.html" hidden>Feedback history</a></div>
+    </section>
+
+    <!-- ═══ DATE / TIME / WEATHER BAR ═══ -->
+    <div class="dt-weather-bar wfi-local-time">
+      <div class="dt-left">
+        <div class="dt-time" id="liveTime">--:--:--</div>
+        <div class="dt-date" id="liveDate">Loading…</div>
+      </div>
+      <div class="dt-right">
+        <div class="weather-block" id="weatherBlock">
+          <span class="weather-loading">⛅ Loading weather…</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="stats-row">
+      <div class="stat-card"><div class="stat-num" id="statTotal">–</div><div class="stat-label">Total Tasks</div></div>
+      <div class="stat-card"><div class="stat-num green" id="statCompleted">–</div><div class="stat-label">Completed</div></div>
+      <div class="stat-card"><div class="stat-num red" id="statOverdue">–</div><div class="stat-label">Overdue Tasks</div></div>
+      <div class="stat-card"><div class="stat-num" id="statUsers">–</div><div class="stat-label">User records</div></div>
+      <div class="stat-card"><div class="stat-num orange" id="statPendingUsers">0</div><div class="stat-label">Pending Approvals</div></div>
+      <div class="stat-card"><div class="stat-num orange" id="statPendingLeaves">–</div><div class="stat-label">Pending Leaves</div></div>
+      <div class="stat-card"><div class="stat-num green" id="statPresent">–</div><div class="stat-label">Present Today</div></div>
+      <div class="stat-card"><div class="stat-num red" id="statUnpaidSalary">–</div><div class="stat-label">Unpaid Salaries</div></div>
+      <div class="stat-card" id="sosStatCard" style="display:none;border-left:4px solid #dc2626;cursor:pointer" onclick="location.href='sos-alerts.html'">
+        <div class="stat-num red" id="statSOS">0</div><div class="stat-label">🚨 Open SOS</div>
+      </div>
+    </div>
+
+    <!-- SOS Alert Widget -->
+    <div id="sosWidget" style="display:none;background:linear-gradient(135deg,#fef2f2,#fff1f1);border:1.5px solid #fca5a5;border-radius:14px;padding:16px 20px;margin-bottom:18px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+        <div style="font-size:.95rem;font-weight:800;color:#dc2626">🚨 Active SOS Alerts</div>
+        <a href="sos-alerts.html" style="font-size:.78rem;font-weight:700;color:#dc2626;text-decoration:none">View All →</a>
+      </div>
+      <div id="sosWidgetList" style="display:flex;flex-direction:column;gap:8px"></div>
+    </div>
+
+    <div class="tab-nav">
+      <button class="tab-btn active" onclick="switchTab(this,'tasks')">📋 Tasks</button>
+      <button class="tab-btn" onclick="switchTab(this,'users')">👥 Users</button>
+      <button class="tab-btn" onclick="switchTab(this,'teams')">🏢 Teams</button>
+      <button class="tab-btn" onclick="switchTab(this,'attendance')">📅 Attendance</button>
+      <button class="tab-btn" onclick="switchTab(this,'salary')">💰 Salary</button>
+      <button class="tab-btn" onclick="switchTab(this,'reports')">📈 Reports</button>
+    </div>
+
+    <!-- TASKS TAB -->
+    <div id="tab-tasks" class="tab-panel active">
+      <div class="grid-2">
+        <div class="card">
+          <h3>📋 Create Task</h3>
+          <div class="form-group"><label for="title">Title</label><input id="title" placeholder="Task title"></div>
+          <div class="form-group"><label for="description">Description</label><textarea id="description" rows="2" placeholder="Task description…"></textarea></div>
+          <div class="form-group"><label for="written_note">📝 Written Note</label><textarea id="written_note" rows="2" placeholder="Instructions, context…"></textarea></div>
+          <div class="form-group"><label for="task_file">📎 Attach File</label>
+            <input type="file" id="task_file" accept=".csv,.xlsx,.xls,.pdf,.txt,.json,.docx,.png,.jpg,.mp3,.wav,.m4a" style="border:none;padding:0">
+            <span id="fileUploadStatus" style="font-size:.8rem;color:#64748b"></span>
+          </div>
+          <div class="grid-2" style="gap:10px">
+            <div class="form-group"><label for="assigned_to">Assign To (Employee ID)</label><input id="assigned_to" type="number" placeholder="User ID"></div>
+            <div class="form-group"><label for="priority">Priority</label>
+              <select id="priority"><option value="Low">Low</option><option value="Medium" selected>Medium</option><option value="High">High</option></select>
+            </div>
+          </div>
+          <div class="grid-2" style="gap:10px">
+            <div class="form-group"><label for="due_date">Due Date</label><input id="due_date" type="date"></div>
+            <div class="form-group"><label for="timer_hours">⏱ Timer Window</label>
+              <select id="timer_hours"><option value="">No timer</option><option value="24">24 hours</option><option value="48">48 hours</option><option value="72">72 hours</option></select>
+            </div>
+          </div>
+          <button onclick="createTask()" class="btn btn-full">Create Task</button>
+          <p id="taskMsg" class="msg"></p>
+        </div>
+        <div class="card">
+          <h3>🔔 Overdue Alerts</h3>
+          <div id="alertList" class="scroll-list"><p class="empty-msg">Loading…</p></div>
+          <hr style="margin:16px 0">
+          <h3>⏳ Extension Requests</h3>
+          <div id="extensionList" class="scroll-list"><p class="empty-msg">Loading…</p></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header"><h3>📑 All Tasks</h3><button onclick="loadTasks()" class="btn btn-sm">Refresh</button></div>
+        <div id="taskList" class="task-grid"><p class="empty-msg">Loading tasks…</p></div>
+      </div>
+    </div>
+
+    <!-- USERS TAB -->
+    <div id="tab-users" class="tab-panel">
+      <div id="pendingBanner" style="display:none;background:linear-gradient(135deg,#fefce8,#fffbeb);border:2px solid #fde047;border-radius:14px;padding:18px;margin-bottom:16px">
+        <h3 style="color:#854d0e;margin-bottom:12px">🟡 Pending Registration Approvals</h3>
+        <div id="pendingUserList"></div>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <h3>👥 All Users</h3>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <input id="userSearch" placeholder="Search users…" style="padding:6px 12px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:.84rem;width:180px" oninput="filterUsers()">
+            <button onclick="loadAllUsers()" class="btn btn-sm">Refresh</button>
+          </div>
+        </div>
+        <div style="overflow-x:auto">
+          <table class="user-table">
+            <thead><tr><th>ID</th><th>Name</th><th>Email</th><th>Role</th><th>Department</th><th>Base Salary</th><th>Status</th><th>Access</th><th>Points</th><th>Actions</th></tr></thead>
+            <tbody id="userTableBody"><tr><td colspan="10" style="text-align:center;color:#94a3b8;padding:30px">Loading…</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- TEAMS TAB -->
+    <div id="tab-teams" class="tab-panel">
+      <div class="grid-2">
+        <div class="card">
+          <h3>➕ Create Department / Team</h3>
+          <div class="form-group"><label>Department Name</label><input id="deptName" placeholder="e.g. Engineering, HR…"></div>
+          <div class="form-group"><label>Description</label><textarea id="deptDesc" rows="2" placeholder="What does this team do?"></textarea></div>
+          <div class="form-group"><label>Team Manager (User ID)</label><input id="deptManager" type="number" placeholder="User ID of manager"></div>
+          <button onclick="createDepartment()" class="btn btn-full">Create Department</button>
+          <p id="deptMsg" class="msg"></p>
+        </div>
+        <div class="card">
+          <h3>👀 View Team Members</h3>
+          <div class="form-group"><label>Select Department</label>
+            <select id="deptViewSelect" onchange="loadDeptMembers()"><option value="">-- Select --</option></select>
+          </div>
+          <div id="deptMembersView" class="scroll-list" style="max-height:260px"><p class="empty-msg">Select a department</p></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header"><h3>🏢 All Departments</h3><button onclick="loadDepartments()" class="btn btn-sm">Refresh</button></div>
+        <div id="deptGrid" class="dept-grid"><p class="empty-msg">Loading…</p></div>
+      </div>
+    </div>
+
+    <!-- ATTENDANCE TAB -->
+    <div id="tab-attendance" class="tab-panel">
+      <div class="grid-2">
+        <div class="card">
+          <h3>✏️ Mark Attendance</h3>
+          <div class="form-group"><label>Employee ID</label><input id="attUserId" type="number" placeholder="User ID"></div>
+          <div class="form-group"><label>Date</label><input id="attDate" type="date"></div>
+          <div class="grid-2" style="gap:10px">
+            <div class="form-group"><label>Clock In</label><input id="attClockIn" type="time"></div>
+            <div class="form-group"><label>Clock Out</label><input id="attClockOut" type="time"></div>
+          </div>
+          <div class="form-group"><label>Status</label>
+            <select id="attStatus">
+              <option value="present">🟢 Present</option><option value="absent">🔴 Absent</option>
+              <option value="late">🟡 Late</option><option value="half_day">🔵 Half Day</option><option value="leave">⚪ Leave</option>
+            </select>
+          </div>
+          <div class="form-group"><label>Remarks</label><input id="attRemarks" placeholder="Optional remarks"></div>
+          <button onclick="markAttendance()" class="btn btn-full">Mark Attendance</button>
+          <p id="attMsg" class="msg"></p>
+        </div>
+        <div class="card">
+          <h3>📊 Monthly Summary</h3>
+          <div class="grid-2" style="gap:10px">
+            <div class="form-group"><label>Month</label>
+              <select id="sumMonth"><option value="1">January</option><option value="2">February</option><option value="3">March</option><option value="4">April</option><option value="5">May</option><option value="6">June</option><option value="7">July</option><option value="8">August</option><option value="9">September</option><option value="10">October</option><option value="11">November</option><option value="12">December</option></select>
+            </div>
+            <div class="form-group"><label>Year</label><input id="sumYear" type="number" value="2025"></div>
+          </div>
+          <button onclick="loadAttSummary()" class="btn btn-full btn-outline" style="margin-bottom:14px">Load Summary</button>
+          <div id="attSummaryList" class="scroll-list" style="max-height:260px"><p class="empty-msg">Select month & load</p></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header"><h3>📋 Attendance Log</h3>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <input id="attFilterUser" type="number" placeholder="User ID" style="padding:6px 10px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:.84rem;width:100px">
+            <input id="attFilterFrom" type="date" style="padding:6px 10px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:.84rem">
+            <input id="attFilterTo" type="date" style="padding:6px 10px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:.84rem">
+            <button onclick="loadAttendance()" class="btn btn-sm">Search</button>
+          </div>
+        </div>
+        <div style="overflow-x:auto">
+          <table class="user-table">
+            <thead><tr><th>Employee</th><th>Dept</th><th>Date</th><th>Clock In</th><th>Clock Out</th><th>Status</th><th>Remarks</th></tr></thead>
+            <tbody id="attLogBody"><tr><td colspan="7" style="text-align:center;color:#94a3b8;padding:30px">Use filters above and click Search</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- SALARY TAB -->
+    <div id="tab-salary" class="tab-panel">
+      <div class="grid-2">
+        <div class="card">
+          <h3>💰 Add / Update Salary Record</h3>
+          <div class="grid-2" style="gap:10px">
+            <div class="form-group"><label>Employee ID</label><input id="salUserId" type="number" placeholder="User ID"></div>
+            <div class="form-group"><label>Month</label>
+              <select id="salMonth"><option value="1">January</option><option value="2">February</option><option value="3">March</option><option value="4">April</option><option value="5">May</option><option value="6">June</option><option value="7">July</option><option value="8">August</option><option value="9">September</option><option value="10">October</option><option value="11">November</option><option value="12">December</option></select>
+            </div>
+          </div>
+          <div class="grid-2" style="gap:10px">
+            <div class="form-group"><label>Year</label><input id="salYear" type="number" value="2025"></div>
+            <div class="form-group"><label>Base Salary (₹)</label><input id="salBase" type="number" placeholder="0.00" oninput="previewNet()"></div>
+          </div>
+          <div class="grid-2" style="gap:10px">
+            <div class="form-group"><label>Bonus (₹)</label><input id="salBonus" type="number" placeholder="0.00" value="0" oninput="previewNet()"></div>
+            <div class="form-group"><label>Deductions (₹)</label><input id="salDed" type="number" placeholder="0.00" value="0" oninput="previewNet()"></div>
+          </div>
+          <div class="form-group"><label>Remarks</label><input id="salRemarks" placeholder="Optional remarks"></div>
+          <div id="salNetPreview" style="background:#f0fdf4;border:1.5px solid #86efac;border-radius:10px;padding:12px;margin-bottom:12px;display:none">
+            <b>Net Salary: <span id="salNetAmt" style="color:#15803d;font-size:1.2rem">₹0</span></b>
+          </div>
+          <label for="correctionReason">Correction reason (required for issued payslips)</label><input id="correctionReason" maxlength="500"><button onclick="saveSalary()" class="btn btn-full">Save Record</button>
+          <p id="salMsg" class="msg"></p>
+        </div>
+        <div class="card" style="background:linear-gradient(135deg,#f0f4ff,#f0fdf4)">
+          <h3>⚡ Bulk Generate Monthly Salaries</h3>
+          <p style="font-size:.85rem;color:#64748b;margin-bottom:14px">Auto-generate salary records for all active employees using their profile base salary.</p>
+          <div class="grid-2" style="gap:10px">
+            <div class="form-group"><label>Month</label>
+              <select id="genMonth"><option value="1">January</option><option value="2">February</option><option value="3">March</option><option value="4">April</option><option value="5">May</option><option value="6">June</option><option value="7">July</option><option value="8">August</option><option value="9">September</option><option value="10">October</option><option value="11">November</option><option value="12">December</option></select>
+            </div>
+            <div class="form-group"><label>Year</label><input id="genYear" type="number" value="2025"></div>
+          </div>
+          <button onclick="generateSalaries()" class="btn btn-full" style="background:#8b5cf6;margin-bottom:16px">⚡ Generate All Salaries</button>
+          <p id="genMsg" class="msg"></p>
+          <hr style="margin:12px 0">
+          <h3 style="margin-bottom:10px">🔍 Filter Records</h3>
+          <div class="grid-2" style="gap:10px">
+            <div class="form-group"><label>Month</label>
+              <select id="salFilterMonth"><option value="">All Months</option><option value="1">January</option><option value="2">February</option><option value="3">March</option><option value="4">April</option><option value="5">May</option><option value="6">June</option><option value="7">July</option><option value="8">August</option><option value="9">September</option><option value="10">October</option><option value="11">November</option><option value="12">December</option></select>
+            </div>
+            <div class="form-group"><label>Year</label><input id="salFilterYear" type="number" placeholder="e.g. 2025"></div>
+          </div>
+          <button onclick="loadSalaryRecords()" class="btn btn-full btn-outline">Load Records</button>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header"><h3>📋 Salary Records</h3><button onclick="loadSalaryRecords()" class="btn btn-sm">Refresh</button></div>
+        <div style="overflow-x:auto">
+          <table class="user-table">
+            <thead><tr><th>ID</th><th>Employee</th><th>Dept</th><th>Month/Year</th><th>Base (₹)</th><th>Bonus</th><th>Deductions</th><th>Net (₹)</th><th>Status</th><th>Action</th></tr></thead>
+            <tbody id="salaryTableBody"><tr><td colspan="10" style="text-align:center;color:#94a3b8;padding:30px">Load records using filter</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- REPORTS TAB -->
+    <div id="tab-reports" class="tab-panel">
+      <div class="card">
+        <div class="card-header"><h3>📈 Reports</h3><a href="reports.html" class="btn btn-sm">Open Report Centre →</a></div>
+        <p style="font-size:.85rem;color:#64748b;margin-bottom:14px">Quick-generate:</p>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px">
+          <button class="quick-report-btn" onclick="quickReport('Productivity','monthly')"><span>📊</span><span>Productivity<br><small>Monthly</small></span></button>
+          <button class="quick-report-btn" onclick="quickReport('Task Summary','weekly')"><span>📋</span><span>Task Summary<br><small>Weekly</small></span></button>
+          <button class="quick-report-btn" onclick="quickReport('Employee Performance','all')"><span>👥</span><span>Performance<br><small>All Time</small></span></button>
+          <button class="quick-report-btn" onclick="quickReport('Overdue Alert','all')"><span>⚠️</span><span>Overdue Alert<br><small>Live</small></span></button>
+        </div>
+        <p id="reportMsg" class="msg"></p>
+        <div id="reportList" class="scroll-list"></div>
+        <a href="reports.html" style="display:block;text-align:center;margin-top:10px;font-size:.85rem;color:#2563eb;font-weight:600;text-decoration:none">View all reports →</a>
+      </div>
+    </div>
+
+
+    <!-- ═══ CAB APPROVAL TAB (ADMIN) ═══ -->
+    <div id="tab-cab_approval" class="tab-panel">
+      <div class="card">
+        <div class="card-header">
+          <h3>🚌 Cab Booking Approvals</h3>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <select id="cabFilterStatus" onchange="loadCabApprovals()" style="padding:6px 10px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:.82rem">
+              <option value="">All Status</option>
+              <option value="pending" selected>Pending</option>
+              <option value="approved">Approved</option>
+              <option value="rejected">Rejected</option>
+              <option value="cancelled">Cancelled</option>
+            </select>
+            <input type="date" id="cabFilterDate" onchange="loadCabApprovals()" style="padding:6px 10px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:.82rem">
+            <button onclick="loadCabApprovals()" class="btn btn-sm">Refresh</button>
+          </div>
+        </div>
+        <div style="margin-bottom:12px;display:flex;gap:8px;flex-wrap:wrap"><a href="cab-drivers.html" class="btn btn-sm" style="background:linear-gradient(135deg,#1a56db,#0891b2);text-decoration:none">🧑‍✈️ Manage Drivers</a><a href="cab-tracking.html" class="btn btn-sm" style="background:#f0fdf4;color:#15803d;text-decoration:none">🗺️ Live Tracking</a><a href="cab-driver-panel.html" class="btn btn-sm" style="background:linear-gradient(135deg,#7c3aed,#2563eb);color:#fff;text-decoration:none">🧑‍✈️ Driver Panel</a></div>
+        <div id="cabApprovalStats" style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px"></div>
+        <div id="cabApprovalList"><p class="empty-msg">Loading…</p></div>
+      </div>
+    </div>
+
+
+    <!-- ═══ MEETINGS TAB (ADMIN) ═══ -->
+    <div id="tab-meetings" class="tab-panel">
+      <div class="card">
+        <div class="card-header">
+          <h3>📹 Meetings Overview</h3>
+          <a href="meetings.html" class="btn btn-sm" style="background:linear-gradient(135deg,#1a56db,#0891b2);text-decoration:none;color:#fff">Open Full Meeting Room →</a>
+        </div>
+        <div id="adminMeetingStats" style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px"></div>
+        <div style="overflow-x:auto">
+          <table class="user-table">
+            <thead><tr><th>Title</th><th>Type</th><th>Host</th><th>Scheduled</th><th>Status</th><th>Participants</th><th>Report</th></tr></thead>
+            <tbody id="adminMeetingBody"><tr><td colspan="7" style="text-align:center;color:#94a3b8;padding:20px">Loading…</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /.dashboard -->
+
+  <!-- EDIT USER MODAL -->
+  <div id="editUserModal" class="modal-overlay">
+    <div class="modal-box">
+      <div class="modal-title">✏️ Edit User</div>
+      <input type="hidden" id="editUserId">
+      <div class="form-group"><label>Full Name</label><input id="editFullName" placeholder="Full Name"></div>
+      <div class="form-group"><label>Email</label><input id="editEmail" type="email"></div>
+      <div class="form-group"><label>Role</label><select id="editRole"><option value="1">Admin</option><option value="2">Employee</option></select></div>
+      <div class="form-group"><label>Department</label><select id="editDept"><option value="">No Department</option></select></div>
+      <div class="form-group"><label>Base Salary (₹)</label><input id="editSalary" type="number" placeholder="0.00"></div>
+      <div class="form-group"><label>Phone</label><input id="editPhone" placeholder="Phone number"></div>
+      <div class="form-group"><label>Profile Notes</label><textarea id="editNotes" rows="2"></textarea></div>
+      <div class="modal-footer">
+        <button onclick="closeModal('editUserModal')" class="btn btn-sm btn-outline">Cancel</button>
+        <button onclick="saveEditUser()" class="btn btn-sm">Save Changes</button>
+      </div>
+      <p id="editUserMsg" class="msg"></p>
+    </div>
+  </div>
+
+  <!-- PERMISSIONS MODAL -->
+  <div id="permsModal" class="modal-overlay">
+    <div class="modal-box">
+      <div class="modal-title">🔐 Feature Access Permissions</div>
+      <p style="font-size:.85rem;color:#64748b;margin-bottom:16px">Control which platform features this employee can access.</p>
+      <input type="hidden" id="permsUserId">
+      <div class="perm-row"><span>📊 View Analytics Dashboard</span><label class="toggle-switch"><input type="checkbox" id="perm_analytics"><span class="toggle-slider"></span></label></div>
+      <div class="perm-row"><span>📈 View & Generate Reports</span><label class="toggle-switch"><input type="checkbox" id="perm_reports"><span class="toggle-slider"></span></label></div>
+      <div class="perm-row"><span>🤖 Use AI Chat Assistant</span><label class="toggle-switch"><input type="checkbox" id="perm_chat"><span class="toggle-slider"></span></label></div>
+      <div class="perm-row"><span>⏳ Request Task Extensions</span><label class="toggle-switch"><input type="checkbox" id="perm_extension"><span class="toggle-slider"></span></label></div>
+      <div class="perm-row"><span>💰 View Own Salary Slips</span><label class="toggle-switch"><input type="checkbox" id="perm_salary"><span class="toggle-slider"></span></label></div>
+      <div class="perm-row"><span>🏢 View Team Members</span><label class="toggle-switch"><input type="checkbox" id="perm_team"><span class="toggle-slider"></span></label></div>
+      <div class="modal-footer">
+        <button onclick="closeModal('permsModal')" class="btn btn-sm btn-outline">Cancel</button>
+        <button onclick="savePermissions()" class="btn btn-sm">Save Permissions</button>
+      </div>
+      <p id="permsMsg" class="msg"></p>
+    </div>
+  </div>
+
+  <!-- RESET PASSWORD MODAL -->
+  <div id="resetPwModal" class="modal-overlay">
+    <div class="modal-box">
+      <div class="modal-title">🔑 Reset User Password</div>
+      <input type="hidden" id="resetPwUserId">
+      <p>Verify the employee’s identity before issuing a reset link. Share it privately with that employee.</p>
+      <div class="form-group" id="resetPwLinkField" hidden><label for="resetPwLink">One-time reset link</label><input id="resetPwLink" type="url" readonly></div>
+      <div class="form-group"><label for="resetPwValue">New password (at least 8 characters)</label><input id="resetPwValue" type="password" placeholder="Enter new password"></div>
+      <div class="modal-footer">
+        <button onclick="closeModal('resetPwModal')" class="btn btn-sm btn-outline">Cancel</button>
+        <button type="button" id="generateResetLink" class="btn btn-sm btn-outline">Create reset link</button>
+        <button onclick="confirmResetPassword()" class="btn btn-sm" style="background:#dc2626">Reset Password</button>
+      </div>
+      <p id="resetPwMsg" class="msg"></p>
+    </div>
+  </div>
+
+  <!-- EDIT DEPARTMENT MODAL -->
+  <div id="editDeptModal" class="modal-overlay">
+    <div class="modal-box">
+      <div class="modal-title">✏️ Edit Department</div>
+      <input type="hidden" id="editDeptId">
+      <div class="form-group"><label>Department Name</label><input id="editDeptName"></div>
+      <div class="form-group"><label>Description</label><textarea id="editDeptDesc" rows="2"></textarea></div>
+      <div class="form-group"><label>Manager User ID</label><input id="editDeptMgr" type="number"></div>
+      <div class="modal-footer">
+        <button onclick="closeModal('editDeptModal')" class="btn btn-sm btn-outline">Cancel</button>
+        <button onclick="saveEditDept()" class="btn btn-sm">Save</button>
+      </div>
+      <p id="editDeptMsg" class="msg"></p>
+    </div>
+  </div>
+
+  <script src="app.js">
+const API = '/api';
+</script>
+  <script src="chat.js"></script>
+
+
+
+<div class="toast" id="toast"></div>
+</div></div>
+<script>
+
+function showToast(msg, ok, type) {
+  const t = document.getElementById('toast');
+  if (!t) return;
+  t.textContent = msg;
+  t.className = 'toast show';
+  if (type === 'success' || ok === true)  t.style.background = '#16a34a';
+  else if (type === 'error' || ok === false) t.style.background = '#dc2626';
+  else if (type === 'warn')  t.style.background = '#d97706';
+  else t.style.background = '#1e293b';
+  clearTimeout(t._timer);
+  t._timer = setTimeout(() => t.className = 'toast', 3500);
+}
+
+  var _allUsers=[]; var _depts=[];
+  var MONTHS=['','Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+  function switchTab(btn,name){
+    document.querySelectorAll('.tab-btn').forEach(function(b){b.classList.remove('active');});
+    document.querySelectorAll('.tab-panel').forEach(function(p){p.classList.remove('active');});
+    btn.classList.add('active');
+    document.getElementById('tab-'+name).classList.add('active');
+    if(name==='users'){loadAllUsers();loadPendingUsers();}
+    if(name==='teams'){loadDepartments();}
+    if(name==='attendance'){var d=document.getElementById('attDate');if(d)d.value=new Date().toISOString().slice(0,10);}
+    if(name==='reports'){loadReportList();}
+    if(name==='tasks'){loadTasks();loadAlerts();loadExtensionRequests();}
+  }
+  function openModal(id){document.getElementById(id).classList.add('open');}
+  function closeModal(id) {
+    document.getElementById(id).classList.remove('open');
+    if (id === 'resetPwModal') {
+      document.getElementById('resetPwUserId').value = '';
+      document.getElementById('resetPwLink').value = '';
+      document.getElementById('resetPwValue').value = '';
+    }
+  }
+
+  /* USERS */
+  async function loadAllUsers(){
+    try{var r=await fetch(API+'/admin/users',{headers:authHeaders()});_allUsers=await r.json();renderUserTable(_allUsers);setInner('statUsers',_allUsers.length);}catch(e){}
+  }
+  async function loadPendingUsers(){
+    try{
+      var r=await fetch(API+'/admin/users/pending',{headers:authHeaders()});
+      var p=await r.json(); setInner('statPendingUsers',p.length);
+      var banner=document.getElementById('pendingBanner');
+      var list=document.getElementById('pendingUserList');
+      if(!p.length){if(banner)banner.style.display='none';return;}
+      if(banner)banner.style.display='block';
+      list.innerHTML=p.map(function(u){
+        return '<div style="display:flex;align-items:center;justify-content:space-between;padding:10px;border:1px solid #fde047;border-radius:10px;margin-bottom:8px;background:#fff">'
+          +'<div><b>'+escHtml(u.full_name)+'</b> &nbsp;<span style="color:#64748b;font-size:.85rem">'+escHtml(u.email)+'</span>&nbsp;<span class="pill pill-pending">'+escHtml(u.role_name)+'</span></div>'
+          +'<div style="display:flex;gap:6px">'
+          +'<button class="action-btn btn-approve" onclick="approveUser('+u.user_id+')">\u2705 Approve</button>'
+          +'<button class="action-btn btn-delete" data-name="'+escHtml(u.full_name)+'" onclick="deleteUser('+u.user_id+',this.dataset.name)">\u274C Reject</button>'
+          +'</div></div>';
+      }).join('');
+    }catch(e){}
+  }
+  function filterUsers(){var q=document.getElementById('userSearch').value.toLowerCase();renderUserTable(_allUsers.filter(function(u){return(u.full_name+u.email+(u.role_name||'')+(u.dept_name||'')).toLowerCase().includes(q);}));}
+  function renderUserTable(users){
+    var body=document.getElementById('userTableBody');
+    if(!users||!users.length){body.innerHTML='<tr><td colspan="10" style="text-align:center;color:#94a3b8;padding:30px">No users found</td></tr>';return;}
+    body.innerHTML=users.map(function(u){
+      var st=u.status||'active';
+      var sc={active:'pill-active',pending:'pill-pending',suspended:'pill-suspended'}[st]||'pill-active';
+      return '<tr><td><b>#'+u.user_id+'</b></td><td>'+escHtml(u.full_name)+'</td><td style="font-size:.8rem">'+escHtml(u.email)+'</td>'
+        +'<td>'+escHtml(u.role_name)+'</td>'
+        +'<td>'+(u.dept_name?escHtml(u.dept_name):'<span style="color:#94a3b8">--</span>')+'</td>'
+        +'<td>\u20B9'+(u.base_salary?Number(u.base_salary).toLocaleString('en-IN'):'0')+'</td>'
+        +'<td><span class="pill '+sc+'">'+st+'</span></td>'
+        +'<td>L'+(u.access_level||1)+'</td><td>'+u.total_points+'</td>'
+        +'<td style="white-space:nowrap">'
+        +(st==='pending'?'<button class="action-btn btn-approve" onclick="approveUser('+u.user_id+')">\u2705 Approve</button>':'')
+        +(st==='active'?'<button class="action-btn btn-suspend" onclick="suspendUser('+u.user_id+')">⏸ Suspend</button>':'')
+        +(st==='suspended'?'<button class="action-btn btn-approve" onclick="approveUser('+u.user_id+')">▶ Activate</button>':'')
+        +'<button class="action-btn btn-edit" onclick="openEditUser('+u.user_id+')">✏️</button>'
+        +'<button class="action-btn btn-perms" onclick="openPerms('+u.user_id+')">🔐</button>'
+        +'<button class="action-btn btn-reset" aria-label="Reset user password" onclick="openResetPw('+u.user_id+')">🔑</button>'
+        +'<button class="action-btn btn-delete" data-name="'+escHtml(u.full_name)+'" onclick="deleteUser('+u.user_id+',this.dataset.name)">🗑</button>'
+        +'</td></tr>';
+    }).join('');
+  }
+  async function approveUser(id){try{await fetch(API+'/admin/users/'+id+'/approve',{method:'PATCH',headers:authHeaders()});loadAllUsers();loadPendingUsers();}catch(e){}}
+  async function suspendUser(id){if(!confirm('Suspend this user?'))return;try{await fetch(API+'/admin/users/'+id+'/suspend',{method:'PATCH',headers:authHeaders()});loadAllUsers();}catch(e){}}
+  async function deleteUser(id,name){
+    if(!confirm('Permanently delete '+name+'? This cannot be undone.'))return;
+    try{var r=await fetch(API+'/admin/users/'+id,{method:'DELETE',headers:authHeaders()});var d=await r.json();alert(d.message);loadAllUsers();loadPendingUsers();}catch(e){}
+  }
+  async function openEditUser(id){
+    var u=_allUsers.find(function(x){return x.user_id===id;});if(!u)return;
+    var ds=document.getElementById('editDept');
+    ds.innerHTML='<option value="">No Department</option>'+_depts.map(function(d){return'<option value="'+d.dept_id+'"'+(u.dept_id===d.dept_id?' selected':'')+'>'+escHtml(d.dept_name)+'</option>';}).join('');
+    document.getElementById('editUserId').value=u.user_id;
+    document.getElementById('editFullName').value=u.full_name;
+    document.getElementById('editEmail').value=u.email;
+    document.getElementById('editRole').value=u.role_id;
+    document.getElementById('editSalary').value=u.base_salary||0;
+    document.getElementById('editPhone').value=u.phone||'';
+    document.getElementById('editNotes').value=u.profile_notes||'';
+    openModal('editUserModal');
+  }
+  async function saveEditUser(){
+    var id=document.getElementById('editUserId').value;
+    var body={full_name:document.getElementById('editFullName').value,email:document.getElementById('editEmail').value,role_id:document.getElementById('editRole').value,department_id:document.getElementById('editDept').value||null,base_salary:document.getElementById('editSalary').value||0,phone:document.getElementById('editPhone').value,profile_notes:document.getElementById('editNotes').value};
+    try{var r=await fetch(API+'/admin/users/'+id,{method:'PATCH',headers:authHeaders(),body:JSON.stringify(body)});var d=await r.json();showMsg('editUserMsg',d.message,!r.ok);if(r.ok){loadAllUsers();setTimeout(function(){closeModal('editUserModal');},900);}}catch(e){showMsg('editUserMsg','Failed.',true);}
+  }
+  async function openPerms(id){
+    document.getElementById('permsUserId').value=id;
+    try{var r=await fetch(API+'/admin/users/'+id+'/permissions',{headers:authHeaders()});var p=await r.json();
+      document.getElementById('perm_analytics').checked=!!p.can_view_analytics;
+      document.getElementById('perm_reports').checked=!!p.can_view_reports;
+      document.getElementById('perm_chat').checked=!!p.can_use_chat;
+      document.getElementById('perm_extension').checked=!!p.can_request_extension;
+      document.getElementById('perm_salary').checked=!!p.can_view_salary;
+      document.getElementById('perm_team').checked=!!p.can_view_team;
+    }catch(e){}
+    openModal('permsModal');
+  }
+  async function savePermissions(){
+    var id=document.getElementById('permsUserId').value;
+    var body={can_view_analytics:document.getElementById('perm_analytics').checked,can_view_reports:document.getElementById('perm_reports').checked,can_use_chat:document.getElementById('perm_chat').checked,can_request_extension:document.getElementById('perm_extension').checked,can_view_salary:document.getElementById('perm_salary').checked,can_view_team:document.getElementById('perm_team').checked};
+    try{var r=await fetch(API+'/admin/users/'+id+'/permissions',{method:'PUT',headers:authHeaders(),body:JSON.stringify(body)});var d=await r.json();showMsg('permsMsg',d.message,!r.ok);if(r.ok)setTimeout(function(){closeModal('permsModal');},900);}catch(e){showMsg('permsMsg','Failed.',true);}
+  }
+  function openResetPw(id) {
+    document.getElementById('resetPwUserId').value = id;
+    document.getElementById('resetPwValue').value = '';
+    document.getElementById('resetPwLink').value = '';
+    document.getElementById('resetPwLinkField').hidden = true;
+    document.getElementById('resetPwMsg').textContent = '';
+    openModal('resetPwModal');
+  }
+  document.getElementById('generateResetLink').addEventListener('click', async event => {
+    const button = event.currentTarget;
+    if (!window.confirm('Have you verified the employee’s identity?')) return;
+    const id = document.getElementById('resetPwUserId').value;
+    button.disabled = true;
+    try {
+      const response = await fetch(API + '/admin/users/' + encodeURIComponent(id) + '/reset-link',
+        { method: 'POST', headers: authHeaders() });
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.message);
+      if (document.getElementById('resetPwUserId').value !== id) return;
+      const input = document.getElementById('resetPwLink');
+      input.value = new URL(result.path, location.origin).href;
+      document.getElementById('resetPwLinkField').hidden = false;
+      input.select();
+      showMsg('resetPwMsg', 'Link ready. It expires in 20 minutes or after first use.', false);
+    } catch (error) { showMsg('resetPwMsg', error.message, true); }
+    finally { button.disabled = false; }
+  });
+  async function confirmResetPassword(){
+    var id=document.getElementById('resetPwUserId').value;var pw=document.getElementById('resetPwValue').value;
+    try{var r=await fetch(API+'/admin/users/'+id+'/reset-password',{method:'PATCH',headers:authHeaders(),body:JSON.stringify({new_password:pw})});var d=await r.json();showMsg('resetPwMsg',d.message,!r.ok);if(r.ok)setTimeout(function(){closeModal('resetPwModal');},900);}catch(e){showMsg('resetPwMsg','Failed.',true);}
+  }
+
+  /* DEPARTMENTS */
+  async function loadDepartments(){
+    try{
+      var r=await fetch(API+'/admin/departments',{headers:authHeaders()});_depts=await r.json();
+      var sel=document.getElementById('deptViewSelect');
+      sel.innerHTML='<option value="">-- Select --</option>'+_depts.map(function(d){return'<option value="'+d.dept_id+'">'+escHtml(d.dept_name)+'</option>';}).join('');
+      var grid=document.getElementById('deptGrid');
+      if(!_depts.length){grid.innerHTML='<p class="empty-msg">No departments yet.</p>';return;}
+      grid.innerHTML=_depts.map(function(d){
+        return '<div class="dept-card"><div class="dept-count">'+d.member_count+'</div>'
+          +'<b style="font-size:1rem">'+escHtml(d.dept_name)+'</b>'
+          +'<div style="font-size:.82rem;color:#64748b;margin:4px 0">'+escHtml(d.description||'No description')+'</div>'
+          +'<div style="font-size:.8rem;color:#94a3b8">Manager: '+(d.manager_name?escHtml(d.manager_name):'Unassigned')+'</div>'
+          +'<div style="display:flex;gap:6px;margin-top:10px">'
+          +'<button class="action-btn btn-edit" data-name="'+escHtml(d.dept_name||'')+'" data-description="'+escHtml(d.description||'')+'" onclick="openEditDept('+d.dept_id+',this.dataset.name,this.dataset.description,'+d.manager_id+')">✏️ Edit</button>'
+          +'<button class="action-btn btn-delete" data-name="'+escHtml(d.dept_name||'')+'" onclick="deleteDept('+d.dept_id+',this.dataset.name)">🗑 Delete</button>'
+          +'</div></div>';
+      }).join('');
+    }catch(e){}
+  }
+  async function createDepartment(){
+    var name=document.getElementById('deptName').value.trim();
+    var desc=document.getElementById('deptDesc').value.trim();
+    var mgr=document.getElementById('deptManager').value;
+    if(!name)return showMsg('deptMsg','Department name required.',true);
+    try{var r=await fetch(API+'/admin/departments',{method:'POST',headers:authHeaders(),body:JSON.stringify({dept_name:name,description:desc,manager_id:mgr||null})});var d=await r.json();showMsg('deptMsg',d.message,!r.ok);if(r.ok){document.getElementById('deptName').value='';document.getElementById('deptDesc').value='';document.getElementById('deptManager').value='';loadDepartments();}}catch(e){showMsg('deptMsg','Failed.',true);}
+  }
+  async function loadDeptMembers(){
+    var id=document.getElementById('deptViewSelect').value;var c=document.getElementById('deptMembersView');
+    if(!id){c.innerHTML='<p class="empty-msg">Select a department</p>';return;}
+    try{var r=await fetch(API+'/admin/departments/'+id+'/members',{headers:authHeaders()});var m=await r.json();
+      if(!m.length){c.innerHTML='<p class="empty-msg">No members</p>';return;}
+      c.innerHTML=m.map(function(x){return'<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 10px;border:1px solid #e2e8f0;border-radius:8px;margin-bottom:6px"><div><b>'+escHtml(x.full_name)+'</b> <span style="font-size:.78rem;color:#64748b">'+escHtml(x.role_name)+'</span></div><span style="font-size:.78rem;color:#94a3b8">L'+x.access_level+' | '+x.total_points+'pts</span></div>';}).join('');
+    }catch(e){}
+  }
+  function openEditDept(id,name,desc,mgr){
+    document.getElementById('editDeptId').value=id;document.getElementById('editDeptName').value=name;document.getElementById('editDeptDesc').value=desc||'';document.getElementById('editDeptMgr').value=mgr||'';
+    openModal('editDeptModal');
+  }
+  async function saveEditDept(){
+    var id=document.getElementById('editDeptId').value;
+    var body={dept_name:document.getElementById('editDeptName').value,description:document.getElementById('editDeptDesc').value,manager_id:document.getElementById('editDeptMgr').value||null};
+    try{var r=await fetch(API+'/admin/departments/'+id,{method:'PATCH',headers:authHeaders(),body:JSON.stringify(body)});var d=await r.json();showMsg('editDeptMsg',d.message,!r.ok);if(r.ok){loadDepartments();setTimeout(function(){closeModal('editDeptModal');},900);}}catch(e){showMsg('editDeptMsg','Failed.',true);}
+  }
+  async function deleteDept(id,name){
+    if(!confirm('Delete department "'+name+'"? Employees will be un-assigned.'))return;
+    try{await fetch(API+'/admin/departments/'+id,{method:'DELETE',headers:authHeaders()});loadDepartments();}catch(e){}
+  }
+
+  /* ATTENDANCE */
+  async function markAttendance(){
+    var uid=document.getElementById('attUserId').value;var dt=document.getElementById('attDate').value;
+    if(!uid||!dt)return showMsg('attMsg','User ID and date required.',true);
+    var ci=document.getElementById('attClockIn').value;var co=document.getElementById('attClockOut').value;
+    var body={user_id:uid,work_date:dt,clock_in:ci?dt+' '+ci+':00':null,clock_out:co?dt+' '+co+':00':null,status:document.getElementById('attStatus').value,remarks:document.getElementById('attRemarks').value};
+    try{var r=await fetch(API+'/admin/attendance',{method:'POST',headers:authHeaders(),body:JSON.stringify(body)});var d=await r.json();showMsg('attMsg',d.message,!r.ok);}catch(e){showMsg('attMsg','Failed.',true);}
+  }
+  async function loadAttendance(){
+    var uid=document.getElementById('attFilterUser').value;var from=document.getElementById('attFilterFrom').value;var to=document.getElementById('attFilterTo').value;
+    var qs='?';if(uid)qs+='user_id='+uid+'&';if(from)qs+='date_from='+from+'&';if(to)qs+='date_to='+to;
+    try{
+      var r=await fetch(API+'/admin/attendance'+qs,{headers:authHeaders()});var rows=await r.json();
+      var body=document.getElementById('attLogBody');
+      if(!rows.length){body.innerHTML='<tr><td colspan="7" style="text-align:center;color:#94a3b8;padding:20px">No records</td></tr>';return;}
+      var si={present:'🟢',absent:'🔴',late:'🟡',half_day:'🔵',leave:'⚪'};
+      body.innerHTML=rows.map(function(rx){
+        return '<tr><td>'+escHtml(rx.full_name)+'</td><td>'+(rx.dept_name?escHtml(rx.dept_name):'--')+'</td><td>'+formatDate(rx.work_date)+'</td>'
+          +'<td>'+(rx.clock_in?String(rx.clock_in).slice(11,16):'--')+'</td>'
+          +'<td>'+(rx.clock_out?String(rx.clock_out).slice(11,16):'--')+'</td>'
+          +'<td>'+(si[rx.status]||'')+'&nbsp;'+escHtml(rx.status)+'</td>'
+          +'<td>'+(rx.remarks?escHtml(rx.remarks):'--')+'</td></tr>';
+      }).join('');
+    }catch(e){}
+  }
+  async function loadAttSummary(){
+    var m=document.getElementById('sumMonth').value;var y=document.getElementById('sumYear').value;var c=document.getElementById('attSummaryList');
+    try{
+      var r=await fetch(API+'/admin/attendance/summary?month='+m+'&year='+y,{headers:authHeaders()});var rows=await r.json();
+      if(!rows.length){c.innerHTML='<p class="empty-msg">No data for this period</p>';return;}
+      c.innerHTML=rows.map(function(rx){
+        return '<div style="display:flex;justify-content:space-between;align-items:center;padding:10px;border:1px solid #e2e8f0;border-radius:10px;margin-bottom:6px;font-size:.82rem">'
+          +'<div><b>'+escHtml(rx.full_name)+'</b>'+(rx.dept_name?' <span style="color:#94a3b8">('+escHtml(rx.dept_name)+')</span>':'')+'</div>'
+          +'<div style="display:flex;gap:8px"><span style="color:#15803d">P:'+rx.days_present+'</span><span style="color:#991b1b">A:'+rx.days_absent+'</span><span style="color:#854d0e">L:'+rx.days_late+'</span><span style="color:#6d28d9">H:'+rx.days_half+'</span></div></div>';
+      }).join('');
+    }catch(e){c.innerHTML='<p class="empty-msg">Failed to load</p>';}
+  }
+
+  /* SALARY */
+  function previewNet(){
+    var b=parseFloat(document.getElementById('salBase').value)||0;var bn=parseFloat(document.getElementById('salBonus').value)||0;var dd=parseFloat(document.getElementById('salDed').value)||0;
+    var net=b+bn-dd;
+    document.getElementById('salNetAmt').textContent='\u20B9'+net.toLocaleString('en-IN');
+    document.getElementById('salNetPreview').style.display='block';
+  }
+  async function saveSalary(){
+    var body={user_id:document.getElementById('salUserId').value,month:document.getElementById('salMonth').value,year:document.getElementById('salYear').value,base_salary:document.getElementById('salBase').value,bonus:document.getElementById('salBonus').value||0,deductions:document.getElementById('salDed').value||0,correction_reason:document.getElementById('correctionReason').value,remarks:document.getElementById('salRemarks').value};
+    if(!body.user_id)return showMsg('salMsg','Employee ID required.',true);
+    try{var r=await fetch(API+'/admin/salary',{method:'POST',headers:authHeaders(),body:JSON.stringify(body)});var d=await r.json();showMsg('salMsg',d.message+(d.net_salary?' | Net: \u20B9'+Number(d.net_salary).toLocaleString('en-IN'):''),!r.ok);if(r.ok)loadSalaryRecords();}catch(e){showMsg('salMsg','Failed.',true);}
+  }
+  async function generateSalaries(){
+    if(!confirm('Generate salary records for all active employees for this period?'))return;
+    var body={month:document.getElementById('genMonth').value,year:document.getElementById('genYear').value};
+    try{var r=await fetch(API+'/admin/salary/generate',{method:'POST',headers:authHeaders(),body:JSON.stringify(body)});var d=await r.json();showMsg('genMsg',d.message,!r.ok);if(r.ok)loadSalaryRecords();}catch(e){showMsg('genMsg','Failed.',true);}
+  }
+  async function loadSalaryRecords(){
+    var m=document.getElementById('salFilterMonth').value;var y=document.getElementById('salFilterYear').value;
+    var qs='?';if(m)qs+='month='+m+'&';if(y)qs+='year='+y;
+    try{
+      var r=await fetch(API+'/admin/salary'+qs,{headers:authHeaders()});var rows=await r.json();
+      var body=document.getElementById('salaryTableBody');
+      if(!rows.length){body.innerHTML='<tr><td colspan="10" style="text-align:center;color:#94a3b8;padding:20px">No records found</td></tr>';return;}
+      body.innerHTML=rows.map(function(rx){
+        var paid=rx.payment_status==='paid';
+        return '<tr style="'+(paid?'background:#f0fdf4':'')+'">'
+          +'<td>#'+rx.salary_id+'</td><td>'+escHtml(rx.full_name)+'</td><td>'+(rx.dept_name?escHtml(rx.dept_name):'--')+'</td>'
+          +'<td>'+MONTHS[rx.month]+' '+rx.year+'</td>'
+          +'<td>\u20B9'+Number(rx.base_salary).toLocaleString('en-IN')+'</td>'
+          +'<td style="color:#15803d">+\u20B9'+Number(rx.bonus).toLocaleString('en-IN')+'</td>'
+          +'<td style="color:#991b1b">-\u20B9'+Number(rx.deductions).toLocaleString('en-IN')+'</td>'
+          +'<td><b>\u20B9'+Number(rx.net_salary).toLocaleString('en-IN')+'</b></td>'
+          +'<td>'+(paid?'<span class="pill pill-active">\u2705 Paid</span>':'<span class="pill pill-pending">⏳ Pending</span>')+'</td>'
+          +'<td>'+(paid?'<span style="color:#94a3b8;font-size:.8rem">'+formatDate(rx.paid_on)+'</span>':'<button class="action-btn btn-approve" onclick="markPaid('+rx.salary_id+')">Mark Paid</button>')+'</td>'
+          +'</tr>';
+      }).join('');
+    }catch(e){}
+  }
+  async function markPaid(id){try{var r=await fetch(API+'/admin/salary/'+id+'/paid',{method:'PATCH',headers:authHeaders()});var d=await r.json();alert(d.message);loadSalaryRecords();}catch(e){}}
+
+  /* REPORTS */
+  async function loadReportList(){
+    try{var r=await fetch(API+'/reports',{headers:authHeaders()});var reports=await r.json();
+      var c=document.getElementById('reportList');
+      if(!reports.length){c.innerHTML='<p class="empty-msg">No reports yet.</p>';return;}
+      c.innerHTML=reports.slice(0,5).map(function(rx){
+        return '<div style="padding:10px;border:1px solid #e2e8f0;border-radius:10px;margin-bottom:8px"><b>'+escHtml(rx.report_title)+'</b><div style="font-size:.8rem;color:#64748b">'+formatDateTime(rx.report_date)+' · '+escHtml(rx.report_type)+'</div></div>';
+      }).join('');
+    }catch(e){}
+  }
+
+  /* EXTENSION REQUESTS */
+  async function loadExtensionRequests(){
+    var c=document.getElementById('extensionList');if(!c)return;
+    try{var r=await fetch(API+'/tasks',{headers:authHeaders()});var tasks=await r.json();
+      var pending=tasks.filter(function(t){return t.extension_status==='pending';});
+      if(!pending.length){c.innerHTML='<p class="empty-msg">No pending extension requests.</p>';return;}
+      c.innerHTML=pending.map(function(t){
+        return '<div class="alert-item" style="background:#fefce8;border-color:#fde047">'
+          +'<b>⏳ '+escHtml(t.title)+'</b>'
+          +'<div class="meta">ID #'+t.task_id+' | +'+t.extension_hours+'h | '+escHtml(t.extension_reason||'No reason')+'</div>'
+          +'<div style="display:flex;gap:6px;margin-top:8px">'
+          +'<button class="btn btn-sm wfi-success-action" style="padding:5px 12px" onclick="reviewExtension('+t.task_id+',\'approved\')">\u2705 Approve</button>'
+          +'<button class="btn btn-sm" style="background:#dc2626;padding:5px 12px" onclick="reviewExtension('+t.task_id+',\'rejected\')">\u274C Reject</button>'
+          +'</div></div>';
+      }).join('');
+    }catch(e){c.innerHTML='<p class="empty-msg">Could not load.</p>';}
+  }
+
+
+  /* ── Live Clock ── */
+  function updateClock(){
+    var now=new Date();
+    var te=document.getElementById('liveTime'); if(te)te.textContent=now.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:true});
+    var de=document.getElementById('liveDate'); if(de)de.textContent=now.toLocaleDateString('en-IN',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+  }
+  updateClock(); setInterval(updateClock,1000);
+
+  /* ── Weather ── */
+  // Location is opt-in. Read cached account weather; never request GPS on page load.
+  async function loadWeather() {
+    const block = document.getElementById('weatherBlock');
+    if (!block) return;
+    try {
+      const response = await fetch('/api/location/weather-widget', {headers:authHeaders()});
+      const result = await response.json();
+      block.textContent = result.enabled && result.weather_enabled && result.data?.temperature_c != null
+        ? result.data.temperature_c + '°C · ' + (result.data.city || '')
+        : 'Location settings available in your profile';
+    } catch { block.textContent = 'Weather unavailable'; }
+  }
+
+  /* ── CAB APPROVAL (admin) ─────────────────────────── */
+  async function loadCabApprovals() {
+    var status = (document.getElementById('cabFilterStatus')||{}).value || '';
+    var date   = (document.getElementById('cabFilterDate')||{}).value  || '';
+    var c      = document.getElementById('cabApprovalList');
+    var stats  = document.getElementById('cabApprovalStats');
+    if(!c) return;
+    try {
+      var url = API+'/cab/all?'+(status?'status='+status:'')+( date?'&date='+date:'');
+      var r   = await fetch(url,{headers:authHeaders()});
+      var list= await r.json();
+
+      // Stats bar
+      if(stats){
+        var pending  = list.filter(function(b){return b.status==='pending';}).length;
+        var approved = list.filter(function(b){return b.status==='approved';}).length;
+        var rejected = list.filter(function(b){return b.status==='rejected';}).length;
+        var night    = list.filter(function(b){return b.night_cab;}).length;
+        stats.innerHTML =
+          '<div style="background:#fef9c3;border:1px solid #fde047;border-radius:10px;padding:10px 16px;text-align:center"><div style="font-size:1.4rem;font-weight:900;color:#854d0e">'+pending+'</div><div style="font-size:.72rem;color:#92400e">Pending</div></div>'+
+          '<div style="background:#dcfce7;border:1px solid #86efac;border-radius:10px;padding:10px 16px;text-align:center"><div style="font-size:1.4rem;font-weight:900;color:#15803d">'+approved+'</div><div style="font-size:.72rem;color:#166534">Approved</div></div>'+
+          '<div style="background:#fee2e2;border:1px solid #fca5a5;border-radius:10px;padding:10px 16px;text-align:center"><div style="font-size:1.4rem;font-weight:900;color:#991b1b">'+rejected+'</div><div style="font-size:.72rem;color:#b91c1c">Rejected</div></div>'+
+          '<div style="background:#ede9fe;border:1px solid #c4b5fd;border-radius:10px;padding:10px 16px;text-align:center"><div style="font-size:1.4rem;font-weight:900;color:#6d28d9">'+night+'</div><div style="font-size:.72rem;color:#7c3aed">Night Cab</div></div>';
+      }
+
+      if(!list.length){ c.innerHTML='<p class="empty-msg">No bookings found.</p>'; return; }
+      var vIcon = function(t){ return t==='Bus'?'🚌':t==='Car'?'🚗':'🏍️'; };
+      c.innerHTML = list.map(function(b){
+        var isPending = b.status==='pending';
+        var bgMap = {pending:'#fefce8',approved:'#f0fdf4',rejected:'#fff5f5',cancelled:'#f8fafc'};
+        var brMap = {pending:'#fde047',approved:'#86efac',rejected:'#fca5a5',cancelled:'#e2e8f0'};
+        return '<div style="border:1.5px solid '+brMap[b.status]+';background:'+bgMap[b.status]+';border-radius:12px;padding:14px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:flex-start;gap:10px;flex-wrap:wrap">'+
+          '<div style="flex:1">'+
+            '<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">'+
+              '<b style="font-size:.9rem">'+escHtml(b.full_name)+'</b>'+
+              (b.night_cab?'<span style="background:linear-gradient(135deg,#1e3a8a,#7c3aed);color:#fff;font-size:.68rem;padding:2px 8px;border-radius:999px;font-weight:700">🌙 Night Cab</span>':'')+
+              '<span style="font-size:.72rem;padding:3px 9px;border-radius:999px;font-weight:700;background:'+(isPending?'#fef9c3':'#f1f5f9')+';color:'+(isPending?'#854d0e':'#64748b')+'">'+b.status.toUpperCase()+'</span>'+
+            '</div>'+
+            '<div style="font-size:.78rem;color:#64748b;display:flex;flex-wrap:wrap;gap:8px">'+
+              '<span>'+vIcon(b.vehicle_type)+' '+escHtml(b.vehicle_label)+'</span>'+
+              '<span>📅 '+formatDate(b.booking_date)+'</span>'+
+              '<span>📍 '+escHtml(b.route_name)+'</span>'+
+              '<span>🕗 '+String(b.pickup_time).slice(0,5)+'</span>'+
+              (b.seat_number?'<span>💺 Seat #'+b.seat_number+'</span>':'')+
+              (b.shift_name?'<span>⏰ '+escHtml(b.shift_name)+'</span>':'')+
+              '<span>📧 '+escHtml(b.email)+'</span>'+
+            '</div>'+
+            (b.special_note?'<div style="font-size:.75rem;color:#475569;margin-top:4px;background:rgba(0,0,0,.04);padding:6px 10px;border-radius:6px">📝 '+escHtml(b.special_note)+'</div>':'')+
+            (b.reject_reason?'<div style="font-size:.75rem;color:#991b1b;margin-top:4px">\u274C Reason: '+escHtml(b.reject_reason)+'</div>':'')+
+            (b.approved_by_name?'<div style="font-size:.72rem;color:#15803d;margin-top:3px">\u2705 By: '+escHtml(b.approved_by_name)+'</div>':'')+
+          '</div>'+
+          (isPending?
+            '<div style="display:flex;flex-direction:column;gap:6px;flex-shrink:0">'+
+              '<button class="btn btn-sm" style="background:#dcfce7;color:#15803d" onclick="cabApprove('+b.booking_id+')">\u2705 Approve</button>'+
+              '<button class="btn btn-sm" style="background:#fee2e2;color:#991b1b" onclick="cabReject('+b.booking_id+')">\u274C Reject</button>'+
+            '</div>':
+          '')+
+        '</div>';
+      }).join('');
+    } catch(e){ c.innerHTML='<p class="empty-msg">Could not load cab bookings.</p>'; }
+  }
+
+  async function cabApprove(id){
+    try {
+      var r = await fetch(API+'/cab/'+id+'/approve',{method:'PATCH',headers:authHeaders()});
+      var d = await r.json(); alert(d.message); loadCabApprovals();
+    } catch(e){ alert('Failed.'); }
+  }
+  async function cabReject(id){
+    var reason = prompt('Reason for rejection (optional):') || '';
+    try {
+      var r = await fetch(API+'/cab/'+id+'/reject',{method:'PATCH',headers:authHeaders(),body:JSON.stringify({reason})});
+      var d = await r.json(); alert(d.message); loadCabApprovals();
+    } catch(e){ alert('Failed.'); }
+  }
+
+
+  /* ── ADMIN MEETINGS ────────────────────────── */
+  async function loadAdminMeetings() {
+    try {
+      var r = await fetch(API+'/meetings',{headers:authHeaders()});
+      var list = await r.json();
+      var stats = document.getElementById('adminMeetingStats');
+      var body  = document.getElementById('adminMeetingBody');
+      if(!stats||!body) return;
+      var scheduled = list.filter(function(m){return m.status==='scheduled';}).length;
+      var active    = list.filter(function(m){return m.status==='active';}).length;
+      var ended     = list.filter(function(m){return m.status==='ended';}).length;
+      var withReport= list.filter(function(m){return m.report_generated;}).length;
+      stats.innerHTML =
+        '<div style="background:#dcfce7;border-radius:10px;padding:10px 16px;text-align:center"><div style="font-size:1.4rem;font-weight:900;color:#15803d">'+active+'</div><div style="font-size:.7rem;color:#166534">Live Now</div></div>'+
+        '<div style="background:#dbeafe;border-radius:10px;padding:10px 16px;text-align:center"><div style="font-size:1.4rem;font-weight:900;color:#1d4ed8">'+scheduled+'</div><div style="font-size:.7rem;color:#1e40af">Scheduled</div></div>'+
+        '<div style="background:#f1f5f9;border-radius:10px;padding:10px 16px;text-align:center"><div style="font-size:1.4rem;font-weight:900;color:#64748b">'+ended+'</div><div style="font-size:.7rem;color:#475569">Ended</div></div>'+
+        '<div style="background:#ede9fe;border-radius:10px;padding:10px 16px;text-align:center"><div style="font-size:1.4rem;font-weight:900;color:#6d28d9">'+withReport+'</div><div style="font-size:.7rem;color:#7c3aed">Reports</div></div>';
+      var typeIcons={internal:'🏢',client:'🤝',standup:'⚡',review:'📊',interview:'👤',training:'📚',emergency:'🚨'};
+      var stColors={scheduled:'#f1f5f9',active:'#dcfce7',ended:'#f0f4ff',cancelled:'#fee2e2'};
+      var stText  ={scheduled:'#64748b',active:'#15803d',ended:'#6d28d9',cancelled:'#991b1b'};
+      body.innerHTML = list.length ? list.map(function(m){
+        return '<tr>'+
+          '<td><b>'+escHtml(m.title)+'</b><br><code style="font-size:.65rem;color:#94a3b8">'+escHtml(m.room_code)+'</code></td>'+
+          '<td>'+(typeIcons[m.meeting_type]||'🏢')+' '+escHtml(m.meeting_type)+'</td>'+
+          '<td>'+escHtml(m.host_name)+'</td>'+
+          '<td style="font-size:.8rem">'+new Date(m.scheduled_at).toLocaleDateString('en-IN',{day:'numeric',month:'short'})+' '+new Date(m.scheduled_at).toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit',hour12:true})+'</td>'+
+          '<td><span style="background:'+(stColors[m.status]||'#f1f5f9')+';color:'+(stText[m.status]||'#64748b')+';border-radius:999px;padding:3px 9px;font-size:.7rem;font-weight:700">'+m.status+'</span></td>'+
+          '<td style="text-align:center">'+(m.participant_count||0)+'</td>'+
+          '<td>'+(m.report_generated?'<span style="background:#dcfce7;color:#15803d;border-radius:6px;padding:2px 8px;font-size:.7rem;font-weight:700">\u2705 Generated</span>':'<span style="color:#94a3b8;font-size:.75rem">–</span>')+'</td>'+
+        '</tr>';
+      }).join('') : '<tr><td colspan="7" style="text-align:center;color:#94a3b8;padding:20px">No meetings found</td></tr>';
+    } catch(e){ console.error(e); }
+  }
+
+  document.addEventListener('DOMContentLoaded',function(){
+    if(!guardAuth(1))return;
+    if (getUser()?.role_id === 1) {
+      document.getElementById('build-requests-link').hidden = false;
+      document.getElementById('feedback-history-link').hidden = false;
+    }
+    if (getUser()?.role_id === 4) {
+      document.getElementById('wfi-dashboard-context').textContent = 'Human resources';
+      document.getElementById('wfi-dashboard-title').textContent = 'HR dashboard';
+      document.title = 'HR dashboard · Workforce Intelligence';
+    }
+    var u=getUser(); setInner('adminName','👤 '+(u?u.full_name:'Admin'));
+    loadTasks(); loadAlerts(); loadExtensionRequests();
+    var now=new Date();
+    ['salMonth','genMonth','sumMonth'].forEach(function(id){var el=document.getElementById(id);if(el)el.value=now.getMonth()+1;});
+    ['salYear','genYear','sumYear'].forEach(function(id){var el=document.getElementById(id);if(el)el.value=now.getFullYear();});
+    var dt=document.getElementById('attDate');if(dt)dt.value=now.toISOString().slice(0,10);
+    var demoWeather = document.querySelector('.weather-loading');
+    if (demoWeather) demoWeather.textContent = 'Location settings available in your profile';
+    fetch(API+'/admin/dashboard/stats',{headers:authHeaders()}).then(r=>r.json()).then(s=>{
+      if(!s || s.headcount === undefined) return;
+      for(const [id,key] of Object.entries({statPendingLeaves:'pending_leaves',statPresent:'today_present',statUnpaidSalary:'unpaid_salary_count'})) setInner(id,s[key]);
+    }).catch(()=>{});
+    fetch(API+'/admin/users',{headers:authHeaders()}).then(function(r){return r.json();}).then(function(d){_allUsers=d;setInner('statUsers',d.length);}).catch(function(){});
+    fetch(API+'/admin/users/pending',{headers:authHeaders()}).then(function(r){return r.json();}).then(function(d){setInner('statPendingUsers',d.length);}).catch(function(){});
+    fetch(API+'/admin/departments',{headers:authHeaders()}).then(function(r){return r.json();}).then(function(d){_depts=d;}).catch(function(){});
+    loadSOSAlerts();
+    setInterval(loadSOSAlerts, 60000); // refresh every minute
+  });
+
+  function loadSOSAlerts() {
+    fetch(API+'/cab/sos-alerts', {headers:authHeaders()})
+      .then(function(r){return r.json();})
+      .then(function(alerts){
+        var open = alerts.filter(function(a){return a.status==='open'||!a.status;});
+        var btn  = document.getElementById('sosNavBtn');
+        var stat = document.getElementById('sosStatCard');
+        var wdgt = document.getElementById('sosWidget');
+        if(open.length > 0) {
+          if(btn)  { btn.style.display='inline-flex'; document.getElementById('sosNavCount').textContent=open.length; }
+          if(stat) { stat.style.display=''; setInner('statSOS', open.length); }
+          if(wdgt) {
+            wdgt.style.display='';
+            document.getElementById('sosWidgetList').innerHTML = open.slice(0,3).map(function(a){
+              return '<div style="background:#fff;border-radius:8px;padding:10px 14px;border-left:3px solid #dc2626;display:flex;justify-content:space-between;align-items:center">'+
+                '<div>'+
+                  '<div style="font-weight:700;font-size:.85rem;color:#1e293b">🚨 '+escHtml(a.driver_name||'Driver')+'</div>'+
+                  '<div style="font-size:.75rem;color:#64748b">'+escHtml(a.message||'SOS triggered')+' · '+new Date(a.created_at).toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'})+'</div>'+
+                '</div>'+
+                '<a href="sos-alerts.html" style="background:#dc2626;color:#fff;border-radius:6px;padding:5px 12px;font-size:.75rem;font-weight:700;text-decoration:none">Respond</a>'+
+              '</div>';
+            }).join('');
+          }
+        } else {
+          if(btn)  btn.style.display='none';
+          if(stat) stat.style.display='none';
+          if(wdgt) wdgt.style.display='none';
+        }
+      }).catch(function(){});
+  }
+
+  /* ── LIVE: Travel complete notification ─── */
+  (function(){
+    var _travelSock = null;
+    function initTravelSocket(){
+      if(typeof io==='undefined') return;
+      var tok = getToken(); if(!tok) return;
+      try {
+        _travelSock = io(window.location.origin,{auth:{token:tok},transports:['websocket','polling']});
+        _travelSock.on('wip:cab_travel_complete', function(data){
+          showTravelCompleteAlert(data);
+          // Reload cab approvals if that tab is visible
+          var cabTab = document.getElementById('tab-cab_approval')||document.getElementById('tab-cab_mgr');
+          if(cabTab && cabTab.classList.contains('active')) {
+            if(typeof loadCabApprovals==='function') loadCabApprovals();
+            if(typeof loadManagerCabApprovals==='function') loadManagerCabApprovals();
+          }
+        });
+      } catch(e){}
+    }
+    function showTravelCompleteAlert(data){
+      var banner = document.createElement('div');
+      banner.style.cssText='position:fixed;top:70px;right:16px;z-index:9999;background:linear-gradient(135deg,#16a34a,#0891b2);color:#fff;border-radius:14px;padding:14px 18px;max-width:320px;box-shadow:0 8px 24px rgba(0,0,0,.25);cursor:pointer;animation:slideInRight .4s ease';
+      banner.innerHTML=
+        '<div style="font-weight:800;font-size:.9rem;margin-bottom:4px">🏁 Travel Complete</div>'+
+        '<div style="font-size:.78rem;opacity:.9;line-height:1.5">'+escHtml(data.message||'')+'</div>'+
+        (data.travel_km?'<div style="font-size:.72rem;margin-top:4px;opacity:.8">📏 '+data.travel_km+' km covered</div>':'')+
+        (data.passenger?'<div style="font-size:.72rem;opacity:.8">👤 '+escHtml(data.passenger)+'</div>':'')+
+        (data.driver?'<div style="font-size:.72rem;opacity:.8">🧑‍✈️ Driver: '+escHtml(data.driver)+'</div>':'')+
+        '<div style="font-size:.65rem;margin-top:5px;opacity:.6">'+new Date().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit',hour12:true})+'</div>';
+      if(!document.getElementById('slideRightStyle')){
+        var st=document.createElement('style');
+        st.id='slideRightStyle';
+        st.textContent='@keyframes slideInRight{from{opacity:0;transform:translateX(30px)}to{opacity:1;transform:translateX(0)}}';
+        document.head.appendChild(st);
+      }
+      banner.onclick=function(){ if(banner.parentNode) document.body.removeChild(banner); };
+      document.body.appendChild(banner);
+      setTimeout(function(){ if(banner.parentNode) document.body.removeChild(banner); }, 10000);
+    }
+    document.addEventListener('DOMContentLoaded', initTravelSocket);
+  })();
+
+  /* ── DRIVER NEW BOOKING NOTIFICATION ─── */
+  (function(){
+    function initDriverBookingSocket(){
+      if(typeof io==='undefined') return;
+      var tok=getToken(); if(!tok) return;
+      try{
+        var sock=io(window.location.origin,{auth:{token:tok},transports:['websocket','polling']});
+        sock.on('wip:cab_driver_new_booking',function(data){
+          showDriverBookingAlert(data);
+          // Refresh panels
+          if(typeof loadCabApprovals==='function') loadCabApprovals();
+          if(typeof loadManagerCabApprovals==='function') loadManagerCabApprovals();
+          if(typeof loadDriverBookings==='function' && window._currentDriverId) loadDriverBookings(window._currentDriverId);
+        });
+      }catch(e){}
+    }
+
+    function showDriverBookingAlert(data){
+      var banner=document.createElement('div');
+      banner.style.cssText=[
+        'position:fixed','top:68px','right:16px','z-index:9999',
+        'background:linear-gradient(135deg,#1e3a8a,#7c3aed)',
+        'color:#fff','border-radius:16px','padding:16px 20px',
+        'max-width:340px','box-shadow:0 8px 28px rgba(0,0,0,.3)',
+        'font-family:Segoe UI,Arial,sans-serif','cursor:pointer'
+      ].join(';');
+      banner.innerHTML=
+        '<div style="font-weight:900;font-size:.92rem;margin-bottom:6px">🚗 New Booking Assigned!</div>'+
+        '<div style="font-size:.8rem;opacity:.9;line-height:1.5">'+escHtml(data.message||'A booking has been assigned to a driver.')+'</div>'+
+        (data.driver_name?'<div style="font-size:.75rem;margin-top:6px;opacity:.8">🧑‍✈️ Driver: '+escHtml(data.driver_name)+'</div>':'')+
+        (data.passenger?'<div style="font-size:.75rem;opacity:.8">👤 Passenger: '+escHtml(data.passenger)+'</div>':'')+
+        (data.route?'<div style="font-size:.75rem;opacity:.8">📍 Route: '+escHtml(data.route)+'</div>':'')+
+        '<div style="font-size:.7rem;margin-top:4px;opacity:.6">'+new Date().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit',hour12:true})+'</div>';
+      banner.onclick=function(){banner.remove();};
+      document.body.appendChild(banner);
+      setTimeout(function(){if(banner.parentNode)banner.remove();},10000);
+    }
+
+    document.addEventListener('DOMContentLoaded',initDriverBookingSocket);
+
+})();
+
+</script>
+<script>
+
+function toggleGroup(el){
+  const items=el.nextElementSibling;
+  const arr=el.querySelector('.arr');
+  const collapsed=items.style.display==='none';
+  items.style.display=collapsed?'flex':'none';
+  if(arr)arr.style.transform=collapsed?'':'rotate(-90deg)';
+}
+function toggleSidebar(){
+  const w=document.querySelector('.wiq-wrap');
+  const btn=document.querySelector('.wiq-toggle');
+  if(!w)return;
+  const collapsed=w.classList.toggle('wiq-collapsed');
+  if(btn)btn.textContent=collapsed?'▶':'◀';
+}
+function openMobSidebar(){
+  document.getElementById('wiqSidebar').classList.toggle('open');
+}
+// Set active page highlight
+(function(){
+  const cur=location.pathname.split('/').pop()||'index.html';
+  document.querySelectorAll('.wiq-nav-item').forEach(a=>{
+    if(a.getAttribute('href')===cur)a.classList.add('active');
+  });
+})();
+// Set sidebar username
+(function(){
+  const name=document.getElementById('sidebarUserName');
+  if(!name)return;
+  const tok=localStorage.getItem('token');
+  if(!tok){name.textContent='Guest';return;}
+  fetch(('/api')+'/auth/me',
+    {headers:{'Authorization':'Bearer '+tok}})
+    .then(r=>r.json()).then(d=>{if(name)name.textContent=d.full_name||d.email||'User';}).catch(()=>{});
+})();
+
+
+
+// Dark/Light Mode
+window.toggleDarkMode=function(){
+  var d=document.body.classList.toggle('dark-mode');
+  localStorage.setItem('wfi_dark_mode',d?'1':'0');
+  var btn=document.getElementById('dmToggle');
+  var icon=document.getElementById('dmIcon');
+  if(btn)btn.classList.toggle('on',d);
+  if(icon)icon.textContent=d?'\u2600\uFE0F':'\uD83C\uDF19';
+};
+(function(){
+  if(localStorage.getItem('wfi_dark_mode')==='1'){
+    document.body.classList.add('dark-mode');
+    var btn=document.getElementById('dmToggle');if(btn)btn.classList.add('on');
+    var icon=document.getElementById('dmIcon');if(icon)icon.textContent='\u2600\uFE0F';
+  }
+})();
+
+
+
+// ── Universal Function Stubs  ─────────────────────────────
+// Sidebar/Mobile
+window.openMobSidebar = window.openMobSidebar || function(){
+  var s=document.querySelector('.wiq-sidebar,aside');
+  if(s){s.style.transform='translateX(0)';s.style.zIndex='999';}
+};
+window.toggleSidebar = window.toggleSidebar || function(){
+  var s=document.querySelector('.wiq-sidebar,aside');
+  if(s){var open=s.style.transform==='translateX(0)';s.style.transform=open?'':'translateX(0)';}
+};
+window.toggleGroup = window.toggleGroup || function(el){
+  var p=el&&el.closest?el.closest('.wiq-nav-group'):null;
+  if(p){var sub=p.querySelector('.wiq-sub');if(sub)sub.style.display=sub.style.display==='none'?'block':'none';}
+};
+// Tab switching
+window.switchTab = window.switchTab || function(tab,section){
+  var tabs=document.querySelectorAll('[onclick*=switchTab]');
+  tabs.forEach(function(t){t.classList.remove('active','btn-primary');t.classList.add('btn-outline');});
+  if(event&&event.target){event.target.classList.add('active','btn-primary');event.target.classList.remove('btn-outline');}
+  var sections=document.querySelectorAll('[id$="-section"],[id$="Tab"],[id$="-tab"],[class*=tab-pane]');
+  sections.forEach(function(s){s.style.display='none';});
+  var target=section?document.getElementById(section):null;
+  if(!target&&tab)target=document.getElementById(tab);
+  if(target)target.style.display='';
+};
+// CSV Download
+window.dlCSV=window.dlCSV||function(rows,headers,fn){var lines=[(headers||[]).join(',')];(rows||[]).forEach(function(r){lines.push((headers||[]).map(function(h){var v=String(r[h]!==undefined?r[h]:'').replace(/"/g,'""');return v.indexOf(',')>-1?'"'+v+'"':v;}).join(','));});var a=document.createElement('a');a.href=URL.createObjectURL(new Blob([lines.join('\n')],{type:'text/csv'}));a.download=(fn||'export')+'_'+new Date().toISOString().slice(0,10)+'.csv';document.body.appendChild(a);a.click();document.body.removeChild(a);if(typeof showToast==='function')showToast('Downloaded',true);};
+
+window.acceptCookies = function() {
+  localStorage.setItem('wfi_cookie_consent','all');
+  localStorage.setItem('wfi_cookie_pref','1');
+  localStorage.setItem('wfi_cookie_analytics','1');
+  var banner = document.getElementById('cookieBanner');
+  if(banner){banner.style.transform='translateY(100%)';setTimeout(function(){banner.style.display='none';},400);}
+  if(typeof showToast==='function') showToast('Cookie preferences saved ✅',true);
+};
+window.declineCookies = function() {
+  localStorage.setItem('wfi_cookie_consent','essential');
+  var banner = document.getElementById('cookieBanner');
+  if(banner){banner.style.transform='translateY(100%)';setTimeout(function(){banner.style.display='none';},400);}
+};
+window.showCookieSettings = function() {
+  var m = document.getElementById('cookieModal');
+  if(m){m.style.display='flex';}
+};
+window.closeCookieModal = function() {
+  var m = document.getElementById('cookieModal');
+  if(m){m.style.display='none';}
+};
+window.saveCookieSettings = function() {
+  var pref = document.getElementById('ckPref');
+  var analytics = document.getElementById('ckAnalytics');
+  localStorage.setItem('wfi_cookie_consent','custom');
+  if(pref) localStorage.setItem('wfi_cookie_pref',pref.checked?'1':'0');
+  if(analytics) localStorage.setItem('wfi_cookie_analytics',analytics.checked?'1':'0');
+  closeCookieModal();
+  var banner = document.getElementById('cookieBanner');
+  if(banner){banner.style.transform='translateY(100%)';}
+  if(typeof showToast==='function') showToast('Cookie preferences saved ✅',true);
+};
+
+</script>
+
+  <section class="card" id="workforce-overview" aria-labelledby="workforce-overview-title">
+    <h2 class="card-title" id="workforce-overview-title">Workforce overview and review queue</h2>
+    <p role="status">Loading current workforce records…</p>
+    <div class="wfi-overview-grid"></div>
+  </section>
+<script id="wfi-utils">
+(function(){
+var w=window;
+w.dlPrint=w.dlPrint||function(t,c){var wi=window.open('','_blank','width=1100,height=800');if(!wi)return;var h='<html><head><title>'+(t||'Report')+'<\/title><style>*{box-sizing:border-box}body{font-family:Segoe UI,sans-serif;padding:28px;color:#1e293b;max-width:960px;margin:0 auto}.hdr{display:flex;justify-content:space-between;align-items:center;border-bottom:2px solid #2563EB;padding-bottom:12px;margin-bottom:20px}.brand{font-weight:900;color:#2563EB;font-size:1rem}.meta{font-size:.72rem;color:#64748b}h2{color:#1e293b;margin-bottom:14px}table{width:100%;border-collapse:collapse;margin-top:10px}th{background:#1e3a5f;color:#fff;padding:8px 12px;text-align:left;font-size:.72rem;font-weight:700;text-transform:uppercase}td{padding:8px 12px;border-bottom:1px solid #e2e8f0;font-size:.8rem}tr:nth-child(even)td{background:#f8fafc}.ftr{margin-top:20px;padding-top:10px;border-top:1px solid #e2e8f0;font-size:.7rem;color:#94a3b8;display:flex;justify-content:space-between}.btn{background:#2563EB;color:#fff;border:none;padding:9px 24px;border-radius:7px;font-weight:700;cursor:pointer;font-size:.8rem;margin-top:14px}@media print{.btn{display:none}}<\/style><\/head><body><div class="hdr"><div class="brand">&#9889; WFI<\/div><div class="meta">'+new Date().toLocaleString()+'<\/div><\/div><h2>'+(t||'Report')+'<\/h2>'+(c||'<p>No data.<\/p>')+'<div class="ftr"><span>WFI<\/span><span>'+new Date().toLocaleDateString()+'<\/span><\/div><button class="btn" onclick="window.print()">Print \/ PDF<\/button><\/body><\/html>';wi.document.write(h);wi.document.close();};
+w.dlCSV=w.dlCSV||function(rows,h,fn){if(!rows||!rows.length)rows=[{}];var keys=h||Object.keys(rows[0]);var L=[keys.map(function(k){return'"'+k+'"';}).join(',')];rows.forEach(function(r){L.push(keys.map(function(k){return'"'+String(r[k]!==undefined?r[k]:'').replace(/"/g,'""')+'"';}).join(','));});var blob=new Blob([L.join('\n')],{type:'text/csv;charset=utf-8;'});var url=URL.createObjectURL(blob);var a=document.createElement('a');a.href=url;a.download=(fn||'export')+'.csv';document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(url);};
+w.tdm=w.tdm||function(){var d=document.body.classList.toggle('dark-mode');localStorage.setItem('wfi_dark_mode',d?'1':'0');var b=document.getElementById('dmt')||document.getElementById('dmToggle');var i=document.getElementById('dmi')||document.getElementById('dmIcon');if(b)b.classList.toggle('on',d);if(i)i.textContent=d?'&#9728;':'&#127769;';};
+w.toggleDarkMode=w.tdm;
+w.showTab=w.showTab||function(id,btn){var lo=id.toLowerCase();var el=document.getElementById('tab'+id)||document.getElementById('tab'+id.charAt(0).toUpperCase()+id.slice(1))||document.getElementById('tab-'+id)||document.getElementById(id)||document.getElementById('section-'+id);if(!el){var all=document.querySelectorAll('[id]');for(var i=0;i<all.length;i++){if(all[i].id.toLowerCase()==='tab'+lo||all[i].id.toLowerCase()===lo||all[i].id.toLowerCase()==='section-'+lo){el=all[i];break;}}}document.querySelectorAll('[id]').forEach(function(s){var sid=s.id.toLowerCase();if((sid.startsWith('tab')||sid.startsWith('section-')||sid.startsWith('panel-'))&&sid!==lo&&sid!=='tab'+lo&&sid!=='section-'+lo)s.style.display='none';});if(el){el.style.display='';el.classList.add('on');}document.querySelectorAll('.sc').forEach(function(e){e.classList.remove('on');});var sc=document.getElementById('tab'+id)||document.getElementById('tab'+id.charAt(0).toUpperCase()+id.slice(1));if(sc)sc.classList.add('on');document.querySelectorAll('.tb,.tab-btn,[role=tab]').forEach(function(b){b.classList.remove('active');});if(btn)btn.classList.add('active');};
+w.switchTab=w.switchTab||w.showTab;
+w.showSection=w.showSection||function(id,btn){document.querySelectorAll('[id^="section-"]').forEach(function(e){e.style.display='none';});var el=document.getElementById('section-'+id)||document.getElementById(id);if(el)el.style.display='block';document.querySelectorAll('.tb,.section-btn').forEach(function(b){b.classList.remove('active');});if(btn)btn.classList.add('active');};
+w.sw=w.sw||w.showSection;
+w.st=w.st||function(msg,ok){var t=document.getElementById('toast');if(!t)return;t.textContent=msg;t.style.background=ok!==false?'linear-gradient(135deg,#059669,#047857)':'linear-gradient(135deg,#DC2626,#B91C1C)';t.classList.add('show');setTimeout(function(){t.classList.remove('show');},3000);};
+w.showToast=w.st;
+w.logout=w.logout||function(){localStorage.clear();window.location.href='login.html';};
+w.ac=w.ac||function(){var b=document.getElementById('cookieBanner')||document.getElementById('ckb');if(b){b.style.display='none';try{localStorage.setItem('wfi_ck','1');}catch(e){}}};
+w.dc=w.dc||function(){var b=document.getElementById('cookieBanner')||document.getElementById('ckb');if(b)b.style.display='none';};
+w.acceptCookies=w.ac;w.declineCookies=w.dc;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+w.closeModal=w.closeModal||function(){document.querySelectorAll('.modal,.dialog').forEach(function(m){m.style.display='none';});};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+w.closeRejectModal=w.closeRejectModal||function(){document.querySelectorAll('.modal').forEach(function(m){m.style.display='none';});};
+
+
+w.openMobSidebar=w.openMobSidebar||function(){var s=document.querySelector('.wiq-sidebar');if(s)s.classList.toggle('open');};
+w.toggleSidebar=w.toggleSidebar||function(){var s=document.querySelector('.wiq-sidebar');if(s)s.classList.toggle('collapsed');};
+w.toggleGroup=w.toggleGroup||function(id){var el=document.getElementById(id);if(el)el.style.display=el.style.display==='none'?'block':'none';};
+
+
+
+})();
+</script>
+
+<footer class="wiq-footer" style="background:#0F172A;border-top:1px solid #1E293B;padding:16px 24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-top:auto;flex-shrink:0">
+  <div style="display:flex;align-items:center;gap:10px">
+    <div style="width:26px;height:26px;background:linear-gradient(135deg,#1D4ED8,#6D28D9);border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:.75rem">&#9889;</div>
+    <div>
+      <div style="font-size:.73rem;font-weight:800;color:#E2E8F0">Workforce Intelligence</div>
+      <div style="font-size:.60rem;color:#475569">Enterprise HRMS &bull; DPDP 2023 &bull; PoSH 2013 &bull; ISO 27001</div>
+    </div>
+  </div>
+  <div style="display:flex;gap:14px;flex-wrap:wrap">
+    <a href="privacy-policy.html" style="color:#475569;font-size:.66rem;text-decoration:none;font-weight:600" onmouseover="this.style.color='#60A5FA'" onmouseout="this.style.color='#475569'">Privacy</a>
+    <a href="cookie-policy.html" style="color:#475569;font-size:.66rem;text-decoration:none;font-weight:600" onmouseover="this.style.color='#60A5FA'" onmouseout="this.style.color='#475569'">Cookies</a>
+    <a href="security-policy.html" style="color:#475569;font-size:.66rem;text-decoration:none;font-weight:600" onmouseover="this.style.color='#60A5FA'" onmouseout="this.style.color='#475569'">Security</a>
+    <a href="company-policies.html" style="color:#475569;font-size:.66rem;text-decoration:none;font-weight:600" onmouseover="this.style.color='#60A5FA'" onmouseout="this.style.color='#475569'">Policies</a>
+    <a href="112-emergency.html" style="color:#DC2626;font-size:.66rem;text-decoration:none;font-weight:700">&#128680; Emergency</a>
+  </div>
+  <div style="font-size:.60rem;color:#334155">&copy; 2026 Workforce Intelligence. All rights reserved.</div>
+</footer>
+<script id="wiq-dd">
+(function(){
+function toggleGroup(id){
+  var b=document.getElementById(id);
+  var a=document.getElementById(id.replace('grp-','arr-'));
+  if(!b)return;
+  var o=b.classList.contains('open');
+  b.classList.toggle('open',!o);
+  if(a)a.style.transform=o?'':'rotate(-90deg)';
+}
+window.toggleGroup=toggleGroup;
+// Auto-open active group
+var cur=window.location.pathname.split('/').pop();
+document.querySelectorAll('.wiq-sidebar a[href]').forEach(function(a){
+  if(a.getAttribute('href')===cur){
+    a.classList.add('active');
+    var g=a.closest('.wiq-dropdown-body');
+    if(g){g.classList.add('open');var ar=document.getElementById(g.id.replace('grp-','arr-'));if(ar)ar.style.transform='rotate(-90deg)';}
+  }
+});
+// Mobile sidebar
+window.openMobSidebar=window.openMobSidebar||function(){var s=document.getElementById('wiqSidebar');if(s)s.classList.toggle('open');};
+document.addEventListener('click',function(e){
+  var sb=document.getElementById('wiqSidebar');var mb=document.getElementById('mobToggleBtn');
+  if(sb&&sb.classList.contains('open')&&!sb.contains(e.target)&&mb&&!mb.contains(e.target))sb.classList.remove('open');
+});
+})();
+</script>
+</body>
+
+
+
+<div id="cookieBanner" style="position:fixed;bottom:0;left:0;right:0;z-index:9998;background:linear-gradient(135deg,#0F172A,#1E293B);border-top:2px solid #2563EB;padding:14px 28px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;transform:translateY(100%);transition:transform .4s ease"><p style="font-size:.76rem;color:#CBD5E1;margin:0">&#127850; We use cookies. <a href="privacy-policy.html" style="color:#60A5FA;font-weight:700;text-decoration:none">Privacy Policy</a></p><div style="display:flex;gap:8px"><button onclick="window.acceptCookies&&acceptCookies()" style="background:linear-gradient(135deg,#2563EB,#4F46E5);color:#fff;border:none;border-radius:8px;padding:7px 18px;font-size:.72rem;font-weight:700;cursor:pointer;font-family:inherit">Accept All</button><button onclick="window.declineCookies&&declineCookies()" style="background:transparent;color:#64748B;border:none;font-size:.7rem;cursor:pointer;font-family:inherit">Decline</button></div></div>
+<span id="dmIcon" style="display:none">&#127769;</span><button id="dmToggle" style="display:flex"></button>
+<script>
+
+</script>
+</html>

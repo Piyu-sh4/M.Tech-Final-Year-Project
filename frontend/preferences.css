@@ -1,0 +1,108 @@
+.settings-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr));
+  gap: 20px;
+}
+.settings-cards section {
+  padding: 24px;
+  min-width: 0;
+}
+.settings-cards h2 {
+  margin-bottom: 16px;
+}
+.settings-cards form {
+  display: grid;
+  gap: 12px;
+  margin: 16px 0;
+}
+.settings-cards :is(a, button) {
+  display: inline-flex;
+  align-items: center;
+  min-height: 40px;
+  margin: 6px 8px 6px 0;
+}
+.settings-cards :is(input:not([type="checkbox"]), select) {
+  max-width: 100%;
+  padding: 10px;
+  border: 1px solid var(--wfi-line);
+  border-radius: 8px;
+  background: var(--wfi-surface);
+  color: var(--wfi-ink);
+}
+.settings-cards p,
+dialog dd {
+  overflow-wrap: anywhere;
+}
+#passkey-list {
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+
+
+
+body[data-appearance] {
+  color: var(--wfi-ink);
+}
+body.dark-mode
+  :is(
+    .records-surface,
+    .finance-card,
+    .page-heading,
+    dialog,
+    .card,
+    .settings-main
+  ) {
+  background: var(--wfi-surface);
+  color: var(--wfi-ink);
+  border-color: var(--wfi-line);
+}
+body.dark-mode
+  :is(dialog h2, dialog dt, dialog dd, .finance-card h2, .page-heading h1) {
+  color: var(--wfi-ink);
+}
+body :is(button, .action-link) {
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease,
+    opacity 0.15s ease;
+}
+body button:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+body :is(button, .action-link):not(:disabled):hover {
+  filter: brightness(0.96);
+}
+@media (prefers-reduced-motion: reduce) {
+  body :is(button, .action-link) {
+    transition: none;
+  }
+}
+dialog[aria-label="Record details"] {
+  max-width: min(680px, calc(100vw - 32px));
+  max-height: 85dvh;
+  overflow: auto;
+  border: 1px solid var(--wfi-line);
+  border-radius: 16px;
+  padding: 24px;
+}
+dialog[aria-label="Record details"] dt {
+  font-weight: 700;
+  margin-top: 12px;
+}
+dialog[aria-label="Record details"] dd {
+  margin: 4px 0;
+}
+.settings-cards label:has(input[type="checkbox"]) {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.settings-cards input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  min-height: 18px;
+  flex: 0 0 18px;
+  margin: 0;
+  accent-color: #3654d9;
+}

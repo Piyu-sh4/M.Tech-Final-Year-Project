@@ -1,0 +1,4 @@
+Workforce Intelligence demo document
+
+This file is a synthetic document fixture for testing the document register.
+It contains no personal data and does not certify employment or training.

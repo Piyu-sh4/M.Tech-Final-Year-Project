@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Register – Workforce Intelligence v6.0</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    body{background:linear-gradient(135deg,#0f172a 0%,#1e3a8a 60%,#0f172a 100%);min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px}
+    .auth-wrap{width:100%;max-width:440px}
+    .brand{text-align:center;margin-bottom:24px}
+    .brand-icon{font-size:44px;display:block;animation:float 3s ease-in-out infinite}
+    @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+    .brand h1{color:#f8fafc;font-size:1.5rem;font-weight:900;margin:8px 0 4px;letter-spacing:-.3px}
+    .brand p{color:#64748b;font-size:13px}
+    .auth-card{background:rgba(255,255,255,.06);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,.1);border-radius:20px;padding:28px}
+    .steps-box{background:rgba(37,99,235,.1);border:1px solid rgba(37,99,235,.25);border-radius:10px;padding:12px 16px;margin-bottom:20px;font-size:12px;color:#93c5fd}
+    .steps-box strong{display:block;margin-bottom:8px;font-weight:700}
+    .step{display:flex;gap:10px;margin-bottom:6px;align-items:flex-start}
+    .step:last-child{margin-bottom:0}
+    .step-num{background:#2563eb;color:#fff;width:20px;height:20px;min-width:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;margin-top:1px}
+    .form-group{margin-bottom:14px}
+    .form-group label{display:block;color:#94a3b8;font-size:11px;font-weight:700;margin-bottom:6px;text-transform:uppercase;letter-spacing:.05em}
+    .form-group input,
+    .form-group select{width:100%;background:rgba(255,255,255,.08);border:1.5px solid rgba(255,255,255,.12);border-radius:10px;padding:11px 14px;color:#f1f5f9;font-size:14px;box-sizing:border-box;outline:none;font-family:inherit;transition:border-color .2s}
+    .form-group input:focus,.form-group select:focus{border-color:#3b82f6;background:rgba(255,255,255,.12)}
+    .form-group input::placeholder{color:#475569}
+    .form-group select option{background:#1e293b;color:#f1f5f9}
+    .pw-hint{font-size:11px;color:#64748b;margin-top:6px;margin-bottom:14px;background:rgba(255,255,255,.04);border-radius:6px;padding:8px 10px}
+    .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    .btn-register{width:100%;background:linear-gradient(135deg,#2563eb,#1d4ed8);color:#fff;border:none;padding:14px;border-radius:12px;font-size:15px;font-weight:800;cursor:pointer;margin-top:4px;font-family:inherit;transition:opacity .2s;letter-spacing:.2px}
+    .btn-register:hover{opacity:.9}
+    .btn-register:disabled{opacity:.5;cursor:not-allowed}
+    /* Message box */
+    .msg-box{margin-top:14px;padding:12px 16px;border-radius:10px;font-size:13px;font-weight:600;display:none;text-align:center;line-height:1.5}
+    .msg-box.error{background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.3);color:#fca5a5;display:block}
+    .msg-box.success{background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.25);color:#86efac;display:block}
+    /* Strength indicator */
+    .strength-bar{height:4px;background:#334155;border-radius:2px;margin-top:6px;overflow:hidden}
+    .strength-fill{height:100%;border-radius:2px;transition:width .3s,background .3s}
+    .strength-label{font-size:10px;margin-top:3px;font-weight:600}
+    /* Success card */
+    .success-card{background:rgba(34,197,94,.08);border:1.5px solid rgba(34,197,94,.25);border-radius:16px;padding:28px;text-align:center;display:none}
+    .success-card .icon{font-size:48px;margin-bottom:12px}
+    .success-card h3{color:#86efac;margin:0 0 10px;font-size:1.2rem;font-weight:800}
+    .success-card p{color:#64748b;font-size:13px;line-height:1.7;margin:0 0 20px}
+    .success-card a{display:inline-block;background:rgba(37,99,235,.2);color:#60a5fa;border:1px solid rgba(37,99,235,.4);padding:11px 28px;border-radius:10px;font-weight:700;font-size:14px;text-decoration:none}
+    .auth-link{text-align:center;margin-top:18px;color:#64748b;font-size:13px}
+    .auth-link a{color:#60a5fa;font-weight:700;text-decoration:none}
+    .auth-link a:hover{text-decoration:underline}
+    .spinner{display:none;width:18px;height:18px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;margin:0 auto}
+    @keyframes spin{to{transform:rotate(360deg)}}
+  </style>
+</head>
+<body>
+  <div class="auth-wrap">
+    <div class="brand">
+      <span class="brand-icon">⚡</span>
+      <h1>Create Account</h1>
+      <p>Join your team's workspace on Workforce Intelligence</p>
+    </div>
+
+    <div class="auth-card" id="authCard">
+      <div class="steps-box">
+        <strong>📋 How Registration Works</strong>
+        <div class="step"><div class="step-num">1</div><span>Fill in your details and click Submit.</span></div>
+        <div class="step"><div class="step-num">2</div><span>Admin reviews and approves your account.</span></div>
+        <div class="step"><div class="step-num">3</div><span>Login with your credentials once approved.</span></div>
+      </div>
+
+      <!-- REGISTRATION FORM -->
+      <div id="regForm">
+        <div class="form-group">
+          <label>Full Name *</label>
+          <input type="text" id="full_name" placeholder="e.g. Piyush Sharma" autocomplete="name">
+        </div>
+
+        <div class="form-group">
+          <label>Work Email *</label>
+          <input type="email" id="email" placeholder="you@company.com" autocomplete="email">
+        </div>
+
+        <div class="grid2">
+          <div class="form-group">
+            <label>Password *</label>
+            <input type="password" id="password" placeholder="Min 8 chars" autocomplete="new-password" oninput="checkStrength(this.value)">
+            <div class="strength-bar"><div class="strength-fill" id="strengthFill" style="width:0"></div></div>
+            <div class="strength-label" id="strengthLabel" style="color:#64748b"></div>
+          </div>
+          <div class="form-group">
+            <label>Confirm Password *</label>
+            <input type="password" id="confirm_password" placeholder="Repeat password">
+          </div>
+        </div>
+
+        <div class="pw-hint">
+          ⚠️ Password must be <strong>8+ characters</strong> with at least <strong>1 uppercase letter</strong> and <strong>1 number</strong>.<br>
+          Example: <code style="color:#60a5fa">Piyush@123</code>
+        </div>
+
+        <div class="grid2">
+          <div class="form-group">
+            <label>Phone (optional)</label>
+            <input type="tel" id="phone" placeholder="+91 9876543210" autocomplete="tel">
+          </div>
+          <div class="form-group">
+            <label>Register As *</label>
+            <select id="role_id">
+              <option value="2" selected>👤 Employee</option>
+              <option value="3">📋 Manager</option>
+              <option value="4">🤝 HR</option>
+              <option value="1">🛡️ Admin</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="grid2">
+          <div class="form-group">
+            <label>Department (optional)</label>
+            <select id="department_id">
+              <option value="">Select Department…</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Designation (optional)</label>
+            <input type="text" id="designation" placeholder="e.g. Software Engineer">
+          </div>
+        </div>
+
+        <button class="btn-register" id="submitBtn" onclick="doRegister()">
+          Submit Registration →
+        </button>
+        <div class="spinner" id="spinner"></div>
+        <div id="msg" class="msg-box"></div>
+      </div>
+
+      <!-- SUCCESS STATE (pending approval) -->
+      <div class="success-card" id="successCard">
+        <div class="icon">✅</div>
+        <h3>Registration Submitted!</h3>
+        <p>
+          Your account request is <strong>pending admin approval</strong>.<br>
+          You'll be able to log in once an admin approves your account.<br><br>
+          <em>Contact your HR team if you need urgent access.</em>
+        </p>
+        <a href="login.html">← Back to Login</a>
+      </div>
+    </div>
+
+    <div class="auth-link">Already have an account? <a href="login.html">Sign in here</a></div>
+  </div>
+
+  <script>
+    /* ── Config ──────────────────────────────────────────── */
+    var API = 'http://localhost:5000/api';
+
+    /* ── Password strength indicator ─────────────────────── */
+    function checkStrength(pw) {
+      var score = 0;
+      if (pw.length >= 8)              score++;
+      if (/[A-Z]/.test(pw))           score++;
+      if (/[0-9]/.test(pw))           score++;
+      if (/[^A-Za-z0-9]/.test(pw))   score++;
+
+      var colors = ['#dc2626','#f97316','#eab308','#22c55e'];
+      var labels = ['Too weak','Weak','Good','Strong'];
+      var fill   = document.getElementById('strengthFill');
+      var label  = document.getElementById('strengthLabel');
+      if (pw.length === 0) { fill.style.width='0'; label.textContent=''; return; }
+      fill.style.width    = (score * 25) + '%';
+      fill.style.background = colors[score - 1] || '#dc2626';
+      label.textContent   = labels[score - 1] || '';
+      label.style.color   = colors[score - 1] || '#dc2626';
+    }
+
+    /* ── Show message ─────────────────────────────────────── */
+    function showMsg(text, isError) {
+      var el = document.getElementById('msg');
+      el.textContent  = text;
+      el.className    = 'msg-box ' + (isError ? 'error' : 'success');
+    }
+
+    /* ── Set loading state ────────────────────────────────── */
+    function setLoading(on) {
+      var btn = document.getElementById('submitBtn');
+      var sp  = document.getElementById('spinner');
+      btn.disabled    = on;
+      btn.style.display = on ? 'none' : '';
+      sp.style.display  = on ? 'block' : 'none';
+    }
+
+    /* ── Main registration function ───────────────────────── */
+    async function doRegister() {
+      var full_name        = document.getElementById('full_name').value.trim();
+      var email            = document.getElementById('email').value.trim().toLowerCase();
+      var password         = document.getElementById('password').value;
+      var confirm_password = document.getElementById('confirm_password').value;
+      var phone            = document.getElementById('phone').value.trim();
+      var role_id          = document.getElementById('role_id').value;
+      var department_id    = document.getElementById('department_id').value;
+      var designation      = document.getElementById('designation').value.trim();
+
+      /* Client-side validation */
+      if (!full_name)
+        return showMsg('Full name is required.', true);
+      if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
+        return showMsg('Please enter a valid email address.', true);
+      if (!password)
+        return showMsg('Password is required.', true);
+      if (password !== confirm_password)
+        return showMsg('Passwords do not match. Please re-enter.', true);
+      if (!/^(?=.*[A-Z])(?=.*[0-9]).{8,}$/.test(password))
+        return showMsg('Password must be 8+ chars with at least 1 uppercase letter and 1 number. Example: Piyush@123', true);
+
+      setLoading(true);
+      document.getElementById('msg').className = 'msg-box'; // hide old message
+
+      try {
+        var response = await fetch(API + '/auth/register', {
+          method:  'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body:    JSON.stringify({
+            full_name,
+            email,
+            password,
+            phone:         phone || null,
+            role_id:       parseInt(role_id),
+            department_id: department_id ? parseInt(department_id) : null,
+            designation:   designation || null
+          })
+        });
+
+        var data;
+        try {
+          data = await response.json();
+        } catch (parseErr) {
+          showMsg('Server returned an unexpected response. Check that the backend is running.', true);
+          setLoading(false);
+          return;
+        }
+
+        if (!response.ok) {
+          // Show server error message (email duplicate, DB error, etc.)
+          showMsg(data.message || 'Registration failed. Please try again.', true);
+          setLoading(false);
+          return;
+        }
+
+        // SUCCESS — data.status comes from the JSON body, not HTTP status
+        if (data.status === 'pending') {
+          // Hide form, show pending-approval success card
+          document.getElementById('regForm').style.display  = 'none';
+          document.getElementById('successCard').style.display = 'block';
+        } else if (data.status === 'active') {
+          // Immediately active (Admin registered themselves)
+          showMsg('✅ Admin account created! Redirecting to login…', false);
+          setTimeout(function() { window.location.href = 'login.html'; }, 1500);
+        } else {
+          // Fallback for unexpected status
+          showMsg(data.message || 'Registration complete!', false);
+        }
+
+      } catch (networkErr) {
+        showMsg(
+          '⚠️ Cannot reach the server. Make sure the backend is running on http://localhost:5000',
+          true
+        );
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    /* ── Enter key triggers submit ────────────────────────── */
+    // Load departments for dropdown
+    fetch(API + '/admin/departments', {headers:{'Content-Type':'application/json'}})
+      .then(function(r){ return r.ok ? r.json() : []; })
+      .then(function(depts){
+        var sel = document.getElementById('department_id');
+        if (!sel || !depts.length) return;
+        depts.forEach(function(d){
+          var opt = document.createElement('option');
+          opt.value = d.dept_id;
+          opt.textContent = d.dept_name;
+          sel.appendChild(opt);
+        });
+      }).catch(function(){});
+
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter' &&
+          document.activeElement.tagName !== 'SELECT' &&
+          document.getElementById('regForm').style.display !== 'none') {
+        doRegister();
+      }
+    });
+  </script>
+
+  <footer style="text-align:center;color:#1e293b;font-size:11px;padding:20px 0 8px">
+    &copy; 2025 Workforce Intelligence Platform v6.0
+  </footer>
+</body>
+</html>
